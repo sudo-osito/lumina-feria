@@ -6,7 +6,7 @@
    problema y Lumina lo ve; al avanzar, Neisstech actúa. EPP, zona restringida, frío y eventos son historias propias, con la
    simulación en pausa. Todas las personas salen con el rostro pixelado.
    crear(cont) → { toma(nombre, paso), paso(n), activo(si) } */
-import { montar } from '../js/planta5/vista.js?v=21';
+import { montar } from '../js/planta5/vista.js?v=22';
 import * as P from '../js/planta5/trazado.js';
 import { THREE, clamp, lerp } from '../js/planta/nucleo.js';
 

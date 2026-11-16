@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Neisstech × Lumina · Feria</title>
 <link rel="icon" href="recursos/marcas/lumina-isotipo.svg">
-<link rel="stylesheet" href="presentacion.css?v=42">
+<link rel="stylesheet" href="presentacion.css?v=46">
 </head>
 <body>
 <!-- Estructura v5 (16-nov, feedback de Max): Portada → UNA pregunta (o la historia) → Quién soy → Desafíos «Eso es Neisstech» →
@@ -31,12 +31,12 @@
 
   <!-- ═════════ LA HISTORIA DE DON SALVA (16-nov): contada en 3D sobre la planta del plano de Max (historia/historia.js) ═════════ -->
 
-  <section class="lam lam--hist" data-escena="salva" data-sin-firma data-acto="1 · La historia" data-titulo="Este es Don Salva"
-    data-notas="La cámara baja desde el predio completo hasta él. «Este es Don Salva. Un operador muy experimentado de un centro logístico. Lleva años en el rubro liderando equipos de seguridad: es brigadista de emergencia y miembro del comité paritario. Su compromiso con la seguridad es de otro nivel.»">
-    <div class="hist hist--tarde">
-      <span class="hist__eti" data-e>Un centro de distribución · 07:55</span>
-      <h2 class="hist__t" data-e style="--i:1">Este es <span class="acento">Don Salva.</span></h2>
-      <div class="hist__chips" data-e style="--i:2"><span>Operador con años de experiencia</span><span>Brigadista de emergencia</span><span>Comité paritario</span></div>
+  <section class="lam lam--hist" data-escena="salva" data-sin-firma data-acto="1 · La historia" data-titulo="Un día cualquiera → Este es Don Salva"
+    data-notas="PAUSA: el predio completo, hasta la cordillera. Se queda aquí todo lo que Bastián quiera (silencio, la sala se acomoda). AVANZAR → la cámara baja, el techo se va y lo encontramos: «Este es Don Salva. Un operador muy experimentado de un centro logístico. Lleva años en el rubro liderando equipos de seguridad: es brigadista de emergencia y miembro del comité paritario. Su compromiso con la seguridad es de otro nivel.»">
+    <div class="hist apilado">
+      <div class="sale"><span class="hist__eti" data-e>Santiago · 07:55</span><h2 class="hist__t" data-e style="--i:1">Un día cualquiera.</h2></div>
+      <div data-paso class="tarde"><span class="hist__eti">Sala de reunión · 07:58</span><h2 class="hist__t">Este es <span class="acento">Don Salva.</span></h2>
+        <div class="hist__chips"><span>Operador con años de experiencia</span><span>Brigadista de emergencia</span><span>Comité paritario</span></div></div>
     </div>
   </section>
 
@@ -61,7 +61,7 @@
     <div class="hist">
       <span class="hist__eti" data-e>Pasillo central</span>
       <h2 class="hist__t" data-e style="--i:1">Este es <span class="acento">Alejandro.</span></h2>
-      <div class="hist__chips" data-e style="--i:2"><span>Operador de montacargas</span><span>Poco tiempo en la compañía</span><span>«No me pagan por eso»</span></div>
+      <div class="hist__chips" data-e style="--i:2"><span>Operador de montacargas</span><span>Poco tiempo en la compañía</span><span>No le interesan las reuniones</span></div>
     </div>
   </section>
 
@@ -88,10 +88,11 @@
     </div>
   </section>
 
-  <section class="lam lam--hist oscura" data-escena="despues" data-sin-firma data-acto="1 · La historia" data-titulo="Al día siguiente: el contador vuelve a cero" data-oscuro
-    data-notas="Lento. «Al día siguiente, la charla de seguridad ya no fue la misma.» AVANZAR → el tablero baja de 1.000 a 0: «El contador de días sin accidentes nuevamente quedó en cero.» Pausa larga. Después: «Me presento…»">
+  <section class="lam lam--hist oscura" data-escena="despues" data-sin-firma data-acto="1 · La historia" data-titulo="Negro · Al día siguiente → la charla → el contador en cero" data-oscuro
+    data-notas="Negro. Silencio. «Al día siguiente…» AVANZAR → la sala de reunión, el casco de Don Salva con una vela: «…la charla de seguridad ya no fue la misma.» AVANZAR → el tablero baja de 1.000 a 0: «El contador de días sin accidentes nuevamente quedó en cero.» Pausa larga. Después: «Me presento…»">
+    <div class="hist__dia" data-e>Al día siguiente.</div>
     <div class="hist apilado">
-      <div class="sale"><span class="hist__eti" data-e>Al día siguiente</span><h2 class="hist__t" data-e style="--i:1">La charla ya no<br>fue la misma.</h2></div>
+      <div data-paso class="sale2"><span class="hist__eti">Al día siguiente · 08:00</span><h2 class="hist__t">La charla ya no<br>fue la misma.</h2></div>
       <div data-paso><span class="hist__eti">Días sin accidentes</span><h2 class="hist__t">El contador volvió<br>a <span class="rojo">cero.</span></h2></div>
     </div>
   </section>
@@ -99,7 +100,7 @@
   <section class="lam" data-acto="1 · Apertura" data-titulo="Quién soy: Bastián Osorio"
     data-notas="Después del silencio: «Me presento. Mi nombre es Bastián Osorio, cofundador y gerente técnico de Neisstech, empresa dedicada a crear espacios de trabajo seguros y eficientes para la industria logística en Chile y Sudamérica.» No más de 30 segundos.">
     <div class="yo">
-      <div class="yo__foto" data-e><img src="recursos/personas/bastian.webp" alt="Bastián Osorio"></div>
+      <div class="yo__foto" data-e><img src="recursos/personas/bastian.jpg" alt="Bastián Osorio"></div>
       <div class="yo__txt">
         <span class="eti" data-e style="--i:1">Quién les habla</span>
         <h2 class="t t--xl" data-e style="--i:2">Bastián Osorio</h2>
@@ -251,7 +252,6 @@
     <div class="cultura__chips rotulos">
       <span data-paso><i></i>Rotan antes de aprender</span>
       <span data-paso><i></i>Casi todos sin experiencia</span>
-      <span data-paso><i></i>Demarcación gastada</span>
     </div>
   </section>
 
@@ -442,14 +442,6 @@
     <div class="texto"><span class="eti" data-e>Eventos críticos</span><h2 class="t" data-e style="--i:1">Lo que <span class="naranjo">no puede esperar.</span></h2></div>
   </section>
 
-  <section class="lam lam--centro" data-acto="6 · Lumina" data-titulo="Lumina cierra el ciclo"
-    data-notas="El cierre del ciclo. «Todo lo que vieron hoy: la gestión visual, el tráfico, las barreras, el flujo, la IA en la grúa.» AVANZAR → Lumina al centro: «Lumina las conecta en una sola inteligencia. Ve toda la planta, avisa a cada solución y aprende de cada cuasi-accidente.»">
-    <div class="ciclo">
-      <canvas class="vis" data-vis="ciclo" width="1920" height="1080"></canvas>
-      <h2 class="t t--m ciclo__t apilado"><span class="sale" data-e>Todo lo que vieron hoy…</span><span data-paso>…en <span class="naranjo">una sola inteligencia.</span></span></h2>
-    </div>
-  </section>
-
   <section class="lam" data-acto="6 · Lumina" data-titulo="Casos: Americold y Piston Automotive" data-estado="verificar fuentes"
     data-notas="«Esto ya funciona afuera.» Americold: −77 % de lesiones en 12 meses. AVANZAR → Piston Automotive: −86 % de incidentes vehiculares en 3 meses. Amazon, DHL y DP World ya usan visión artificial en seguridad. VERIFICAR la fuente de cada cifra antes de la feria.">
     <div class="cifras">
@@ -457,16 +449,6 @@
       <div data-paso><b data-contar="-86">0 %</b><span>incidentes vehiculares · 3 meses</span><small>Piston Automotive</small></div>
     </div>
     <p class="tambien" data-paso>Amazon · DHL · DP World</p>
-  </section>
-
-  <section class="lam lam--centro" data-acto="6 · Lumina" data-titulo="Seguridad + privacidad: la balanza"
-    data-notas="«La pregunta que siempre aparece: ¿y la privacidad?» De un lado, lo que pide la seguridad: DS 594, ISO 45001, BSI PAS 13, OSHA 1910.178. La balanza se va hacia ese lado. AVANZAR → caen al otro plato la Ley 21.719 de datos personales, los dictámenes de la Dirección del Trabajo y el pixelado de rostros: la balanza queda pareja. AVANZAR → «Las cámaras son para cuidar, no para vigilar.»">
-    <div class="bal">
-      <h2 class="t t--m bal__t" data-e>Seguridad <span class="gris">y</span> privacidad.</h2>
-      <canvas class="vis" data-vis="balanza" width="1700" height="760"></canvas>
-      <i data-paso hidden></i>
-      <p class="bal__pie" data-paso>Cámaras para <b>cuidar</b>, no para vigilar.</p>
-    </div>
   </section>
 
   <section class="lam lam--3d" data-toma="todo" data-acto="6 · Lumina" data-titulo="Todo a la vez · ¿Cuál es el suyo?"
@@ -526,6 +508,6 @@
 <aside class="notas" id="notas"><b>Bastián dice</b><p></p></aside>
 <div class="mapa" id="mapa"></div>
 
-<script src="presentacion.js?v=42"></script>
+<script src="presentacion.js?v=46"></script>
 </body>
 </html>

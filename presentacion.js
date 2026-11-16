@@ -26,14 +26,30 @@
     const x = parseFloat(el.style.getPropertyValue("--x")), y = parseFloat(el.style.getPropertyValue("--y"));
     el.style.setProperty("--hx", `${960 - (x + 230)}px`); el.style.setProperty("--hy", `${470 - (y + 80)}px`);
   });
-  $$(".muro img").forEach((el, n) => el.style.setProperty("--n", (n * 7) % 26));
+  // logos de clientes: cuatro bandas que corren, una a la derecha y otra a la izquierda; cada banda con marcas distintas.
+  // Se mueven desde el bucle (no con animación CSS: la invertida se desfasaba y dejaba huecos)
+  const cintas = [];
+  function moverCintas(t) {
+    for (const c of cintas) { if (!c.mitad) { const h = c.pista.children, n = h.length / 2; c.mitad = h[n].offsetLeft - h[0].offsetLeft; } if (!c.mitad) continue;
+      const x = ((t / 1000) * c.vel) % c.mitad; c.pista.style.transform = `translate3d(${c.dir > 0 ? -x : x - c.mitad}px,0,0)`; }
+  }
+  $$(".muro").forEach((m) => {
+    const imgs = $$("img", m), filas = [[], [], [], []];
+    imgs.forEach((im, n) => filas[n < 7 ? 0 : n < 13 ? 1 : n < 20 ? 2 : 3].push(im));
+    m.innerHTML = "";
+    filas.forEach((f, k) => { const b = document.createElement("div"); b.className = `cinta cinta--${k % 2 ? "izq" : "der"}`; b.style.setProperty("--dur", `${42 + k * 5}s`);
+      const pista = document.createElement("div"); pista.className = "cinta__pista";
+      for (let c = 0; c < 2; c++) f.forEach((im) => { const x = im.cloneNode(); if (c) x.setAttribute("aria-hidden", "true"); pista.appendChild(x); });
+      cintas.push({ pista, dir: k % 2 ? -1 : 1, vel: 46 + k * 6, mitad: 0 });
+      b.appendChild(pista); m.appendChild(b); if (k === 1) { const hueco = document.createElement("div"); hueco.className = "cinta__hueco"; m.appendChild(hueco); } });
+  });
 
   /* ── Planta 3D: se carga al inicio en segundo plano; solo dibuja cuando una lámina la usa ── */
   let planta = null;
-  const pedirPlanta = import("./escena/lumina5.js?v=40").then((m) => m.crear($("#planta3d"))).then((p) => { planta = p; sincronizar3d(); return planta; }).catch((e) => console.error("planta 3D:", e));
+  const pedirPlanta = import("./escena/lumina5.js?v=41").then((m) => m.crear($("#planta3d"))).then((p) => { planta = p; sincronizar3d(); return planta; }).catch((e) => console.error("planta 3D:", e));
   // La historia de Don Salva: otra escena 3D, con cámara de cine (historia/historia.js); una toma por paso
   let historia = null;
-  const pedirHistoria = import("./historia/historia.js?v=1").then((m) => m.crear($("#historia3d"))).then((h) => { historia = h; sincronizar3d(); return h; }).catch((e) => console.error("historia 3D:", e));
+  const pedirHistoria = import("./historia/historia.js?v=4").then((m) => m.crear($("#historia3d"))).then((h) => { historia = h; sincronizar3d(); return h; }).catch((e) => console.error("historia 3D:", e));
   function sincronizar3d() {
     const esc = lams[i].dataset.escena;
     escenario.classList.toggle("conhistoria", !!esc);
@@ -253,7 +269,7 @@
     // cultura: un prevencionista (azul) para casi 200 personas; los pasos suman rotación, gente nueva y demarcación gastada
     cultura: (() => { const r = azar(5), C = 20, F = 10, G = [...Array(C * F)].map(() => ({ s: 1, sale: false, nuevo: r() < .3 })), PV = 87; let prox = 0;
       return (c, t, w, h) => { c.clearRect(0, 0, w, h); const sx = w / C, sy = 56, oy = 70;
-        if (paso >= 3) { c.lineWidth = 2; c.strokeStyle = `rgba(${CARBON},.3)`; for (const y of [oy - 36, oy + F * sy - 10]) for (let x = 0; x < w; x += 38) { if (Math.sin(x * 7.13 + y) > .35) continue; c.beginPath(); c.moveTo(x, y); c.lineTo(x + 18, y); c.stroke(); } }
+        if (false) { c.lineWidth = 2; c.strokeStyle = `rgba(${CARBON},.3)`; for (const y of [oy - 36, oy + F * sy - 10]) for (let x = 0; x < w; x += 38) { if (Math.sin(x * 7.13 + y) > .35) continue; c.beginPath(); c.moveTo(x, y); c.lineTo(x + 18, y); c.stroke(); } }
         if (paso >= 1 && t > prox) { prox = t + 70; const q = G[Math.floor(r() * G.length)]; if (q !== G[PV] && !q.sale) q.sale = true; }
         G.forEach((q, n) => { if (q.sale) { q.s -= .09; if (q.s <= 0) { q.sale = false; q.s = .01; q.nuevo = true; } } else q.s = Math.min(1, q.s + .06);
           if (n === PV) return; const x = sx / 2 + (n % C) * sx, y = oy + Math.floor(n / C) * sy, nuevo = paso >= 2 ? q.nuevo || n % 9 !== 0 : q.nuevo;
@@ -290,6 +306,7 @@
       if (!escenario.classList.contains("con3d") && !escenario.classList.contains("conhistoria")) pintarMalla(t);
       if (pir && pir.closest(".lam").classList.contains("activa")) pintarPiramide();
       pintarVis(t);
+      if (lams[i].classList.contains("lam--clientes")) moverCintas(t);
       const vs = $$(".clips video.ve", lams[i]);   // barra de la historia en curso
       if (vs.length) { const v = vs[0], b = $$(".historias i", lams[i])[$$(".clips video", lams[i]).indexOf(v)]; if (b && v.duration) b.style.setProperty("--p", v.currentTime / v.duration); }
     }

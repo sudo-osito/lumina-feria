@@ -1,0 +1,1552 @@
+{
+ "version": 3,
+ "nombre": "historia",
+ "historia": "",
+ "elementos": [
+  {
+   "id": "emwjowosmii",
+   "tipo": "muro",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "ancho": 0.2,
+   "puntos": [
+    [
+     35,
+     0
+    ],
+    [
+     110,
+     0
+    ]
+   ]
+  },
+  {
+   "id": "emwjoxe99oq",
+   "tipo": "muro",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "ancho": 0.2,
+   "puntos": [
+    [
+     110,
+     0
+    ],
+    [
+     110,
+     20
+    ],
+    [
+     90,
+     20
+    ]
+   ]
+  },
+  {
+   "id": "emwjp0yn21eo",
+   "tipo": "baranda",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "ancho": 0.15,
+   "puntos": [
+    [
+     89,
+     11
+    ],
+    [
+     110,
+     11
+    ]
+   ]
+  },
+  {
+   "id": "emwjp1er51jh",
+   "tipo": "calle",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "ancho": 3.5,
+   "puntos": [
+    [
+     110,
+     8
+    ],
+    [
+     58.5,
+     8
+    ]
+   ]
+  },
+  {
+   "id": "emwjp1rzz1mo",
+   "tipo": "sendero",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "ancho": 1,
+   "puntos": [
+    [
+     141,
+     12
+    ],
+    [
+     88.5,
+     12
+    ]
+   ]
+  },
+  {
+   "id": "emwjp1xpk1oo",
+   "tipo": "sendero",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "ancho": 1,
+   "puntos": [
+    [
+     88.5,
+     0
+    ],
+    [
+     88.5,
+     40
+    ]
+   ]
+  },
+  {
+   "id": "emwjp33up1t4",
+   "tipo": "porton",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 90,
+   "x": 110,
+   "z": 8,
+   "w": 4,
+   "d": 0.3
+  },
+  {
+   "id": "emwjp3osf20w",
+   "tipo": "columna",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 0,
+   "x": 89.5,
+   "z": 5.5,
+   "w": 0.4,
+   "d": 0.4
+  },
+  {
+   "id": "emwjp3ry922h",
+   "tipo": "columna",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 0,
+   "x": 89.5,
+   "z": 10.5,
+   "w": 0.4,
+   "d": 0.4
+  },
+  {
+   "id": "emwjp3yjs26l",
+   "tipo": "columna",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 0,
+   "x": 89.5,
+   "z": 15,
+   "w": 0.4,
+   "d": 0.4
+  },
+  {
+   "id": "emwjp41yw28j",
+   "tipo": "columna",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 0,
+   "x": 89.5,
+   "z": 19,
+   "w": 0.4,
+   "d": 0.4
+  },
+  {
+   "id": "emwjp45742a6",
+   "tipo": "columna",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 0,
+   "x": 89.5,
+   "z": 1.5,
+   "w": 0.4,
+   "d": 0.4
+  },
+  {
+   "id": "emwjp48um2bh",
+   "tipo": "puerta",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 0,
+   "x": 88.5,
+   "z": 0,
+   "w": 1,
+   "d": 0.25
+  },
+  {
+   "id": "emwjp4jpu2dg",
+   "tipo": "oficina",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 0,
+   "x": 103,
+   "z": 16.25,
+   "w": 13,
+   "d": 6.5
+  },
+  {
+   "id": "emwjp5j6o2lr",
+   "tipo": "safetygate",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 90,
+   "x": 109.15,
+   "z": 8,
+   "w": 2,
+   "d": 0.3
+  },
+  {
+   "id": "emwjp6m3k2yg",
+   "tipo": "calle",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "ancho": 4,
+   "puntos": [
+    [
+     86,
+     8
+    ],
+    [
+     86,
+     40
+    ]
+   ]
+  },
+  {
+   "id": "emwjp7axk2yh",
+   "tipo": "rack",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 90,
+   "x": 83.05,
+   "z": 15,
+   "w": 10,
+   "d": 1.1
+  },
+  {
+   "id": "emwjp7fe92yi",
+   "tipo": "calle",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "ancho": 2.5,
+   "puntos": [
+    [
+     81,
+     8
+    ],
+    [
+     81,
+     21.5
+    ]
+   ]
+  },
+  {
+   "id": "emwjp7jh32yj",
+   "tipo": "rack",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 90,
+   "x": 79.05,
+   "z": 15,
+   "w": 10,
+   "d": 1.1
+  },
+  {
+   "id": "emwjp7mov2yk",
+   "tipo": "calle",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "ancho": 2.5,
+   "puntos": [
+    [
+     77,
+     8
+    ],
+    [
+     77,
+     21
+    ]
+   ]
+  },
+  {
+   "id": "emwjp7pwj2yl",
+   "tipo": "rack",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 90,
+   "x": 75.05,
+   "z": 15,
+   "w": 10,
+   "d": 1.1
+  },
+  {
+   "id": "emwjp8imp304",
+   "tipo": "muro",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "ancho": 0.2,
+   "puntos": [
+    [
+     90,
+     20
+    ],
+    [
+     90,
+     40
+    ],
+    [
+     35,
+     40
+    ],
+    [
+     35,
+     0
+    ]
+   ]
+  },
+  {
+   "id": "emwjp95s6305",
+   "tipo": "calle",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "ancho": 2.5,
+   "puntos": [
+    [
+     73,
+     8
+    ],
+    [
+     73,
+     21
+    ]
+   ]
+  },
+  {
+   "id": "emwjp95s6306",
+   "tipo": "rack",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 90,
+   "x": 71.05,
+   "z": 15,
+   "w": 10,
+   "d": 1.1
+  },
+  {
+   "id": "emwjp9a5g307",
+   "tipo": "calle",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "ancho": 2.5,
+   "puntos": [
+    [
+     69,
+     8
+    ],
+    [
+     69,
+     21.5
+    ]
+   ]
+  },
+  {
+   "id": "emwjp9a5g308",
+   "tipo": "rack",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 90,
+   "x": 67.05,
+   "z": 15,
+   "w": 10,
+   "d": 1.1
+  },
+  {
+   "id": "emwjp9e4c309",
+   "tipo": "calle",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "ancho": 2.5,
+   "puntos": [
+    [
+     65,
+     8
+    ],
+    [
+     65,
+     21.5
+    ]
+   ]
+  },
+  {
+   "id": "emwjp9e4c30a",
+   "tipo": "rack",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 90,
+   "x": 63.05,
+   "z": 15,
+   "w": 10,
+   "d": 1.1
+  },
+  {
+   "id": "emwjp9hfh30b",
+   "tipo": "calle",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "ancho": 2.5,
+   "puntos": [
+    [
+     61,
+     7.5
+    ],
+    [
+     61,
+     21
+    ]
+   ]
+  },
+  {
+   "id": "emwjp9hfh30c",
+   "tipo": "rack",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 90,
+   "x": 59.05,
+   "z": 15,
+   "w": 10,
+   "d": 1.1
+  },
+  {
+   "id": "emwjpa2z031i",
+   "tipo": "porton",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 0,
+   "x": 86,
+   "z": 40,
+   "w": 4,
+   "d": 0.3
+  },
+  {
+   "id": "emwjpahzq32v",
+   "tipo": "puerta",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 0,
+   "x": 88.5,
+   "z": 40,
+   "w": 1,
+   "d": 0.25
+  },
+  {
+   "id": "emwjpbrrv347",
+   "tipo": "baranda",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "ancho": 0.15,
+   "puntos": [
+    [
+     88,
+     36.5
+    ],
+    [
+     88,
+     9.5
+    ]
+   ]
+  },
+  {
+   "id": "emwjpc9ae348",
+   "tipo": "calle",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "ancho": 2.5,
+   "puntos": [
+    [
+     85,
+     21.5
+    ],
+    [
+     40,
+     21.5
+    ]
+   ]
+  },
+  {
+   "id": "emwjpczzf349",
+   "tipo": "rack",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 90,
+   "x": 83.05,
+   "z": 28,
+   "w": 10,
+   "d": 1.1
+  },
+  {
+   "id": "emwjpczzf34a",
+   "tipo": "rack",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 90,
+   "x": 79.05,
+   "z": 28,
+   "w": 10,
+   "d": 1.1
+  },
+  {
+   "id": "emwjpczzf34b",
+   "tipo": "rack",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 90,
+   "x": 75.05,
+   "z": 28,
+   "w": 10,
+   "d": 1.1
+  },
+  {
+   "id": "emwjpczzf34c",
+   "tipo": "rack",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 90,
+   "x": 71.05,
+   "z": 28,
+   "w": 10,
+   "d": 1.1
+  },
+  {
+   "id": "emwjpczzf34d",
+   "tipo": "rack",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 90,
+   "x": 67.05,
+   "z": 28,
+   "w": 10,
+   "d": 1.1
+  },
+  {
+   "id": "emwjpczzf34e",
+   "tipo": "rack",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 90,
+   "x": 63.05,
+   "z": 28,
+   "w": 10,
+   "d": 1.1
+  },
+  {
+   "id": "emwjpczzf34f",
+   "tipo": "rack",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 90,
+   "x": 59.05,
+   "z": 28,
+   "w": 10,
+   "d": 1.1
+  },
+  {
+   "id": "emwjpczzf34g",
+   "tipo": "calle",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "ancho": 2.5,
+   "puntos": [
+    [
+     61,
+     21
+    ],
+    [
+     61,
+     34.5
+    ]
+   ]
+  },
+  {
+   "id": "emwjpczzf34h",
+   "tipo": "calle",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "ancho": 2.5,
+   "puntos": [
+    [
+     65,
+     21
+    ],
+    [
+     65,
+     34.5
+    ]
+   ]
+  },
+  {
+   "id": "emwjpczzf34i",
+   "tipo": "calle",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "ancho": 2.5,
+   "puntos": [
+    [
+     69,
+     21
+    ],
+    [
+     69,
+     34.5
+    ]
+   ]
+  },
+  {
+   "id": "emwjpczzf34j",
+   "tipo": "calle",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "ancho": 2.5,
+   "puntos": [
+    [
+     73,
+     21
+    ],
+    [
+     73,
+     34
+    ]
+   ]
+  },
+  {
+   "id": "emwjpczzf34k",
+   "tipo": "calle",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "ancho": 2.5,
+   "puntos": [
+    [
+     77,
+     21
+    ],
+    [
+     77,
+     34
+    ]
+   ]
+  },
+  {
+   "id": "emwjpczzf34l",
+   "tipo": "calle",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "ancho": 2.5,
+   "puntos": [
+    [
+     81,
+     21
+    ],
+    [
+     81,
+     34.5
+    ]
+   ]
+  },
+  {
+   "id": "emwjpdips34m",
+   "tipo": "calle",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "ancho": 3.5,
+   "puntos": [
+    [
+     85,
+     35
+    ],
+    [
+     33.5,
+     35
+    ]
+   ]
+  },
+  {
+   "id": "emwjpg9vx3gr",
+   "tipo": "calle",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "ancho": 7,
+   "puntos": [
+    [
+     88,
+     3.5
+    ],
+    [
+     35,
+     3.5
+    ]
+   ]
+  },
+  {
+   "id": "emwjph0he3i4",
+   "tipo": "anden",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 0,
+   "x": 82,
+   "z": 2,
+   "w": 3.5,
+   "d": 4
+  },
+  {
+   "id": "emwjph3bp3j8",
+   "tipo": "anden",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 0,
+   "x": 77.5,
+   "z": 2,
+   "w": 3.5,
+   "d": 4
+  },
+  {
+   "id": "emwjph8zu3kl",
+   "tipo": "anden",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 0,
+   "x": 73,
+   "z": 2,
+   "w": 3.5,
+   "d": 4
+  },
+  {
+   "id": "emwjphbo53lu",
+   "tipo": "anden",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 0,
+   "x": 68.5,
+   "z": 2,
+   "w": 3.5,
+   "d": 4
+  },
+  {
+   "id": "emwjphdwp3n1",
+   "tipo": "anden",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 0,
+   "x": 63.5,
+   "z": 2,
+   "w": 3.5,
+   "d": 4
+  },
+  {
+   "id": "emwjphoc63om",
+   "tipo": "porton",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 0,
+   "x": 82,
+   "z": 0,
+   "w": 4,
+   "d": 0.3
+  },
+  {
+   "id": "emwjphqti3q2",
+   "tipo": "porton",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 0,
+   "x": 63.5,
+   "z": 0,
+   "w": 4,
+   "d": 0.3
+  },
+  {
+   "id": "emwjphsab3rb",
+   "tipo": "porton",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 0,
+   "x": 68.5,
+   "z": 0,
+   "w": 4,
+   "d": 0.3
+  },
+  {
+   "id": "emwjphue83ss",
+   "tipo": "porton",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 0,
+   "x": 73,
+   "z": 0,
+   "w": 4,
+   "d": 0.3
+  },
+  {
+   "id": "emwjphw2e3tz",
+   "tipo": "porton",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 0,
+   "x": 77.5,
+   "z": 0,
+   "w": 4,
+   "d": 0.3
+  },
+  {
+   "id": "emwjpp5md3wr",
+   "tipo": "nota",
+   "etiqueta": "aqui hay unas zones de descanso, zonas de runiones, aqui es donde parte la historia",
+   "nota": "",
+   "fase": "ambos",
+   "x": 51.5,
+   "z": 27,
+   "n": 1
+  },
+  {
+   "id": "emwjpsxjl3xy",
+   "tipo": "nota",
+   "etiqueta": "inventa que podria haber aqui",
+   "nota": "",
+   "fase": "ambos",
+   "x": 99.82,
+   "z": 2.78,
+   "n": 1
+  },
+  {
+   "id": "emwjpt6ca3za",
+   "tipo": "nota",
+   "etiqueta": "alguna zona lean o algo",
+   "nota": "",
+   "fase": "ambos",
+   "x": 45,
+   "z": 25.5,
+   "n": 1
+  },
+  {
+   "id": "emwjptk8c40v",
+   "tipo": "muro",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "ancho": 0.2,
+   "puntos": [
+    [
+     45,
+     40
+    ],
+    [
+     45,
+     30
+    ],
+    [
+     35,
+     30
+    ]
+   ]
+  },
+  {
+   "id": "emwjptoxg41i",
+   "tipo": "nota",
+   "etiqueta": "taller de mantenimiento",
+   "nota": "",
+   "fase": "ambos",
+   "x": 39.89,
+   "z": 35.67,
+   "n": 1
+  },
+  {
+   "id": "emwjpu0nm433",
+   "tipo": "muro",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "ancho": 0.2,
+   "puntos": [
+    [
+     40,
+     30
+    ],
+    [
+     40,
+     7
+    ],
+    [
+     35,
+     7
+    ]
+   ]
+  },
+  {
+   "id": "emwjpuaa644f",
+   "tipo": "nota",
+   "etiqueta": "camarines?",
+   "nota": "",
+   "fase": "ambos",
+   "x": 37.64,
+   "z": 24.87,
+   "n": 1
+  },
+  {
+   "id": "emwjpug9n45t",
+   "tipo": "nota",
+   "etiqueta": "comedor?",
+   "nota": "",
+   "fase": "ambos",
+   "x": 37.33,
+   "z": 16.66,
+   "n": 1
+  },
+  {
+   "id": "emwjputke47i",
+   "tipo": "nota",
+   "etiqueta": "lineas assembly con maquinas haciendo cosas y moviendose por un conveyor",
+   "nota": "",
+   "fase": "ambos",
+   "x": 45.5,
+   "z": 13,
+   "n": 1
+  },
+  {
+   "id": "emwjpvqtv48k",
+   "tipo": "nota",
+   "etiqueta": "nose inventa",
+   "nota": "",
+   "fase": "ambos",
+   "x": 60.94,
+   "z": 38.37,
+   "n": 1
+  },
+  {
+   "id": "emwjpvzc4492",
+   "tipo": "nota",
+   "etiqueta": "estacionamiento",
+   "nota": "",
+   "fase": "ambos",
+   "x": 61.22,
+   "z": -12.14,
+   "n": 1
+  },
+  {
+   "id": "emwjpw42m4a5",
+   "tipo": "nota",
+   "etiqueta": "autopista",
+   "nota": "",
+   "fase": "ambos",
+   "x": 13.54,
+   "z": 17.74,
+   "n": 1
+  },
+  {
+   "id": "emwjpwcm44b7",
+   "tipo": "nota",
+   "etiqueta": "calle lateral de autopista",
+   "nota": "",
+   "fase": "ambos",
+   "x": 22.27,
+   "z": 17.8,
+   "n": 1
+  },
+  {
+   "id": "emwjpwmzt4cm",
+   "tipo": "nota",
+   "etiqueta": "estacionamiento",
+   "nota": "",
+   "fase": "ambos",
+   "x": 119.59,
+   "z": 10.19,
+   "n": 1
+  },
+  {
+   "id": "emwjpwwud4d5",
+   "tipo": "nota",
+   "etiqueta": "estacionamiento",
+   "nota": "",
+   "fase": "ambos",
+   "x": 105.43,
+   "z": 33.38,
+   "n": 1
+  },
+  {
+   "id": "emwjpx09q4dz",
+   "tipo": "nota",
+   "etiqueta": "oficina principal de la empresa",
+   "nota": "",
+   "fase": "ambos",
+   "x": 144,
+   "z": 13,
+   "n": 1
+  },
+  {
+   "id": "emwjpxvl64et",
+   "tipo": "nota",
+   "etiqueta": "parque",
+   "nota": "",
+   "fase": "ambos",
+   "x": 132.88,
+   "z": 28.33,
+   "n": 1
+  },
+  {
+   "id": "emwjpy5hh4ic",
+   "tipo": "momento",
+   "etiqueta": "aqui tienen la reunion",
+   "nota": "",
+   "fase": "ambos",
+   "x": 49.65,
+   "z": 26.39,
+   "n": 1
+  },
+  {
+   "id": "emwjpzsee4og",
+   "tipo": "sendero",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "ancho": 1.2,
+   "puntos": [
+    [
+     56.5,
+     9.5
+    ],
+    [
+     88.5,
+     9.5
+    ]
+   ]
+  },
+  {
+   "id": "emwjq03xa4xi",
+   "tipo": "sendero",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "ancho": 1.2,
+   "puntos": [
+    [
+     45,
+     37.5
+    ],
+    [
+     88.5,
+     37.5
+    ]
+   ]
+  },
+  {
+   "id": "emwjq0ilb4zb",
+   "tipo": "sendero",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "ancho": 1.2,
+   "puntos": [
+    [
+     40,
+     7.5
+    ],
+    [
+     57,
+     7.5
+    ],
+    [
+     57,
+     37.5
+    ]
+   ]
+  },
+  {
+   "id": "emwjq0vsm504",
+   "tipo": "sendero",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "ancho": 1.2,
+   "puntos": [
+    [
+     51.5,
+     7.5
+    ],
+    [
+     51.5,
+     -1
+    ]
+   ]
+  },
+  {
+   "id": "emwjq12sr51e",
+   "tipo": "puerta",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 0,
+   "x": 51.5,
+   "z": 0,
+   "w": 1,
+   "d": 0.25
+  },
+  {
+   "id": "emwjq1cym571",
+   "tipo": "puerta",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 90,
+   "x": 110,
+   "z": 12,
+   "w": 1,
+   "d": 0.25
+  },
+  {
+   "id": "emwjq1i115ac",
+   "tipo": "sendero",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "ancho": 1.2,
+   "puntos": [
+    [
+     135.5,
+     4
+    ],
+    [
+     135.5,
+     30
+    ]
+   ]
+  },
+  {
+   "id": "emwjq3aem5f3",
+   "tipo": "porton",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 90,
+   "x": 58,
+   "z": 21.5,
+   "w": 2.5,
+   "d": 0.3
+  },
+  {
+   "id": "emwjq3iow5gt",
+   "tipo": "muro",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "ancho": 0.2,
+   "puntos": [
+    [
+     58,
+     33
+    ],
+    [
+     45,
+     33
+    ]
+   ]
+  },
+  {
+   "id": "emwjq49hx5j4",
+   "tipo": "muro",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "ancho": 0.2,
+   "puntos": [
+    [
+     58,
+     33
+    ],
+    [
+     58,
+     10.5
+    ]
+   ]
+  },
+  {
+   "id": "emwjq4yr45z0",
+   "tipo": "columna",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 0,
+   "x": 66,
+   "z": 4.5,
+   "w": 0.4,
+   "d": 0.4
+  },
+  {
+   "id": "emwjq52u5613",
+   "tipo": "columna",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 0,
+   "x": 71,
+   "z": 4.5,
+   "w": 0.4,
+   "d": 0.4
+  },
+  {
+   "id": "emwjq557m62r",
+   "tipo": "columna",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 0,
+   "x": 75.5,
+   "z": 4.5,
+   "w": 0.4,
+   "d": 0.4
+  },
+  {
+   "id": "emwjq57ox64j",
+   "tipo": "columna",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 0,
+   "x": 80,
+   "z": 4.5,
+   "w": 0.4,
+   "d": 0.4
+  },
+  {
+   "id": "emwjq5a9q66i",
+   "tipo": "columna",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 0,
+   "x": 84,
+   "z": 4.5,
+   "w": 0.4,
+   "d": 0.4
+  },
+  {
+   "id": "emwjq5f9c688",
+   "tipo": "columna",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 0,
+   "x": 61.5,
+   "z": 4.5,
+   "w": 0.4,
+   "d": 0.4
+  },
+  {
+   "id": "emwjq5ldb6ae",
+   "tipo": "columna",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 0,
+   "x": 57.5,
+   "z": 4.5,
+   "w": 0.4,
+   "d": 0.4
+  },
+  {
+   "id": "emwjq5qjz6be",
+   "tipo": "columna",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 0,
+   "x": 53.5,
+   "z": 4.5,
+   "w": 0.4,
+   "d": 0.4
+  },
+  {
+   "id": "emwjq5wl06d3",
+   "tipo": "columna",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 0,
+   "x": 56,
+   "z": 8.5,
+   "w": 0.4,
+   "d": 0.4
+  },
+  {
+   "id": "emwjq60ud6gq",
+   "tipo": "columna",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 0,
+   "x": 56,
+   "z": 14.5,
+   "w": 0.4,
+   "d": 0.4
+  },
+  {
+   "id": "emwjq63tv6ib",
+   "tipo": "columna",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 0,
+   "x": 56,
+   "z": 20,
+   "w": 0.4,
+   "d": 0.4
+  },
+  {
+   "id": "emwjq66yd6js",
+   "tipo": "columna",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 0,
+   "x": 56,
+   "z": 23.5,
+   "w": 0.4,
+   "d": 0.4
+  },
+  {
+   "id": "emwjq68l26ks",
+   "tipo": "columna",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 0,
+   "x": 56,
+   "z": 32.5,
+   "w": 0.4,
+   "d": 0.4
+  },
+  {
+   "id": "emwjq6bxj6m1",
+   "tipo": "columna",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 0,
+   "x": 48.2,
+   "z": 8.7,
+   "w": 0.4,
+   "d": 0.4
+  },
+  {
+   "id": "emwjq6ga66ob",
+   "tipo": "columna",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 0,
+   "x": 40.5,
+   "z": 8.5,
+   "w": 0.4,
+   "d": 0.4
+  },
+  {
+   "id": "emwjq6w7z6w7",
+   "tipo": "columna",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 0,
+   "x": 48.5,
+   "z": 20,
+   "w": 0.4,
+   "d": 0.4
+  },
+  {
+   "id": "emwjq713e6yk",
+   "tipo": "columna",
+   "etiqueta": "",
+   "nota": "",
+   "fase": "ambos",
+   "rot": 0,
+   "x": 48.5,
+   "z": 23.5,
+   "w": 0.4,
+   "d": 0.4
+  },
+  {
+   "id": "emwjq7bkr6ze",
+   "tipo": "nota",
+   "etiqueta": "nose inventa tu",
+   "nota": "",
+   "fase": "ambos",
+   "x": 82.63,
+   "z": 50.07,
+   "n": 2
+  },
+  {
+   "id": "emwjq805i75i",
+   "tipo": "momento",
+   "etiqueta": "aqui atropellan a don salva",
+   "nota": "",
+   "fase": "ambos",
+   "x": 69.03,
+   "z": 9.58,
+   "n": 2
+  }
+ ],
+ "guardado": "2026-11-16T20:39:55.466Z",
+ "vista_png": "todo",
+ "resumen": {
+  "tamano_m": {
+   "x0": 13.54,
+   "x1": 144,
+   "z0": -12.14,
+   "z1": 50.07
+  },
+  "momentos": [
+   {
+    "n": 1,
+    "titulo": "aqui tienen la reunion",
+    "que_pasa": "",
+    "donde": {
+     "x": 49.65,
+     "z": 26.39
+    },
+    "fase": "ambos",
+    "actores": [],
+    "recorridos": [],
+    "riesgos": [],
+    "camaras": []
+   },
+   {
+    "n": 2,
+    "titulo": "aqui atropellan a don salva",
+    "que_pasa": "",
+    "donde": {
+     "x": 69.03,
+     "z": 9.58
+    },
+    "fase": "ambos",
+    "actores": [],
+    "recorridos": [],
+    "riesgos": [],
+    "camaras": []
+   }
+  ],
+  "en_toda_la_historia": {
+   "actores": [],
+   "recorridos": []
+  }
+ },
+ "leyenda": {
+  "unidades": "metros, vista superior; x a la derecha, z hacia abajo; rot en grados (horario), frente de vehículos y personas hacia +x local",
+  "lineas": "muro, calle (grúas), sendero (personas), baranda, recorrido: puntos = [[x,z],…], ancho en m; recorrido.actor = quién lo hace",
+  "rectangulos": "x,z = centro, w × d antes de girar; porton y puerta van pegados a un muro; vehículos, personas y equipos tienen su tamaño real",
+  "puntos": "momento (n = orden de la historia), riesgo y nota: x,z + texto en etiqueta",
+  "historia": "momento: título en etiqueta y qué pasa en nota; actores, recorridos, riesgos y cámaras llevan momento = n del momento en que aparecen (0 = en toda la historia)",
+  "fase": "ambos | antes | despues (antes = el problema; después = con Neisstech/Lumina)",
+  "tipos": {
+   "muro": "Muro · Estructura",
+   "columna": "Columna · Estructura",
+   "porton": "Portón · Estructura",
+   "puerta": "Puerta · Estructura",
+   "anden": "Andén · Estructura",
+   "oficina": "Oficina · Estructura",
+   "calle": "Calle grúas · Tránsito",
+   "sendero": "Sendero · Tránsito",
+   "cruce": "Cruce · Tránsito",
+   "espera": "Zona de espera · Tránsito",
+   "prohibida": "Zona prohibida · Tránsito",
+   "baranda": "Baranda · Tránsito",
+   "zona": "Zona · Zonas y equipos",
+   "rack": "Rack · Zonas y equipos",
+   "estanteria": "Estantería · Zonas y equipos",
+   "maquina": "Máquina · Zonas y equipos",
+   "pallet": "Pallet · Zonas y equipos",
+   "frio": "Cámara de frío · Zonas y equipos",
+   "grua": "Grúa horquilla · Vehículos y personas",
+   "transpaleta": "Transpaleta · Vehículos y personas",
+   "tren": "Tren logístico · Vehículos y personas",
+   "camion": "Camión · Vehículos y personas",
+   "auto": "Auto · Vehículos y personas",
+   "persona": "Persona · Vehículos y personas",
+   "semaforo": "Semáforo · Soluciones Neisstech",
+   "espejo": "Espejo · Soluciones Neisstech",
+   "safetygate": "Safetygate · Soluciones Neisstech",
+   "sensor": "Sensor de grúa · Soluciones Neisstech",
+   "momento": "Momento · Historia",
+   "recorrido": "Recorrido · Historia",
+   "riesgo": "Riesgo · Historia",
+   "camara": "Cámara Lumina · Historia",
+   "nota": "Nota · Historia"
+  }
+ }
+}

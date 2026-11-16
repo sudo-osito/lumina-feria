@@ -33,7 +33,9 @@ export function gente(k) {
   /* ── poses ── */
   const P = {
     quieto(p) { for (const m of [p.pi, p.pd, p.bi, p.bd]) m.rotation.set(0, 0, 0); p.c.position.y = 0; p.cab.rotation.set(0, 0, 0); p.torso.rotation.set(0, 0, 0); },
-    andar(p, v, t) { const a = Math.sin(t * 8.2 + p.fase) * .55 * v; p.pi.rotation.x = a; p.pd.rotation.x = -a; p.bi.rotation.x = -a * .7; p.bd.rotation.x = a * .7; p.bi.rotation.z = p.bd.rotation.z = 0; p.c.position.y = Math.abs(Math.cos(t * 8.2 + p.fase)) * .035 * v; p.cab.rotation.x = 0; },
+    andar(p, v, t) { const f = t * 8.2 + p.fase, a = Math.sin(f) * .55 * v; p.pi.rotation.x = a; p.pd.rotation.x = -a; p.bi.rotation.x = -a * .7; p.bd.rotation.x = a * .7; p.bi.rotation.z = .06; p.bd.rotation.z = -.06;
+      p.c.position.y = Math.abs(Math.cos(f)) * .035 * v; p.torso.rotation.y = Math.sin(f) * .07 * v; p.torso.rotation.z = Math.cos(f) * .025 * v; p.cab.rotation.x = .03; p.cab.rotation.y = -Math.sin(f) * .05 * v; },
+    chocar(p, t, lado = 1) { const s = Math.sin(t * 4 + p.fase), arr = s > .2; const b = lado > 0 ? p.bd : p.bi; b.rotation.x = arr ? -2.6 : -1.4; b.rotation.z = (arr ? -.35 : -.15) * lado; (lado > 0 ? p.bi : p.bd).rotation.set(-.25, 0, 0); p.c.position.y = Math.max(0, s) * .06; p.cab.rotation.y = .35 * lado; },
     respirar(p, t) { p.torso.rotation.x = Math.sin(t * 1.6 + p.fase) * .015; p.cab.rotation.y = Math.sin(t * .5 + p.fase) * .12; },
     hablar(p, t) { p.bd.rotation.x = -1.0 + Math.sin(t * 2.6) * .28; p.bd.rotation.z = -.25 + Math.sin(t * 1.9) * .12; p.bi.rotation.x = -.35 + Math.sin(t * 2.1 + 1) * .15; p.cab.rotation.y = Math.sin(t * .9) * .28; p.cab.rotation.x = Math.sin(t * 2.2) * .04; },
     saludar(p, t) { p.bd.rotation.x = 0; p.bd.rotation.z = -2.5 + Math.sin(t * 7) * .28; p.cab.rotation.z = Math.sin(t * 3.5) * .03; },
@@ -42,7 +44,7 @@ export function gente(k) {
     triste(p, t) { p.cab.rotation.x = .52 + Math.sin(t * .7 + p.fase) * .02; p.cab.rotation.y = 0; p.bi.rotation.set(-.12, 0, -.06); p.bd.rotation.set(-.12, 0, .06); p.torso.rotation.x = .07; },
     foto(p, k1 = 1) { p.bd.rotation.x = -1.5 * k1; p.bd.rotation.z = .12 * k1; p.bi.rotation.x = -1.3 * k1; p.bi.rotation.z = -.34 * k1; p.cab.rotation.x = .06 * k1; },
     celular(p, t) { p.bd.rotation.x = -1.05; p.bd.rotation.z = .22; p.cab.rotation.x = .42; p.cab.rotation.y = Math.sin(t * .4) * .05; },
-    cabeza(p, t) { p.bi.rotation.set(-2.85, 0, -.5); p.bd.rotation.set(-2.85, 0, .5); p.cab.rotation.x = .3 + Math.sin(t * 1.1) * .04; p.torso.rotation.x = .1; },
+    cabeza(p, t) { p.bi.rotation.set(-2.5, 0, .62); p.bd.rotation.set(-2.5, 0, -.62); p.cab.rotation.x = .5 + Math.sin(t * 1.1) * .04; p.torso.rotation.x = .22; p.c.position.y = -.05; },
     sentado(p) { p.pi.rotation.x = p.pd.rotation.x = -1.45; p.c.position.y = -.42; },
     manejar(p, t, mirar = 0) { P.sentado(p); p.bi.rotation.x = p.bd.rotation.x = -.95; p.bi.rotation.z = -.12; p.bd.rotation.z = .12; p.cab.rotation.y = mirar; p.cab.rotation.x = Math.sin(t * 5.2) * .05; },
   };

@@ -198,7 +198,7 @@ export function crearEscenas(k, H, S) {
         if (kb) { d.ln.pintar(z3.veh ? 1 : 0, kb.origen, pos(G, 1.2), t); d.bK.at(kb.origen.x, kb.origen.y + .3, kb.origen.z).pintar(z3.veh ? .9 : 0, t); }
         if (!f.pa && t > .4) { f.pa = t; sigue(p, 1.25); } d.tP.pintar(f.pa ? clamp((t - f.pa) / 1.2) : 0, .8, t);
         if (z3.veh && p.z > 31.7 && p.z < 32.4) { parada(p, 6); d.esp.at(XP, 32.1).pintar(1, t); } else d.esp.pintar(0, t);
-        if (f.det && !f.lib && G.x - 1.2 < 66.6) { f.lib = t; z3.veh = false; ok(XP, 33.4, 'Pasa la grúa: se abre el cruce'); }
+        if (f.det && !f.lib && G.x + 1.7 < 67.1) { /* se abre recién cuando la cola de la grúa dejó atrás las hojas */ f.lib = t; z3.veh = false; ok(XP, 33.4, 'Pasa la grúa: se abre el cruce'); }
         if (f.lib && t > f.lib + .5) sigue(p, 1.25, 5);
         if (f.lib && !f.listo) f.listo = f.lib + 2.6; } } });
 

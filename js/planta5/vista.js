@@ -6,7 +6,7 @@
 import { THREE, nucleo, clamp, lerp, eio, suave } from '../planta/nucleo.js';
 import { construir } from './escena.js';
 import { crearSim } from './sim.js';
-import { crearEscenas } from './escenas.js?v=21';
+import { crearEscenas } from './escenas.js?v=22';
 import * as P from './trazado.js';
 
 export async function montar(cont, op = {}) {
