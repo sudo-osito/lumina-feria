@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Neisstech × Lumina · Feria</title>
 <link rel="icon" href="recursos/marcas/lumina-isotipo.svg">
-<link rel="stylesheet" href="presentacion.css?v=41">
+<link rel="stylesheet" href="presentacion.css?v=42">
 </head>
 <body>
 <!-- Estructura v5 (16-nov, feedback de Max): Portada → UNA pregunta (o la historia) → Quién soy → Desafíos «Eso es Neisstech» →
@@ -16,6 +16,7 @@
 <div class="escenario" id="escenario">
   <canvas id="malla"></canvas>
   <div class="planta3d" id="planta3d"></div>
+  <div class="historia3d" id="historia3d"></div>
 
   <!-- ═════════ 1 · APERTURA ═════════ -->
 
@@ -28,30 +29,82 @@
     </div>
   </section>
 
-  <!-- Opción A: una sola pregunta, y de inmediato Bastián se presenta -->
-  <section class="lam lam--centro" data-opcion="pregunta" data-estado="opción A · pregunta" data-acto="1 · Apertura" data-titulo="La pregunta"
-    data-notas="«Levanten la mano: ¿quién ya usa inteligencia artificial en la seguridad de su planta? ¿En cuidar a su gente?» Esperar. Quedan una o dos manos, o ninguna. «Guárdenla. Al final vamos a volver a ella.» Y de inmediato: «Me presento.»">
-    <h1 class="pregunta" data-e>¿Ya usan inteligencia artificial en la <span class="acento">seguridad</span> de su planta?</h1>
+  <!-- ═════════ LA HISTORIA DE DON SALVA (16-nov): contada en 3D sobre la planta del plano de Max (historia/historia.js) ═════════ -->
+
+  <section class="lam lam--hist" data-escena="salva" data-sin-firma data-acto="1 · La historia" data-titulo="Este es Don Salva"
+    data-notas="La cámara baja desde el predio completo hasta él. «Este es Don Salva. Un operador muy experimentado de un centro logístico. Lleva años en el rubro liderando equipos de seguridad: es brigadista de emergencia y miembro del comité paritario. Su compromiso con la seguridad es de otro nivel.»">
+    <div class="hist hist--tarde">
+      <span class="hist__eti" data-e>Un centro de distribución · 07:55</span>
+      <h2 class="hist__t" data-e style="--i:1">Este es <span class="acento">Don Salva.</span></h2>
+      <div class="hist__chips" data-e style="--i:2"><span>Operador con años de experiencia</span><span>Brigadista de emergencia</span><span>Comité paritario</span></div>
+    </div>
   </section>
 
-  <!-- Opción B: la historia, contada sobre la planta -->
-  <section class="lam lam--3d" data-toma="invisible" data-opcion="historia" data-estado="opción B · historia (borrador)" data-acto="1 · Apertura" data-titulo="La historia: un día normal"
-    data-notas="BORRADOR, Bastián pone su historia real. Estructura: «Un día normal en una bodega como la suya. Cámaras en todas partes, grabando.» AVANZAR → aparecen en rojo los cuasi-accidentes: «Todo esto pasó hoy. Ninguno quedó registrado. Nadie lo vio.»">
-    <div class="texto apilado">
-      <h2 class="t sale" data-e>Un día normal<br><span class="gris">en su bodega.</span></h2>
-      <h2 class="t" data-paso>Nadie lo <span class="acento">vio.</span></h2>
+  <section class="lam lam--hist" data-escena="charla" data-sin-firma data-acto="1 · La historia" data-titulo="08:00 · La charla de seguridad → 1.000 días"
+    data-notas="«Como todos los días, a las 8 da la charla de seguridad. Y hoy tiene algo muy importante que celebrar con su equipo.» AVANZAR → el tablero pasa de 999 a 1.000 y celebran: «Mil días sin accidentes. Treinta minutos donde todos participaron, tiraron la talla y celebraron el logro.» (Al fondo, apartado y mirando el celular: Alejandro.)">
+    <div class="hist apilado">
+      <div class="sale"><span class="hist__eti" data-e>08:00 · Charla de seguridad</span><h2 class="hist__t" data-e style="--i:1">Hoy hay algo<br>que celebrar.</h2></div>
+      <div data-paso><span class="hist__eti">Días sin accidentes</span><h2 class="hist__t"><span class="acento">1.000 días</span><br>sin accidentes.</h2></div>
+    </div>
+  </section>
+
+  <section class="lam lam--hist" data-escena="vuelven" data-sin-firma data-acto="1 · La historia" data-titulo="Cada uno vuelve a su puesto"
+    data-notas="«Después, cada operador vuelve a su puesto de trabajo…» AVANZAR → plano a ras de piso, la grúa pasa por el lado: «…caminando por los senderos del CD, que poco se ven por el paso continuo de montacargas y la nula señalización.»">
+    <div class="hist apilado">
+      <div class="sale"><span class="hist__eti" data-e>08:30</span><h2 class="hist__t" data-e style="--i:1">Cada uno vuelve<br>a su puesto.</h2></div>
+      <div data-paso><h2 class="hist__t">Por senderos que<br><span class="gris">casi no se ven.</span></h2></div>
+    </div>
+  </section>
+
+  <section class="lam lam--hist" data-escena="ale" data-sin-firma data-acto="1 · La historia" data-titulo="Este es Alejandro"
+    data-notas="«Este es Alejandro. Un operador de montacargas muy joven, con poco tiempo en la compañía. No participa mucho en las reuniones, porque dice que no le pagan por eso…»">
+    <div class="hist">
+      <span class="hist__eti" data-e>Pasillo central</span>
+      <h2 class="hist__t" data-e style="--i:1">Este es <span class="acento">Alejandro.</span></h2>
+      <div class="hist__chips" data-e style="--i:2"><span>Operador de montacargas</span><span>Poco tiempo en la compañía</span><span>«No me pagan por eso»</span></div>
+    </div>
+  </section>
+
+  <section class="lam lam--hist" data-escena="rapido" data-sin-firma data-acto="1 · La historia" data-titulo="Sin cinturón, a toda velocidad"
+    data-notas="«Como todos los días, se sube a su montacargas sin ponerse el cinturón, porque dice que no es necesario. Va a toda velocidad por el pasillo central y entra a buscar un pallet al rack.» AVANZAR → saca el pallet a la rápida: «Como quiere irse temprano, hoy todo lo hace rápido: toma el pallet, lo baja rápidamente de su posición…»">
+    <div class="hist apilado">
+      <div class="sale"><h2 class="hist__t" data-e>Sin cinturón.<br><span class="acento">A toda velocidad.</span></h2></div>
+      <div data-paso><h2 class="hist__t">Hoy quiere<br>irse temprano.</h2></div>
+    </div>
+  </section>
+
+  <section class="lam lam--hist" data-escena="espalda" data-sin-firma data-acto="1 · La historia" data-titulo="La carga no lo deja ver: va de espalda"
+    data-notas="Primero se ve lo que ve él: la carga tapa todo. «…y avanza camino al staging a dejarlo para su despacho. Como la carga no lo dejaba ver, debía ir de espalda.» La toma cambia sola: la grúa retrocede hacia el cruce.">
+    <div class="hist">
+      <h2 class="hist__t" data-e>La carga no lo deja ver.<br><span class="gris">Va de espalda.</span></h2>
+    </div>
+  </section>
+
+  <section class="lam lam--hist" data-escena="cruce" data-sin-firma data-acto="1 · La historia" data-titulo="El cruce" data-oscuro
+    data-notas="«Llegando al cruce aparece Don Salva, que justo caminaba por ese paso de cebra que prácticamente no se veía, y le tomaba una foto al rack que había dañado el mismo Alejandro días atrás, para reportarlo en la reunión de mañana.» Dejar que saque la foto (flash). AVANZAR → la grúa retrocede, corte a negro. SILENCIO. No hablar hasta que aparezca el casco en el piso. Después, avanzar.">
+    <div class="hist apilado">
+      <div class="sale"><span class="hist__eti" data-e>El cruce</span><h2 class="hist__t" data-e style="--i:1">Un paso de cebra<br>que casi no se ve.</h2></div>
+      <i data-paso hidden></i>
+    </div>
+  </section>
+
+  <section class="lam lam--hist oscura" data-escena="despues" data-sin-firma data-acto="1 · La historia" data-titulo="Al día siguiente: el contador vuelve a cero" data-oscuro
+    data-notas="Lento. «Al día siguiente, la charla de seguridad ya no fue la misma.» AVANZAR → el tablero baja de 1.000 a 0: «El contador de días sin accidentes nuevamente quedó en cero.» Pausa larga. Después: «Me presento…»">
+    <div class="hist apilado">
+      <div class="sale"><span class="hist__eti" data-e>Al día siguiente</span><h2 class="hist__t" data-e style="--i:1">La charla ya no<br>fue la misma.</h2></div>
+      <div data-paso><span class="hist__eti">Días sin accidentes</span><h2 class="hist__t">El contador volvió<br>a <span class="rojo">cero.</span></h2></div>
     </div>
   </section>
 
   <section class="lam" data-acto="1 · Apertura" data-titulo="Quién soy: Bastián Osorio"
-    data-notas="Presentarse corto, en primera persona: «Soy Bastián Osorio, ingeniero mecánico, cofundador de Neisstech. Llevo más de quince años en la industria, y una década liderando proyectos de desarrollo e innovación.» No más de 30 segundos.">
+    data-notas="Después del silencio: «Me presento. Mi nombre es Bastián Osorio, cofundador y gerente técnico de Neisstech, empresa dedicada a crear espacios de trabajo seguros y eficientes para la industria logística en Chile y Sudamérica.» No más de 30 segundos.">
     <div class="yo">
       <div class="yo__foto" data-e><img src="recursos/personas/bastian.webp" alt="Bastián Osorio"></div>
       <div class="yo__txt">
         <span class="eti" data-e style="--i:1">Quién les habla</span>
         <h2 class="t t--xl" data-e style="--i:2">Bastián Osorio</h2>
-        <p class="yo__rol" data-e style="--i:3">Ingeniero mecánico · Cofundador de <img src="recursos/marcas/neisstech-logo.svg" alt="Neisstech"></p>
-        <div class="yo__datos" data-e style="--i:4"><span><b>+15</b> años en la industria</span><span><b>10</b> años liderando innovación</span><span><b>Gerente</b> comercial</span></div>
+        <p class="yo__rol" data-e style="--i:3">Cofundador y gerente técnico de <img src="recursos/marcas/neisstech-logo.svg" alt="Neisstech"></p>
+        <div class="yo__datos" data-e style="--i:4"><span><b>+15</b> años en la industria</span><span><b>10</b> años liderando innovación</span><span><b>Chile</b> y Sudamérica</span></div>
       </div>
     </div>
   </section>
@@ -473,6 +526,6 @@
 <aside class="notas" id="notas"><b>Bastián dice</b><p></p></aside>
 <div class="mapa" id="mapa"></div>
 
-<script src="presentacion.js?v=41"></script>
+<script src="presentacion.js?v=42"></script>
 </body>
 </html>

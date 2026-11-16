@@ -31,7 +31,13 @@
   /* ── Planta 3D: se carga al inicio en segundo plano; solo dibuja cuando una lámina la usa ── */
   let planta = null;
   const pedirPlanta = import("./escena/lumina5.js?v=40").then((m) => m.crear($("#planta3d"))).then((p) => { planta = p; sincronizar3d(); return planta; }).catch((e) => console.error("planta 3D:", e));
+  // La historia de Don Salva: otra escena 3D, con cámara de cine (historia/historia.js); una toma por paso
+  let historia = null;
+  const pedirHistoria = import("./historia/historia.js?v=1").then((m) => m.crear($("#historia3d"))).then((h) => { historia = h; sincronizar3d(); return h; }).catch((e) => console.error("historia 3D:", e));
   function sincronizar3d() {
+    const esc = lams[i].dataset.escena;
+    escenario.classList.toggle("conhistoria", !!esc);
+    if (historia) { if (esc) { historia.ir(esc, paso); historia.activo(true); } else historia.activo(false); }
     const toma = lams[i].dataset.toma;
     escenario.classList.toggle("con3d", !!toma);
     if (!planta) return;
@@ -81,7 +87,7 @@
     contar(l); contarN(l);
     $("#avance").style.width = `${((i + 1) / lams.length) * 100}%`;
     $("#numero").innerHTML = `<b>${String(i + 1).padStart(2, "0")}</b> / ${lams.length}`;
-    escenario.classList.toggle("fondo-oscuro", l.classList.contains("lam--video") || tema === "naranjo");
+    escenario.classList.toggle("fondo-oscuro", l.classList.contains("lam--video") || tema === "naranjo" || l.hasAttribute("data-oscuro"));
     $("#notas p").textContent = l.dataset.notas || "";
     $$(".mapa__lam").forEach((b, j) => b.classList.toggle("aqui", j === i));
     sincronizar3d();
@@ -91,6 +97,7 @@
     pasosDe(l).forEach((el, j) => { el.classList.toggle("dado", j < paso); el.classList.toggle("ultimo", j === paso - 1); });
     for (let n = 1; n <= 8; n++) l.classList.toggle(`p${n}`, paso >= n);
     if (planta && l.dataset.toma) planta.paso(paso);
+    if (historia && l.dataset.escena) historia.ir(l.dataset.escena, paso);
     sincronizarVideos();
     history.replaceState(null, "", `${location.search}#${i + 1}${paso ? "." + paso : ""}`);
   }
@@ -280,7 +287,7 @@
   /* ── Bucle ── */
   function cuadro(t) {
     if (!document.hidden) {
-      if (!escenario.classList.contains("con3d")) pintarMalla(t);
+      if (!escenario.classList.contains("con3d") && !escenario.classList.contains("conhistoria")) pintarMalla(t);
       if (pir && pir.closest(".lam").classList.contains("activa")) pintarPiramide();
       pintarVis(t);
       const vs = $$(".clips video.ve", lams[i]);   // barra de la historia en curso
@@ -292,5 +299,5 @@
 
   const [h0, h1] = location.hash.slice(1).split(".");   // #7 o #7.2 (lámina.paso)
   mostrar((parseInt(h0, 10) || 1) - 1, parseInt(h1, 10) || 0);
-  window.PRES = { ir: (n, p) => mostrar(n - 1, p || 0), avanzar, volver, planta: () => pedirPlanta, n: lams.length };   // para QA
+  window.PRES = { ir: (n, p) => mostrar(n - 1, p || 0), avanzar, volver, planta: () => pedirPlanta, historia: () => pedirHistoria, n: lams.length };   // para QA
 })();
