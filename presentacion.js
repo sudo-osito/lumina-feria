@@ -80,6 +80,8 @@
     escenario.classList.toggle("sin-firma", l.hasAttribute("data-sin-firma"));
     contar(l); contarN(l);
     $("#avance").style.width = `${((i + 1) / lams.length) * 100}%`;
+    $("#numero").innerHTML = `<b>${String(i + 1).padStart(2, "0")}</b> / ${lams.length}`;
+    escenario.classList.toggle("fondo-oscuro", l.classList.contains("lam--video") || tema === "naranjo");
     $("#notas p").textContent = l.dataset.notas || "";
     $$(".mapa__lam").forEach((b, j) => b.classList.toggle("aqui", j === i));
     sincronizar3d();

@@ -615,3 +615,9 @@ img, canvas { display: block; }
 .lam--cierre::before { background: linear-gradient(90deg, rgba(var(--velo), .98) 0, rgba(var(--velo), .94) 40%, rgba(var(--velo), 0) 62%); }
 .cierre .btn { white-space: nowrap; }
 .cierre__accion > div { flex: none; }
+
+/* número de lámina, abajo a la derecha (mismo rótulo chico de las gráficas) */
+.numero { position: absolute; right: 64px; bottom: 40px; z-index: 6; font-size: 17px; font-weight: 600; letter-spacing: .2em; color: var(--tinta-3); font-variant-numeric: tabular-nums; pointer-events: none; transition: color .8s; }
+.numero b { font-weight: 600; color: var(--tinta-2); }
+.fondo-oscuro .numero { color: rgba(255, 255, 255, .55); }
+.fondo-oscuro .numero b { color: #fff; }
