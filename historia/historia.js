@@ -11,7 +11,7 @@ import { nucleo, THREE, clamp, lerp } from '../js/planta/nucleo.js';
 import { modelos } from '../js/planta/modelos.js';
 import { modelos2 } from '../js/planta/modelos2.js';
 import { equipos } from '../js/planta5/equipos.js';
-import { construir, SOL, ALERO } from './mundo.js?v=11';
+import { construir, SOL, ALERO } from './mundo.js?v=14';
 import { gente } from './gente.js?v=6';
 
 const PI = Math.PI, H = PI / 2;
@@ -127,7 +127,7 @@ export async function crear(cont) {
     const Mj = W.mejora; Mj.pintura.visible = false; Mj.pintura.material.opacity = 0; Mj.trafico.visible = false; Mj.camara.visible = false; Mj.pk = 1;
     Mj.puertas.forEach((q) => { q.abrir(1); q.rojo.emissiveIntensity = .05; q.verde.emissiveIntensity = 2.4; }); est.lumina = null; fx.rew = 0;
     Mj.visual.visible = false; for (const p of Mj.piezasV) p.o.scale.setScalar(1); W.rackDanadoG.visible = true; Mj.cunas.forEach((c) => { c.poner(1); c.luz(true); }); CLIP.constant = 100;
-    Mj.tren.g.visible = false; Mj.conoM.opacity = 0; Mj.sg.piv.rotation.z = 0; for (const p of Mj.piezas) p.o.scale.y = 1; for (const k of ['cebra1', 'tri1', 'cebra2', 'area1', 'area2']) Mj[k].pintar(0, 0); fondo[0].levantar(.12); fondo[0].carga.visible = false;
+    Mj.tren.g.visible = false; Mj.conoM.opacity = 0; Mj.sg.piv.rotation.z = 0; for (const p of Mj.piezas) p.o.scale.y = 1; for (const k of ['cebra1', 'tri1', 'tri1b', 'cebra2', 'area1', 'area2']) Mj[k].pintar(0, 0); Mj.kq = 1; (Mj.puertasKb || []).forEach((q) => q.abrir(1)); fondo[0].levantar(.12); fondo[0].carga.visible = false;
   }
   const enRonda = (flojo = 0) => turno.forEach((p, i) => pon(p.g, LUGAR[i][0], LUGAR[i][1], rumbo(S0[0] - LUGAR[i][0], S0[1] - LUGAR[i][1]) + flojo * Math.sin(i * 2.7) * .9));
   const trabajar = (t) => turno.forEach((p, i) => { P.respirar(p, t); p.bi.rotation.x = -.55 + Math.sin(t * 1.4 + i) * .2; p.bd.rotation.x = -.6 + Math.cos(t * 1.7 + i) * .22; });
@@ -304,7 +304,8 @@ export async function crear(cont) {
   function visualListo() { Mj.visual.visible = true; for (const p of Mj.piezasV) p.o.scale.setScalar(1); }
   function traficoArriba(t, t0 = 0) { Mj.trafico.visible = true; for (const p of Mj.piezas) p.o.scale.y = Math.max(.01, suave(tr(t, t0 + p.d * .028, t0 + .7 + p.d * .028))); }
   function traficoListo() { Mj.trafico.visible = true; for (const p of Mj.piezas) p.o.scale.y = 1; }
-  function proyecciones(t, alerta1 = false) { Mj.cebra1.pintar(alerta1 ? 0 : 1, reloj); Mj.tri1.pintar(alerta1 ? 1 : 0, reloj); Mj.cebra2.pintar(1, reloj); Mj.area1.pintar(1, reloj); Mj.area2.pintar(1, reloj);
+  function proyecciones(t, alerta1 = false) { Mj.cebra1.pintar(1, reloj); Mj.tri1.pintar(alerta1 ? 1 : 0, reloj); Mj.tri1b.pintar(alerta1 ? 1 : 0, reloj);
+    Mj.kq = (Mj.kq ?? 1) + ((alerta1 ? 0 : 1) - (Mj.kq ?? 1)) * .09; (Mj.puertasKb || []).forEach((q) => { q.abrir(suave(Mj.kq)); q.rojo.emissiveIntensity = alerta1 ? 2.6 : .05; q.verde.emissiveIntensity = alerta1 ? .05 : 2.4; }); Mj.cebra2.pintar(1, reloj); Mj.area1.pintar(1, reloj); Mj.area2.pintar(1, reloj);
     Mj.kb[0].ojo.emissiveIntensity = alerta1 ? (Math.sin(reloj * 8) > 0 ? 2.8 : .6) : .15; for (const kb of Mj.kb) kb.lente.emissiveIntensity = 2.2; }
   function luminaArriba(t, t0 = 0) { Mj.camara.visible = true; Mj.conoM.opacity = .13 * suave(tr(t, t0, t0 + 1.2)); Mj.ojo.emissiveIntensity = 1 + .6 * Math.sin(reloj * 4); }
   function salvaHasta(t, xMax, vel = 1.15, t0 = .6) {   // camina por el sendero hasta xMax (si hay que esperar, espera ahí)

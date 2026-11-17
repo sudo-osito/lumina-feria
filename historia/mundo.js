@@ -73,8 +73,8 @@ export function construir(k, md, m2, eq) {
       c.fillStyle = ['#B7CF96', '#D2D7A0', '#AFC98E', '#DCCF9E', '#BDD3A0', '#C9D4A4', '#A9C48A'][Math.floor(R() * 7)]; c.fillRect(x + 3, z + 3, 114 + R() * 120, 84 + R() * 100); }
     // parque industrial (oriente de la autopista): terrenos claros y calles
     c.fillStyle = '#C9D5B4'; c.fillRect(28, -1100, 1120, 2200); c.fillStyle = '#CDD7BA'; c.fillRect(-760, -760, 700, 1500);
-    c.fillStyle = '#B8BDC4'; for (const z of [-850, -560, -300, 145, 420, 700, 980]) c.fillRect(28, z - 6, 1120, 12); for (const x of [200, 470, 740, 1000]) c.fillRect(x - 6, -1100, 12, 2200);
-    c.fillStyle = '#C3C7CD'; for (const z of [-420, 180, 520]) c.fillRect(-760, z - 5, 700, 10);
+    c.fillStyle = '#A9AFB8'; for (const z of [-850, -560, -300, 145, 420, 700, 980]) c.fillRect(28, z - 6, 1120, 12); for (const x of [200, 470, 740, 1000]) c.fillRect(x - 6, -1100, 12, 2200);
+    c.fillStyle = '#ADB3BB'; for (const z of [-420, 180, 520]) c.fillRect(-760, z - 5, 700, 10);
     // la ciudad: manzanas grises hasta la precordillera
     c.fillStyle = '#D2D3D2'; c.fillRect(1650, -3000, 1350, 6000); c.fillStyle = 'rgba(160,166,174,.5)'; for (let x = 1650; x < 3000; x += 70) c.fillRect(x, -3000, 9, 6000); for (let z = -3000; z < 3000; z += 70) c.fillRect(1650, z, 1350, 9);
     c.fillStyle = 'rgba(176,200,160,.55)'; for (let i = 0; i < 40; i++) c.fillRect(1650 + R() * 1300, -3000 + R() * 5900, 40 + R() * 80, 40 + R() * 80);   // plazas
@@ -169,8 +169,18 @@ export function construir(k, md, m2, eq) {
     const gv = new THREE.BoxGeometry(2.2, .5, 1.55); gv.translate(-.2, 1.07, 0); instancias(gv, mat(0x39424F, { roughness: .2, metalness: .3 }), autos.map((a) => ({ ...a, c: null })), false);
     const gr = new THREE.BoxGeometry(3.3, .42, 1.82); gr.translate(0, .21, 0); instancias(gr, mat(0x1E2126, { roughness: .8 }), autos.map((a) => ({ ...a, c: null })), false);
     // asfalto: estacionamiento bajo cada fila de autos y patio de camiones frente a los andenes (antes estaban sobre el pasto)
-    const asf = []; for (const g of galpones) { const fila = g.z0 + g.d + 30; asf.push({ x: g.x0 + g.w / 2, z: fila + .15, sx: g.w - 4, sz: 9 }); const zp = g.lado < 0 ? g.z0 - 26 : g.z0 + g.d; asf.push({ x: g.x0 + g.w / 2, z: zp + 13, sx: g.w, sz: 26 }); }
-    const ga = new THREE.BoxGeometry(1, .3, 1); ga.translate(0, -.18, 0); instancias(ga, mat(0xB4B9C0, { roughness: .95 }), asf.map((a) => ({ ...a, sy: 1 })), false);
+    const asf = []; for (const g of galpones) { const fila = g.z0 + g.d + 30, zz0 = g.lado < 0 ? g.z0 + g.d : g.z0 + g.d + 26; asf.push({ x: g.x0 + g.w / 2, z: (zz0 + fila + 4.5) / 2, sx: g.w, sz: fila + 4.5 - zz0 }); /* estacionamiento pegado al galpón, sin pasto entre medio */ const zp = g.lado < 0 ? g.z0 - 26 : g.z0 + g.d; asf.push({ x: g.x0 + g.w / 2, z: zp + 13, sx: g.w, sz: 26 }); }
+    // accesos: cada galpón se une a la calle más cercana con un camino propio (pista lateral + conexión a la calle)
+    const V = [200, 470, 740, 1000], H = [-420, 180, 520];
+    for (const g of galpones) { const fila = g.z0 + g.d + 30, zp = g.lado < 0 ? g.z0 - 26 : g.z0 + g.d, za = Math.min(zp, fila - 4.5), zb = Math.max(zp + 26, fila + 4.5), xl = g.x0 - 6;
+      asf.push({ x: xl, z: (za + zb) / 2, sx: 8, sz: zb - za });                                     // pista a lo largo del galpón
+      asf.push({ x: (xl + g.x0 + 2) / 2, z: fila + .15, sx: g.x0 + 2 - xl, sz: 9 });                  // estacionamiento → pista
+      asf.push({ x: (xl + g.x0) / 2, z: zp + 13, sx: g.x0 - xl, sz: 26 });                            // patio → pista
+      if (g.x0 > 28) { const xs = g.x0 < 150 ? 23 : Math.max(...V.filter((v) => v < g.x0)) + 6, zc = zp + 13;   // a la calle del oriente / calle lateral
+        asf.push({ x: (xs + xl) / 2, z: zc, sx: xl - xs + 4, sz: 9 }); }
+      else { const zm = (za + zb) / 2, zs = H.reduce((m, h) => Math.abs(h - zm) < Math.abs(m - zm) ? h : m, H[0]), z1 = zs < za ? zs : zb, z2 = zs < za ? za : zs;   // parque poniente: a la calle norte o sur
+        asf.push({ x: xl, z: (z1 + z2) / 2, sx: 8, sz: Math.abs(z2 - z1) + 5 }); } }
+    const ga = new THREE.BoxGeometry(1, .3, 1); ga.translate(0, -.18, 0); instancias(ga, mat(0xA9AFB8, { roughness: .95 }), asf.map((a) => ({ ...a, sy: 1 })), false);
   }
 
   /* ───────── árboles (instanciados): redondos, álamos y pinos ───────── */
@@ -427,7 +437,7 @@ export function construir(k, md, m2, eq) {
   for (const z of [20.2, 22.6, 26.4, 28.6]) m2.casilleros(base, 35.5, z, 0, 4); caja(.4, .45, 3, 38.4, 0, 21.5, mat(0xD9B98C), base, .04); caja(.4, .45, 3, 38.4, 0, 27.5, mat(0xD9B98C), base, .04);
   { md.estacion(base, 37, 31); const g = md.montacargas(base, { color: mat(0xD8DDE4) }); g.g.position.set(41.3, 0, 38.2); g.g.rotation.y = 2.6; g.op.g.visible = false; g.spot.visible = false; g.levantar(1.1);
     for (const [x, z, cc] of [[36, 33.2, 0x2F6FB0], [36.7, 33.1, 0x2F6FB0], [36.3, 37.1, 0xE5383B]]) cil(.29, .88, x, 0, z, mat(cc, { roughness: .4 }), base, 18);
-    md.tableroElectrico(base, 35.2, 35, 0); md.estanteria(base, 44.3, 37.2, 39.6); }
+    md.tableroElectrico(base, 35.2, 38.7, 0); md.estanteria(base, 44.3, 37.2, 39.6); }
   { const c = new THREE.Mesh(new THREE.PlaneGeometry(2.2, .42), numero('COMEDOR', 2.2, .42, '#ffffff', '#1b2230')); c.position.set(40.09, 2.6, 13.2); c.rotation.y = Math.PI / 2; base.add(c);
     const d = new THREE.Mesh(new THREE.PlaneGeometry(2.4, .42), numero('CAMARINES', 2.4, .42, '#ffffff', '#1b2230')); d.position.set(40.09, 2.6, 25.2); d.rotation.y = Math.PI / 2; base.add(d); }
 
@@ -550,7 +560,7 @@ export function construir(k, md, m2, eq) {
     const par = (xo, xe, z0 = 8.95, z1 = 10.1) => [eq.puertaInteligente(g, xo, z0, -Math.PI / 2, z1 - z0), eq.puertaInteligente(g, xe, z1, Math.PI / 2, z1 - z0)];
     for (const x of [61, 65, 69, 73, 77, 81]) { const pp = par(x - 1.45, x + 1.45); pp.forEach((q) => pieza(q, x, 9.5)); if (x === 69) W.mejora.puertas = pp; else W.mejora.puertasResto = (W.mejora.puertasResto || []).concat(pp); }
     for (const [xo, xe, z0, z1] of [[83.85, 88.15, 8.95, 10.1], [83.85, 88.15, 36.95, 38.1]]) par(xo, xe, z0, z1).forEach((q) => { pieza(q, 86, z0); W.mejora.puertasResto.push(q); });
-    for (const [z, ry, x] of [[20.1, Math.PI, 57.6], [22.9, 0, 56.45]]) { const q = eq.puertaInteligente(g, x, z, ry, 1.15); pieza(q, 57, z); W.mejora.puertasResto.push(q); }
+    W.mejora.puertasKb = []; for (const [z, ry, x] of [[20.1, Math.PI, 57.6], [22.9, 0, 56.45]]) { const q = eq.puertaInteligente(g, x, z, ry, 1.15); pieza(q, 57, z); W.mejora.puertasKb.push(q); }   // las del X-KUBE: se cierran con el aviso
     W.mejora.sensor = eq.sensorGrua(g, 67.62, 10.55, -Math.PI / 2); pieza(W.mejora.sensor, 67.6, 10.5);
     // protecciones: columnas en zonas de tránsito y cabeceras de rack
     for (const [x, z] of COLUMNAS) if (!(x < 49 && z > 8 && z < 24)) pieza(md.protectorColumna(g, x, z), x, z);
@@ -595,7 +605,8 @@ export function construir(k, md, m2, eq) {
     A.proy = [];
     const kb1 = eq.xkube(g, 57, 21.5, 4.7, ALERO - .55), kb2 = eq.xkube(g, 86, 9.5, 4.7, ALERO - .55);
     A.kb = [kb1, kb2];
-    A.cebra1 = eq.proyeccion(g, eq.cebraTex(9), 1.15, 2.4, 57, 21.5, 0, kb1.origen, 0xFFE27A); A.tri1 = eq.proyeccion(g, eq.TX.grua, 2.1, 2.1, 57, 21.5, 0, kb1.origen, 0xFFE27A, .04);
+    A.cebra1 = eq.proyeccion(g, eq.cebraTex(9), 1.15, 2.4, 57, 21.5, 0, kb1.origen, 0xFFE27A); // el aviso va APARTE de la cebra: en el sendero, frente a cada puerta (donde espera el peatón), nunca encima del cruce
+    A.tri1 = eq.proyeccion(g, eq.TX.grua, 1.6, 1.6, 57, 18.35, 0, kb1.origen, 0xFFE27A, .04); A.tri1b = eq.proyeccion(g, eq.TX.grua, 1.6, 1.6, 57, 24.65, Math.PI, kb1.origen, 0xFFE27A, .04);
     A.cebra2 = eq.proyeccion(g, eq.cebraTex(9), 1.15, 3.9, 86, 9.5, Math.PI / 2, kb2.origen, 0xFFE27A);
     const kb3 = eq.xkube(g, 39.2, 35, 4.0, ALERO - .55), kb4 = eq.xkube(g, 91.6, 8, 4.0, ALERO - .55);
     A.area1 = eq.proyeccion(g, eq.TX.grua, 2.2, 2.2, 39.2, 35, Math.PI / 2, kb3.origen, 0xFFE27A, .04); A.area2 = eq.proyeccion(g, eq.TX.grua, 2.2, 2.2, 91.6, 8, -Math.PI / 2, kb4.origen, 0xFFE27A, .04);

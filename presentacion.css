@@ -1083,3 +1083,25 @@ img, canvas { display: block; }
 .usr__pie { margin-top: 26px; font-size: 20px; color: var(--tinta-3); }
 .emb__pct { display: flex; align-items: center; justify-content: center; }
 .emb__pct small { align-self: center; margin-top: 18px; }
+
+/* ═════════ v5 (17-nov noche) · ronda D de Max ═════════ */
+/* embudo: sin descripciones ni columna de pilares; el embudo al centro, flujo de abajo hacia arriba */
+.emb__f { grid-template-columns: 390px 820px 390px; }
+.emb__ctl { padding-right: 48px; gap: 0; }
+.emb__ctl b { font-size: 38px; line-height: 1.12; text-wrap: balance; }
+.emb__eje, .emb__pil { display: none; }
+/* 06 · costos: todo en pastillas, más limpio */
+.costo__col { padding-right: 90px; }
+.costo h3 { font-size: 36px; margin-bottom: 26px; }
+.costo ul { display: flex; flex-wrap: wrap; gap: 14px; }
+.costo li { align-items: center; gap: 14px; padding: 12px 28px 12px 12px; border-radius: 999px; background: #fff; font-size: 25px; color: var(--tinta-1, #181818);
+  box-shadow: 0 0 0 1.5px rgba(24, 24, 24, .08), 0 12px 30px -14px rgba(24, 24, 24, .18); white-space: nowrap; }
+.costo li i { width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; font-size: 15px; letter-spacing: .04em; background: #EEF0F3; color: var(--tinta-2); }
+.costo__arriba { top: 300px; }
+.costo__bajo { top: 540px; right: 90px; }
+.costo__grid { grid-template-columns: 420px 1fr; gap: 40px; align-items: center; }
+.costo__bajo ul { flex-direction: column; align-items: flex-start; padding-top: 0; gap: 14px; }
+.costo__bajo li { box-shadow: 0 0 0 1.5px rgba(5, 108, 242, .22), 0 12px 30px -14px rgba(5, 108, 242, .35); }
+.costo__bajo li i { background: var(--blue); color: #fff; }
+.costo__dato b { font-size: 140px; }
+.costo__dato span { font-size: 26px; }

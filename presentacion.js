@@ -28,7 +28,7 @@
   const pedirPlanta = import("./escena/lumina5.js?v=42").then((m) => m.crear($("#planta3d"))).then((p) => { planta = p; sincronizar3d(); return planta; }).catch((e) => console.error("planta 3D:", e));
   // La historia de Don Salva: otra escena 3D, con cámara de cine (historia/historia.js); una toma por paso
   let historia = null;
-  const pedirHistoria = import("./historia/historia.js?v=20").then((m) => m.crear($("#historia3d"))).then((h) => { historia = h; sincronizar3d(); return h; }).catch((e) => console.error("historia 3D:", e));
+  const pedirHistoria = import("./historia/historia.js?v=21").then((m) => m.crear($("#historia3d"))).then((h) => { historia = h; sincronizar3d(); return h; }).catch((e) => console.error("historia 3D:", e));
   function sincronizar3d() {
     const esc = lams[i].dataset.escena;
     escenario.classList.toggle("conhistoria", !!esc);
@@ -251,33 +251,45 @@
         c.save(); c.translate(1180, 40); dias.forEach((v, d) => { const x = 40 + (d % 7) * 66, y = 60 + Math.floor(d / 7) * 72; if (v && a(2) > d / 35) punto(c, x, y, 13 * (v > .6 ? 1 : .6), NAR, v > .6 ? .9 : .4); else aro(c, x, y, 13, CARBON, .2 * a(2), 1.4); });
         "LMMJVSD".split("").forEach((d, k) => { c.font = "600 15px Poppins"; c.textAlign = "center"; c.fillStyle = `rgba(${GRIS},${.8 * a(2)})`; c.fillText(d, 40 + k * 66, 22); });
         rotulo(c, 240, 444, "Con qué frecuencia", NAR, a(2), 16); c.restore(); }; })(),
-    // 04 · índice de accidentabilidad 2024 por rubro (SUSESO): cada punto = 0,1 accidentes por cada 100 personas; la línea es el promedio (2,5).
-    //      Al avanzar, LOS MISMOS puntos de Transporte se reordenan y crecen hasta la mortalidad (8,8 por 100.000), la línea pasa al promedio (2,1) y se marca «4×».
+    // 04 · índice de accidentabilidad 2024 por rubro (SUSESO): cada punto = 0,1 accidentes por cada 100 personas; columnas de 8 puntos que crecen de abajo hacia arriba.
+    //      Al avanzar, LA MISMA columna de Transporte crece hasta la mortalidad (8,8 por 100.000) al lado del promedio (2,1) y se marca «4×».
     accid: (() => { const R = [["Industria manufacturera", 3.5], ["Agricultura y pesca", 3.3], ["Transporte", 3.1, 1], ["Comercio", 2.8], ["Construcción", 2.8], ["Servicios", 2.0], ["Electricidad, gas y agua", 1.1], ["Minería", .9]];
-      let u = 0; return (c, t, w, h) => { c.clearRect(0, 0, w, h); u = ir(u, paso >= 1 ? 1 : 0, .055); const e = u * u * (3 - 2 * u), x0 = 470, s0 = 27, s1 = 11, f = 66, y0 = 96, ahora = performance.now() - tPaso;
-        const yT0 = y0 + 2 * f, yT1 = 300, yT = yT0 + (yT1 - yT0) * e, s = s0 + (s1 - s0) * e;
+      const lerp = (a, b, e) => a + (b - a) * e, cl = (v) => Math.min(1, Math.max(0, v));
+      const lineas = (c, txt, x, y, max) => { const p = txt.split(" "), L = []; let l = ""; for (const w of p) { const n = l ? l + " " + w : w; if (c.measureText(n).width > max && l) { L.push(l); l = w; } else l = n; } L.push(l); L.forEach((s, i) => c.fillText(s, x, y + i * 27)); };
+      let u = 0; return (c, t, w, h) => { c.clearRect(0, 0, w, h); u = ir(u, paso >= 1 ? 1 : 0, .05); const e = u * u * (3 - 2 * u), ahora = performance.now() - tPaso;
+        const s0 = 22, s1 = 34, s = lerp(s0, s1, e), b0 = 420, b1 = 548, base = lerp(b0, b1, e), slot = w / 8;
+        const col = (cx, n, rgb, a, r, ap) => { for (let i = 0; i < n; i++) { const k = ap(i); if (k <= 0) break; punto(c, cx + ((i % 8) - 3.5) * s, base - s / 2 - Math.floor(i / 8) * s, r * (.4 + .6 * k), rgb, a * k); } };
         // encabezado: qué mide cada punto
-        rotulo(c, x0 - 14, 40, "Accidentes por cada 100 personas · un punto = 0,1", GRIS, 1 - e, 15, "left");
-        rotulo(c, x0 - 14, 40, "Muertes por cada 100.000 personas · un punto = 0,1", GRIS, e, 15, "left");
-        // la línea del promedio: 2,5 (accidentes) → 2,1 (mortalidad), en el mismo gráfico
-        const xp = x0 + (24.5 + (20.5 - 24.5) * e) * s, ya = 70, yb = (y0 + R.length * f - 30) * (1 - e) + (yT1 + 90) * e;
-        c.strokeStyle = `rgba(${CARBON},.38)`; c.lineWidth = 1.8; c.setLineDash([3, 8]); c.beginPath(); c.moveTo(xp, ya); c.lineTo(xp, yb); c.stroke(); c.setLineDash([]);
-        c.save(); c.font = "600 22px Poppins"; c.textAlign = "center"; c.fillStyle = `rgba(${CARBON},${Math.min(1, t / 900) * .75})`; c.fillText(`Promedio del país · ${e > .5 ? "2,1" : "2,5"}`, xp, yb + 34); c.restore();
+        rotulo(c, 0, 4, "Accidentes por cada 100 personas · un punto = 0,1", GRIS, (1 - e) * cl(t / 800), 15, "left");
+        rotulo(c, 0, 4, "Muertes por cada 100.000 personas · un punto = 0,1", GRIS, e, 15, "left");
+        // la línea del promedio: 2,5 accidentes (25 puntos) → 2,1 muertes (21 puntos)
+        const xT = lerp(slot * 2.5, w / 2 + 190, e), xA = w / 2 - 230, yp = base - lerp(25, 21, e) / 8 * s, xa = lerp(0, xA - 4 * s1 - 30, e), xb = lerp(w, xT + 4 * s1 + 16, e);
+        c.strokeStyle = `rgba(${CARBON},.4)`; c.lineWidth = 1.8; c.setLineDash([3, 8]); c.beginPath(); c.moveTo(xa, yp); c.lineTo(xb, yp); c.stroke(); c.setLineDash([]);
+        { const al = .8 * (1 - e) * cl(t / 900); if (al > .01) { c.save(); c.font = "600 20px Poppins"; c.textAlign = "right"; c.textBaseline = "top"; c.fillStyle = `rgba(${CARBON},${al})`; c.fillText("Promedio del país · 2,5", w, 2); const tw = c.measureText("Promedio del país · 2,5").width;
+          c.strokeStyle = `rgba(${CARBON},${al * .6})`; c.lineWidth = 1.8; c.setLineDash([3, 8]); c.beginPath(); c.moveTo(w - tw - 80, 14); c.lineTo(w - tw - 16, 14); c.stroke(); c.setLineDash([]); c.restore(); } }
+        // columnas por rubro
         R.forEach(([nom, val, top], r) => { const trans = !!top, a = trans ? 1 : 1 - e; if (a < .01) return;
-          const y = trans ? yT : y0 + r * f, n0 = Math.round(val * 10), n = trans ? Math.round(n0 + (88 - n0) * e) : n0;
-          c.save(); c.font = `${trans ? 600 : 400} ${trans ? 30 - 4 * e : 27}px Poppins`; c.textAlign = "right"; c.textBaseline = "middle"; c.fillStyle = `rgba(${trans ? AZUL : CARBON},${a * (trans ? 1 : .78)})`; c.fillText(trans && e > .5 ? "Transporte y comunicaciones" : nom, x0 - 36, y); c.restore();
-          let ult = -1; for (let i = 0; i < n; i++) { const ap = Math.min(1, Math.max(0, (t - 250 - r * 70 - i * 22) / 260)) * (i < n0 ? 1 : Math.min(1, Math.max(0, (ahora - 200 - (i - n0) * 16) / 260))); if (ap <= 0) break; ult = i;
-            const sobre = i >= 25 - 4 * e; punto(c, x0 + i * s, y, ((trans ? 8.4 : 7.2) - 2.6 * e) * (.4 + .6 * ap) * (trans ? 1 + .07 * Math.sin(t / 300 - i * .3) : 1), trans ? AZUL : CARBON, a * ap * (trans ? 1 : sobre ? .7 : .42)); }
-          if (ult === n - 1) { c.save(); c.font = `${trans ? 600 : 500} ${trans ? 46 + 20 * e : 34}px Poppins`; c.textBaseline = "middle"; c.fillStyle = `rgba(${trans ? AZUL : CARBON},${a})`; c.fillText(trans ? (e > .5 ? "8,8" : "3,1") : String(val).replace(".", ","), x0 + n * s + 22, y + 1); c.restore(); } });
-        // «4×»: de la línea del promedio al final de Transporte, en el mismo gráfico
-        const k = Math.min(1, Math.max(0, (ahora - 1500) / 600)) * e; if (k > .01) { const xa = xp, xb = x0 + 87 * s1, yy = yT1 + 70;
-          c.strokeStyle = `rgba(${AZUL},${k})`; c.lineWidth = 2.5; c.beginPath(); c.moveTo(xa, yy - 10); c.lineTo(xa, yy); c.lineTo(xa + (xb - xa) * k, yy); if (k > .98) c.lineTo(xb, yy - 10); c.stroke();
-          c.save(); c.textAlign = "center"; c.fillStyle = `rgba(${AZUL},${k})`; c.font = "600 64px Poppins"; c.fillText("4×", (xa + xb) / 2, yy + 74); c.font = "500 24px Poppins"; c.fillStyle = `rgba(${CARBON},${k * .8})`; c.fillText("el promedio del país: el rubro más alto", (xa + xb) / 2, yy + 112); c.restore(); }
+          const cx = trans ? xT : slot * (r + .5), n0 = Math.round(val * 10), n = trans ? Math.round(lerp(n0, 88, cl((ahora - 500) / 1400) * e)) : n0, rgb = trans ? AZUL : CARBON;
+          const ap = (i) => cl((t - 250 - r * 90 - i * 18) / 260);
+          col(cx, n, rgb, a * (trans ? 1 : .55), (trans ? 7.6 : 7) + 4 * e, ap);
+          const filas = Math.ceil(n / 8), yv = base - filas * s - 18, ok = ap(n0 - 1);
+          c.save(); c.textAlign = "center"; c.textBaseline = "alphabetic"; c.font = `${trans ? 600 : 500} ${trans ? lerp(44, 64, e) : 38}px Poppins`; c.fillStyle = `rgba(${rgb},${a * ok})`;
+          c.fillText(trans ? (e > .5 ? (n >= 88 ? "8,8" : "") : "3,1") : String(val).replace(".", ","), cx, yv);
+          c.font = `${trans ? 600 : 400} 21px Poppins`; c.textBaseline = "top"; c.fillStyle = `rgba(${rgb},${a * (trans ? 1 : .75) * cl(t / 700)})`; lineas(c, nom, cx, base + 22, slot - 26); c.restore(); });
+        // mortalidad: el promedio del país, como columna al lado de Transporte
+        if (e > .01) { col(xA, 21, CARBON, .55 * e, 11.6, (i) => cl((ahora - 300 - i * 30) / 300));
+          c.save(); c.textAlign = "center"; c.font = "500 44px Poppins"; c.fillStyle = `rgba(${CARBON},${.8 * cl((ahora - 900) / 400) * e})`; c.fillText("2,1", xA, base - 3 * s - 18);
+          c.font = "400 21px Poppins"; c.textBaseline = "top"; c.fillStyle = `rgba(${CARBON},${.75 * e})`; c.fillText("Promedio del país", xA, base + 22); c.restore(); }
+        // «4×»: del promedio a la cima de Transporte, al costado de la columna
+        const k = cl((ahora - 2100) / 600) * e; if (k > .01) { const x = xT + 4 * s1 + 34, ya = yp, yb = base - 11 * s1, yk = ya + (yb - ya) * k;
+          c.strokeStyle = `rgba(${AZUL},${k})`; c.lineWidth = 2.5; c.beginPath(); c.moveTo(x - 10, ya); c.lineTo(x, ya); c.lineTo(x, yk); if (k > .98) c.lineTo(x - 10, yb); c.stroke();
+          c.save(); c.textAlign = "left"; c.textBaseline = "middle"; c.fillStyle = `rgba(${AZUL},${k})`; c.font = "600 84px Poppins"; c.fillText("4×", x + 30, (ya + yb) / 2 - 18);
+          c.font = "500 23px Poppins"; c.fillStyle = `rgba(${CARBON},${k * .8})`; c.fillText("el promedio del país", x + 34, (ya + yb) / 2 + 40); c.fillText("el rubro más alto", x + 34, (ya + yb) / 2 + 70); c.restore(); }
       }; })(),
     // 05 · un día cualquiera de 2024: cerca de 390 accidentes del trabajo (un punto = una persona); 4 de ellos, graves
     dia: (() => { const N = 390, C = 26, k = new Float32Array(N), az = new Float32Array(N), rj = new Float32Array(N), graves = [57, 140, 233, 318];
       return (c, t, w, h) => { c.clearRect(0, 0, w, h); const s = 31, ox = (w - (C - 1) * s) / 2, oy = 70, ahora = performance.now() - tPaso;
-        rotulo(c, w / 2, 26, paso >= 1 ? "Un día cualquiera · un punto = una persona" : "2024 · accidentes del trabajo", GRIS, Math.min(1, t / 800), 15);
+        rotulo(c, w / 2, 26, paso >= 1 ? "Un día cualquiera · un punto = una persona" : "2024 · accidentes en la industria", GRIS, Math.min(1, t / 800), 15);
         for (let n = 0; n < N; n++) { const x = ox + (n % C) * s, y = oy + Math.floor(n / C) * s;
           k[n] = ir(k[n], t > 200 + n * 4 ? 1 : 0, .12); az[n] = ir(az[n], paso >= 1 && ahora > n * 3 ? 1 : 0, .1); const g = graves.includes(n); rj[n] = ir(rj[n], paso >= 2 && g ? 1 : 0, .1);
           const rgb = rj[n] > .5 ? ROJO : az[n] > .5 ? AZUL : CARBON, a = (paso >= 2 ? (g ? 1 : .18) : az[n] > .5 ? .9 : .45) * k[n];
@@ -287,18 +299,18 @@
       c.strokeStyle = `rgba(${CARBON},.4)`; c.lineWidth = 1.6; c.beginPath(); for (let x = 0; x <= w; x += 8) { const y = yw + Math.sin(x / 90 + t / 900) * 4; x ? c.lineTo(x, y) : c.moveTo(x, y); } c.stroke();
       esfera(c, 400, 370, 92, P160, g, CARBON, 1, 2.4);
       esfera(c, 400, 790, 230 * (.3 + .7 * u), P900, -g * .7, AZUL, u, 2.4); }; })(),
-    // 09 · 11 · 13 · el embudo: partículas que bajan por el embudo; la franja del pilar activo brilla. Cuenta los porcentajes.
+    // 09 · 11 · 13 · el embudo: partículas que suben por el embudo (de lo menos a lo más efectivo); la franja del pilar activo brilla. Cuenta los porcentajes.
     embudo: (() => { const r = azar(31), P = [...Array(260)].map(() => ({ x: r(), y: r(), v: .4 + r() * .8, z: r() })); let on = [0, 0, 0], cuenta = 0;
-      return (c, t, w, h, cv) => { c.clearRect(0, 0, w, h); const lam = cv.closest(".lam"), n = +lam.dataset.pilar, act = n === 0 ? (paso >= 1 ? 1 : 0) : n, cx = 420 + 410, bandas = [[0, 190], [204, 394], [408, 598]];
+      return (c, t, w, h, cv) => { c.clearRect(0, 0, w, h); const lam = cv.closest(".lam"), n = +lam.dataset.pilar, act = n === 0 ? (paso >= 1 ? 1 : 0) : n, cx = 390 + 410, bandas = [[0, 190], [204, 394], [408, 598]];
         const ancho = (y) => 820 - (y / 598) * 540;   // ancho del embudo a la altura y (820 arriba, 280 abajo)
         const COL = [NAR, AZUL, AZUL];   // franja 0 = Lúmina (arriba), 1 = tráfico, 2 = gestión visual (abajo)
         const activo = (b) => act === 0 || (act === 1 && b === 2) || (act === 2 && b === 1) || (act === 3 && b === 0);
         for (let b = 0; b < 3; b++) on[b] = ir(on[b], activo(b) ? 1 : 0, .06);
-        for (const p of P) { p.y += p.v * .0016 * (1 + p.z); if (p.y > 1) { p.y = 0; p.x = r(); } const y = p.y * 598, b = y < 197 ? 0 : y < 401 ? 1 : 2, W = ancho(y) - 30, x = cx + (p.x - .5) * W;
+        for (const p of P) { p.y -= p.v * .0016 * (1 + p.z); if (p.y < 0) { p.y = 1; p.x = r(); } const y = p.y * 598, b = y < 197 ? 0 : y < 401 ? 1 : 2, W = ancho(y) - 30, x = cx + (p.x - .5) * W;
           const a = (.12 + .55 * on[b]) * (.4 + .6 * p.z), rr = (1.6 + 2.6 * p.z) * (.7 + .5 * on[b]); punto(c, x, y, rr, COL[b], a); }
         for (let b = 0; b < 3; b++) { if (on[b] < .02) continue; const [y0, y1] = bandas[b], wt = ancho(y0), wb = ancho(y1); c.strokeStyle = `rgba(${COL[b]},${.5 * on[b]})`; c.lineWidth = 3; c.beginPath(); c.moveTo(cx - wt / 2, y0); c.lineTo(cx + wt / 2, y0); c.lineTo(cx + wb / 2, y1); c.lineTo(cx - wb / 2, y1); c.closePath(); c.stroke(); }
         // los porcentajes cuentan hasta su valor la primera vez
-        cuenta = Math.min(1, cuenta + .012); const e = 1 - Math.pow(1 - cuenta, 3); lam.querySelectorAll(".emb__pct").forEach((el) => { const v = +el.dataset.v; el.firstChild.nodeValue = String(Math.round(v * e)); });
+        cuenta = Math.min(1.6, cuenta + .012); lam.querySelectorAll(".emb__pct").forEach((el) => { const v = +el.dataset.v, f = +el.closest(".emb__f").className.match(/--(\d)/)[1], q = Math.min(1, Math.max(0, cuenta - (f - 1) * .3)), e = 1 - Math.pow(1 - q, 3); el.firstChild.nodeValue = String(Math.round(v * e)); });
       }; })(),
     // 17 · analítica (ilustrativa): dónde · a qué hora · con qué frecuencia · qué decidir
     a1: (() => { const r = azar(5), F = [[150, 110], [380, 180], [300, 80]], pts = [...Array(90)].map(() => { const f = F[Math.floor(r() * 3)]; return [f[0] + (r() - .5) * 70, f[1] + (r() - .5) * 50, r()]; });
