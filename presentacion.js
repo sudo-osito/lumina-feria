@@ -42,6 +42,18 @@
   let tema = "";
   /* ── Navegación ── */
   const pasosDe = (l) => $$("[data-paso]", l);
+  // Lúmina: las láminas data-lu muestran la one-page de Lúmina tal cual (un solo iframe en modo lámina); cada avance la mueve como el scroll
+  const LU_URL = /^(127\.0\.0\.1|localhost)$/.test(location.hostname) ? "http://127.0.0.1:4412/?lamina" : "https://sudo-osito.github.io/lumina-onepage/?lamina";
+  let luAntes = null, luMsj = null;
+  function luMover(l) {
+    const fr = document.getElementById("luweb"); if (!fr) return;
+    if (!fr.getAttribute("src") && lams.slice(Math.max(0, i - 3), i + 3).some((x) => x.dataset.lu)) fr.src = LU_URL;   // se carga un par de láminas antes
+    const id = l.dataset.lu; escenario.classList.toggle("conlu", !!id); if (!id) { luAntes = null; return; }
+    const us = (l.dataset.luU || "").split(",").filter(Boolean).map(Number), u = us.length ? us[Math.min(paso, us.length - 1)] : null;
+    luMsj = { lamina: id, u, salto: luAntes !== id }; luAntes = id;
+    try { fr.contentWindow.postMessage(luMsj, "*"); } catch (e) {}
+  }
+  addEventListener("message", (e) => { if (e.data && e.data.luminaLista && luMsj) { const fr = document.getElementById("luweb"); fr.contentWindow.postMessage({ ...luMsj, salto: true }, "*"); } });
   function mostrar(n, p = 0, alFinal = false) {
     i = Math.max(0, Math.min(lams.length - 1, n)); tLam = performance.now();
     const l = lams[i], ps = pasosDe(l); paso = alFinal ? ps.length : Math.min(p, ps.length);
@@ -60,6 +72,7 @@
   }
   function aplicarPaso() {
     const l = lams[i]; tPaso = performance.now();
+    luMover(l);
     pasosDe(l).forEach((el, j) => { el.classList.toggle("dado", j < paso); el.classList.toggle("ultimo", j === paso - 1); });
     for (let n = 1; n <= 8; n++) l.classList.toggle(`p${n}`, paso >= n);
     if (planta && l.dataset.toma) planta.paso(paso);
