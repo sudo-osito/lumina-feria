@@ -11,7 +11,7 @@ import { nucleo, THREE, clamp, lerp } from '../js/planta/nucleo.js';
 import { modelos } from '../js/planta/modelos.js';
 import { modelos2 } from '../js/planta/modelos2.js';
 import { equipos } from '../js/planta5/equipos.js';
-import { construir, SOL, ALERO } from './mundo.js?v=3';
+import { construir, SOL, ALERO } from './mundo.js?v=4';
 import { gente } from './gente.js?v=4';
 
 const PI = Math.PI, H = PI / 2;
@@ -52,9 +52,11 @@ export async function crear(cont) {
   const cam = new THREE.PerspectiveCamera(36, 16 / 9, .3, 30000);
   const hemi = k.escena.children.find((o) => o.isHemisphereLight); if (hemi) { hemi.color.set(0xDDE9F7); hemi.groundColor.set(0xD8CFC2); }
   k.escena.background = new THREE.Color(AMB.dia.niebla); k.escena.fog = new THREE.Fog(AMB.dia.niebla, 320, 5200);
-  const fx = { negro: 0, flash: 0, vel: 0 };
+  const fx = { negro: 0, flash: 0, vel: 0, rew: 0 };
   const el = (c) => { const d = document.createElement('i'); d.className = c; cont.appendChild(d); return d; };
-  const eVin = el('h-vin'), eVel = el('h-vel'), eFlash = el('h-flash'), eNegro = el('h-negro');
+  const eVin = el('h-vin'), eVel = el('h-vel'), eFlash = el('h-flash'), eNegro = el('h-negro'), eRew = el('h-rew');
+  eRew.innerHTML = '<b>◀◀</b><span>Rebobinando</span>';
+  const lu = document.createElement('canvas'); lu.className = 'h-lumina'; lu.width = 1920; lu.height = 1080; cont.appendChild(lu); const lc = lu.getContext('2d');
 
   /* ───────── reparto ───────── */
   const salva = G.persona({ padre: vivo, chaleco: 0xF2741F, casco: 0xF6F7F8, bigote: 0xAEB5BE, panza: 1.14, radio: true, insignia: 0xE5383B, manga: 0x47648F, piel: 0xE8BE9C });
@@ -118,6 +120,9 @@ export async function crear(cont) {
     W.palletPick.visible = true; W.fiesta.visible = false; recuerdo.visible = false; casco.visible = false; fonoPiso.visible = false; conf.visible = false;
     W.tablero.pintar(999); W.tablero.mat.emissiveIntensity = .22;
     est.fondo = 'ronda'; est.chase = null;
+    // el rebobinado: todo lo de Neisstech parte oculto
+    const Mj = W.mejora; Mj.pintura.visible = false; Mj.pintura.material.opacity = 0; Mj.trafico.visible = false; Mj.camara.visible = false; Mj.pk = 1;
+    Mj.puertas.forEach((q) => { q.abrir(1); q.rojo.emissiveIntensity = .05; q.verde.emissiveIntensity = 2.4; }); est.lumina = null; fx.rew = 0;
   }
   const enRonda = (flojo = 0) => turno.forEach((p, i) => pon(p.g, LUGAR[i][0], LUGAR[i][1], rumbo(S0[0] - LUGAR[i][0], S0[1] - LUGAR[i][1]) + flojo * Math.sin(i * 2.7) * .9));
   const trabajar = (t) => turno.forEach((p, i) => { P.respirar(p, t); p.bi.rotation.x = -.55 + Math.sin(t * 1.4 + i) * .2; p.bd.rotation.x = -.6 + Math.cos(t * 1.7 + i) * .22; });
@@ -279,6 +284,97 @@ export async function crear(cont) {
     tick(t) { E.despues[1].tick(t); const u = tr(t, 1.3, 3.9); if (u >= 1) W.tablero.pintar(0, true); else W.tablero.pintar(Math.round(1000 * (1 - suave(u)))); W.tablero.mat.emissiveIntensity = .22 + (u >= 1 ? .5 * Math.exp(-(t - 3.9) * 1.2) : 0); },
   }];
 
+  /* ───────── TILSE 22 · volvamos a la historia: se rebobina y la misma mañana ocurre con Neisstech ─────────
+     0 rebobinar · 1 gestión visual · 2 gestión de tráfico · 3 Lúmina · 4 al día siguiente (1.001 días) */
+  const Mj = W.mejora, R_S2 = ruta([[61.6, 9.45], [69.55, 9.45]]);
+  function puertas(cerradas) { Mj.pk += ((cerradas ? 0 : 1) - Mj.pk) * .09; Mj.puertas.forEach((q) => { q.abrir(suave(Mj.pk)); q.rojo.emissiveIntensity = cerradas ? 2.6 : .05; q.verde.emissiveIntensity = cerradas ? .05 : 2.4; });
+    Mj.sensor.led.emissiveIntensity = cerradas ? (Math.sin(reloj * 10) > 0 ? 2.6 : .3) : .6; }
+  function pintura(t, t0 = 0) { Mj.pintura.visible = true; Mj.pintura.material.opacity = suave(tr(t, t0, t0 + 1.6)); }
+  function salvaHasta(t, xMax, vel = 1.15, t0 = .6) {   // camina por el sendero hasta xMax (si hay que esperar, espera ahí)
+    const meta = distA(R_S2, xMax, 9.45), d = Math.min(meta, Math.max(0, (t - t0) * vel)), q = en(R_S2, d); pon(salva.g, q.x, q.z, 0);
+    if (d < meta) P.andar(salva, 1, t); else { P.quieto(salva); P.respirar(salva, t); }
+    return d >= meta;
+  }
+  function retrocede(t, t0, t1, z0 = 15.4, z1 = 7.4) { const u = suave(tr(t, t0, t1)); cargado(z0 + (z1 - z0) * u); P.manejar(aleS, t, .9); baliza(t, u > 0 && u < 1); return grua.g.position.z; }
+  const CAM_CRUCE = [69.4, 15.5, 20.5, 68.9, 0, 9.4, 40];   // sobre el pasillo 69, mirando el cruce desde arriba (sin techo)
+  E.rewind = [{   // ◀◀ se rebobina desde lo que quedó
+    corte: true, casa: 0,
+    ini() { est.fondo = 'fuera'; est.amb = 'frio'; },
+    cam: claves([[0, 72.5, .45, 6.9, 70.15, .55, 8.95, 31], [1.2, 71.5, 1.6, 8.5, 69.6, .7, 10.5, 33], [4.6, ...CAM_CRUCE]]),
+    tick(t) {
+      trabajar(t); const u = tr(t, .15, 4.4); fx.rew = t < 4.7 ? 1 : Math.max(0, 1 - (t - 4.7) * 2); est.amb = u < .25 ? 'frio' : 'dia';
+      const vuelto = u > .06;
+      casco.visible = !vuelto; fonoPiso.visible = !vuelto; casco.position.set(70.3, .012, 8.75); fonoPiso.position.set(70.95, .004, 8.35);
+      ale.g.visible = !vuelto; if (!vuelto) { pon(ale.g, 68.5, 10.1, rumbo(1.8, -1.35)); P.cabeza(ale, t); } aleS.g.visible = vuelto; P.manejar(aleS, t, .9);
+      cargado(11.7 + 3.7 * sale(u)); baliza(t);
+      salva.g.visible = vuelto; const x = 69.55 - 7.9 * sale(tr(u, .3, 1)); pon(salva.g, x, 9.45, 0); if (u > .3 && u < 1) { P.andar(salva, 1, -t * 1.4); } else { P.quieto(salva); P.foto(salva, u < .3 ? 1 : 0); }
+      fono.g.visible = vuelto && u < .3;
+    },
+  }, {            // gestión visual: el sendero y el cruce se ven; la grúa se detiene en la línea de PARE
+    casa: 0,
+    ini() { est.fondo = 'fuera'; cargado(15.4); },
+    cam: claves([[0, ...CAM_CRUCE], [20, 69.2, 14.5, 19.6, 68.9, 0, 9.4, 39]]),
+    tick(t) { trabajar(t); pintura(t, .3); salvaHasta(t, 66.6, 1.1, 2.2); const z = retrocede(t, 2.6, 7.4, 15.4, 11.85); grua.balMat.emissiveIntensity = z > 11.9 ? grua.balMat.emissiveIntensity : .4; },
+  }, {            // gestión de tráfico: el sensor ve la grúa, el cruce se cierra; pasa la grúa y se abre
+    casa: 0,
+    ini() { est.fondo = 'fuera'; cargado(15.4); pintura(9); Mj.trafico.visible = true; Mj.pk = 1; },
+    cam: claves([[0, ...CAM_CRUCE], [20, 69.2, 14.5, 19.6, 68.9, 0, 9.4, 39]]),
+    tick(t) {
+      trabajar(t); pintura(9);
+      const sube = suave(tr(t, .2, 1.1)); Mj.trafico.scale.y = Math.max(.01, sube); Mj.trafico.visible = true;
+      const z = retrocede(t, 2.4, 8.8, 15.4, 7.4), viene = z < 14.4 && z > 7.6 + .2, libre = t > 9.6; puertas(viene || (!libre && t > 2.6));
+      if (!libre) salvaHasta(t, 67.0, 1.1, 1.6); else { const d = Math.min(R_S2.largo, distA(R_S2, 67, 9.45) + (t - 9.6) * 1.15), q = en(R_S2, d); pon(salva.g, q.x, q.z, 0); d < R_S2.largo ? P.andar(salva, 1, t) : (P.quieto(salva), P.respirar(salva, t)); }
+    },
+  }, {            // Lúmina: la cámara ve a la persona y a la grúa en retroceso, avisa y activa la respuesta
+    casa: 0,
+    ini() { est.fondo = 'fuera'; cargado(15.4); pintura(9); Mj.trafico.visible = true; Mj.trafico.scale.y = 1; Mj.camara.visible = true; Mj.pk = 1; est.lumina = { alerta: 0, evento: 0 }; },
+    cam: claves([[0, 66.1, 5.05, 5.2, 68.6, .55, 11.4, 50], [30, 66.1, 5.05, 5.2, 68.7, .55, 11.6, 48]]),
+    tick(t) {
+      trabajar(t); pintura(9); Mj.ojo.emissiveIntensity = 1 + .6 * Math.sin(reloj * 4);
+      const L = est.lumina, z = retrocede(t, 2.0, 5.2, 15.4, 12.0); salvaHasta(t, 66.9, 1.1, .8);
+      const riesgo = t > 3.3; if (riesgo && !L.alerta) L.alerta = t; if (L.alerta && !L.evento && t > L.alerta + 2.2) L.evento = t;
+      puertas(riesgo); if (riesgo) grua.balMat.emissiveIntensity = Math.sin(reloj * 12) > 0 ? 2.6 : .1;
+    },
+  }, {            // al día siguiente: 1.001 días sin accidentes
+    corte: true,
+    ini() { enRonda(); W.fiesta.visible = false; ale.g.visible = true; aleS.g.visible = false; fonoAle.g.visible = false; pon(ale.g, 52.2, 28.0, rumbo(S0[0] - 52.2, S0[1] - 28.0)); W.tablero.pintar(1001); grua.g.visible = false; },
+    cam: claves([[0, 45.2, 3.3, 24.6, 47.8, 1.55, 31.3, 33], [26, 49.4, 3.2, 24.3, 47.8, 1.55, 31.3, 33]]),
+    tick(t) { P.hablar(salva, t); turno.forEach((p, i) => { P.respirar(p, t); p.cab.rotation.x = Math.max(0, Math.sin(t * 1.3 + i * 2)) * .12; }); P.respirar(ale, t); W.tablero.mat.emissiveIntensity = .22 + .5 * Math.exp(-t * 1.2); },
+  }];
+
+  /* Lúmina sobre la imagen: marcos con esquinas, rostros pixelados, la línea del riesgo y el aviso (solo en el rebobinado) */
+  const V3 = new THREE.Vector3();
+  function proyectar(pts) { let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; for (const [x, y, z] of pts) { V3.set(x, y, z).project(cam); const sx = (V3.x + 1) / 2 * 1920, sy = (1 - V3.y) / 2 * 1080; x0 = Math.min(x0, sx); y0 = Math.min(y0, sy); x1 = Math.max(x1, sx); y1 = Math.max(y1, sy); } return [x0, y0, x1, y1]; }
+  const cajaMundo = (x, z, r, h, y = 0) => { const p = []; for (const a of [-r, r]) for (const b of [-r, r]) for (const yy of [y, y + h]) p.push([x + a, yy, z + b]); return proyectar(p); };
+  function marco(c, [x0, y0, x1, y1], col, txt) { const L = Math.min(28, (x1 - x0) / 3, (y1 - y0) / 3); c.strokeStyle = col; c.lineWidth = 3;
+    for (const [px, py, dx, dy] of [[x0, y0, 1, 1], [x1, y0, -1, 1], [x0, y1, 1, -1], [x1, y1, -1, -1]]) { c.beginPath(); c.moveTo(px, py + dy * L); c.lineTo(px, py); c.lineTo(px + dx * L, py); c.stroke(); }
+    c.fillStyle = 'rgba(236,109,39,.07)'; c.fillRect(x0, y0, x1 - x0, y1 - y0);
+    c.font = '600 21px Poppins, Arial'; const w = c.measureText(txt).width + 44; c.fillStyle = 'rgba(24,24,24,.86)'; c.beginPath(); c.roundRect(x0, y0 - 46, w, 36, 18); c.fill();
+    c.fillStyle = col; c.beginPath(); c.arc(x0 + 18, y0 - 28, 6, 0, 7); c.fill(); c.fillStyle = '#fff'; c.textBaseline = 'middle'; c.fillText(txt, x0 + 32, y0 - 27); }
+  function pixel(c, x, y, s = 7) { const tonos = ['#c9a58a', '#b38e75', '#d8b89f', '#a07c66']; for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) { c.fillStyle = tonos[(i * 3 + j * 5) % 4]; c.fillRect(x - 2 * s + i * s, y - 2 * s + j * s, s, s); } }
+  function dibujarLumina(t) {
+    lc.clearRect(0, 0, 1920, 1080); const L = est.lumina; if (!L) return;
+    cam.updateMatrixWorld(); const NAR = '#EC6D27';
+    // marco de cámara (CCTV)
+    lc.fillStyle = 'rgba(255,255,255,.92)'; lc.font = '600 22px Poppins, Arial'; lc.textBaseline = 'middle'; lc.fillText('CAM 04 · CRUCE C1', 1150, 60);
+    if (Math.sin(reloj * 5) > -.2) { lc.fillStyle = '#FF3B3B'; lc.beginPath(); lc.arc(1130, 60, 8, 0, 7); lc.fill(); }
+    const seg = 47 * 60 + 12 + Math.floor(t), hh = `08:${String(Math.floor(seg / 60) % 60).padStart(2, '0')}:${String(seg % 60).padStart(2, '0')}`; lc.fillText(hh, 1400, 60);
+    const bs = salva.g.position, bg = grua.g.position;
+    const rS = cajaMundo(bs.x, bs.z, .35, 1.8), rG = cajaMundo(bg.x, bg.z, 1.25, 2.3);
+    marco(lc, rS, NAR, 'Persona'); marco(lc, rG, NAR, 'Grúa · en retroceso');
+    V3.set(bs.x, 1.62, bs.z).project(cam); pixel(lc, (V3.x + 1) / 2 * 1920, (1 - V3.y) / 2 * 1080);
+    V3.set(bg.x, 1.36, bg.z + .38).project(cam); pixel(lc, (V3.x + 1) / 2 * 1920, (1 - V3.y) / 2 * 1080, 6);
+    if (L.alerta) { const a = Math.min(1, (t - L.alerta) * 3); lc.globalAlpha = a; lc.setLineDash([10, 10]); lc.strokeStyle = '#FF4D4F'; lc.lineWidth = 3; lc.beginPath(); lc.moveTo((rS[0] + rS[2]) / 2, rS[3]); lc.lineTo((rG[0] + rG[2]) / 2, rG[3]); lc.stroke(); lc.setLineDash([]);
+      // aviso
+      const X = 1340, Y = 110; lc.fillStyle = 'rgba(255,255,255,.97)'; lc.beginPath(); lc.roundRect(X, Y, 500, 132, 22); lc.fill();
+      lc.fillStyle = NAR; lc.beginPath(); lc.arc(X + 52, Y + 66, 26, 0, 7); lc.fill(); lc.fillStyle = '#fff'; lc.beginPath(); lc.arc(X + 52, Y + 66, 10, 0, 7); lc.fill();
+      lc.fillStyle = '#6c6c6c'; lc.font = '600 17px Poppins, Arial'; lc.fillText('LÚMINA · AVISO AL JEFE DE TURNO', X + 98, Y + 36);
+      lc.fillStyle = '#181818'; lc.font = '600 30px Poppins, Arial'; lc.fillText('Riesgo de atropello', X + 98, Y + 72); lc.fillStyle = '#6c6c6c'; lc.font = '500 19px Poppins, Arial'; lc.fillText('Cruce C1 · cierra el cruce y avisa a la grúa', X + 98, Y + 106);
+      lc.globalAlpha = 1; }
+    if (L.evento) { const a = Math.min(1, (t - L.evento) * 3), X = 1340, Y = 262; lc.globalAlpha = a; lc.fillStyle = 'rgba(24,24,24,.86)'; lc.beginPath(); lc.roundRect(X, Y, 500, 64, 32); lc.fill();
+      lc.fillStyle = '#3DD07A'; lc.beginPath(); lc.arc(X + 34, Y + 32, 8, 0, 7); lc.fill(); lc.fillStyle = '#fff'; lc.font = '500 21px Poppins, Arial'; lc.fillText('Evento registrado para el análisis', X + 56, Y + 33); lc.globalAlpha = 1; }
+  }
+
   /* ───────── motor ───────── */
   const est = { esc: 'salva', paso: 0, clip: E.salva[0], t: 0, amb: 'dia', de: null, activo: false, fondo: 'ronda', q: { x: 95.9, z: 3.2, ry: -H }, casa: 1 };
   const ahora = { p: [-81, 50, 78], m: [300, -28, -60], f: 36 }, luzAmb = { ...AMB.dia, sol: new THREE.Color(AMB.dia.sol), niebla: new THREE.Color(AMB.dia.niebla) }, cTmp = new THREE.Color();
@@ -311,6 +407,7 @@ export async function crear(cont) {
     const r = lejos > 150 ? 118 : clamp(dist * .95, 9, 85); k.sol.target.position.set(foco[0], 0, foco[1]); k.sol.position.set(foco[0] + SOL.x * 160, SOL.y * 160, foco[1] + SOL.z * 160);
     Object.assign(k.sol.shadow.camera, { left: -r, right: r, top: r, bottom: -r, near: 1, far: 420 }); k.sol.shadow.camera.updateProjectionMatrix();
     if (A.filtro !== filtro) { filtro = A.filtro; k.lienzo.style.filter = filtro; }
+    eRew.style.opacity = fx.rew.toFixed(3); if (est.lumina || est.luminaPintada) { dibujarLumina(t); est.luminaPintada = !!est.lumina; }
     eVin.style.opacity = luzAmb.vin.toFixed(3); eNegro.style.opacity = fx.negro.toFixed(3); eFlash.style.opacity = fx.flash.toFixed(3); eVel.style.opacity = fx.vel.toFixed(3);
     k.render.render(k.escena, cam);
   }

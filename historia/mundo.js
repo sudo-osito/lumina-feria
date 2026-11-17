@@ -468,6 +468,38 @@ export function construir(k, md, m2, eq) {
   for (let i = 0; i < 6; i++) { const pista = [-15.7, -7.3][i % 2], sur = pista < -11.5, t = eq.camion(vivo, [0x2F6FB0, 0xC9603A, 0xE9EDF2][i % 3]); t.g.rotation.y = sur ? -Math.PI / 2 : Math.PI / 2; t.g.position.x = pista; W.transito.push({ g: t.g, z: -900 + R() * 1800, v: (sur ? 1 : -1) * (15 + R() * 4) }); }
   for (let i = 0; i < 3; i++) { const g = eq.auto(vivo, 16.6 + (i % 2) * 4, 0, i % 2 ? Math.PI / 2 : -Math.PI / 2, COL[i + 4]); W.transito.push({ g, z: -300 + i * 220, v: (i % 2 ? -1 : 1) * 8 }); }
 
+  /* ───────── el rebobinado (TILSE 22): la misma planta con Neisstech. Todo parte oculto. ───────── */
+  W.mejora = {};
+  { // gestión visual: pintura nueva sobre el piso gastado (franja de los racks y los andenes)
+    const t = lienzo(55, 0, 36, 25, 2048, (c) => {
+      const borde = (x0, z0, x1, z1, col, w = .12) => { c.fillStyle = col; if (x1 - x0 > z1 - z0) { c.fillRect(x0, z0 - w / 2, x1 - x0, w); c.fillRect(x0, z1 - w / 2, x1 - x0, w); } else { c.fillRect(x0 - w / 2, z0, w, z1 - z0); c.fillRect(x1 - w / 2, z0, w, z1 - z0); } };
+      // calle transversal: bordes amarillos nítidos y flechas
+      borde(58.5, 6.25, 90, 9.75, '#F5C400', .14);
+      c.fillStyle = 'rgba(255,255,255,.92)'; for (const x of [62, 72, 82]) { c.beginPath(); c.moveTo(x + 1.2, 7.4); c.lineTo(x - .4, 6.75); c.lineTo(x - .4, 7.15); c.lineTo(x - 1.6, 7.15); c.lineTo(x - 1.6, 7.65); c.lineTo(x - .4, 7.65); c.lineTo(x - .4, 8.05); c.closePath(); c.fill(); }
+      // sendero peatonal verde, con bordes y pictogramas
+      c.fillStyle = 'rgba(31,164,90,.38)'; c.fillRect(56.5, 8.9, 32, 1.2); c.fillRect(56.4, 7.5, 1.2, 17); borde(56.5, 8.9, 88.5, 10.1, '#1FA45A', .1); borde(56.4, 7.5, 57.6, 24.5, '#1FA45A', .1);
+      c.fillStyle = 'rgba(255,255,255,.9)'; for (let x = 59; x < 88; x += 8) { c.beginPath(); c.arc(x, 9.27, .12, 0, 7); c.fill(); c.fillRect(x - .07, 9.4, .14, .38); }
+      // pasos de cebra nítidos en la boca de cada pasillo, línea de PARE y «PARE» para la grúa
+      c.font = '800 .55px Poppins, Arial'; c.textAlign = 'center'; c.textBaseline = 'middle';
+      for (const x of [61, 65, 69, 73, 77, 81]) { c.fillStyle = '#FFFFFF'; c.fillRect(x - 1.25, 8.9, 2.5, 1.2); c.fillStyle = '#F5C400'; for (let k = x - 1.15; k < x + 1.1; k += .5) c.fillRect(k, 8.98, .25, 1.04);
+        c.fillStyle = '#FFFFFF'; c.fillRect(x - 1.2, 10.45, 2.4, .14); c.fillText('PARE', x, 11.0); }
+      c.fillStyle = '#FFFFFF'; c.fillRect(56.4, 20.25, 1.2, 2.5); c.fillStyle = '#F5C400'; for (let z = 20.35; z < 22.6; z += .5) c.fillRect(56.48, z, 1.04, .25);
+    });
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(36, 25), new THREE.MeshStandardMaterial({ map: t, transparent: true, opacity: 0, roughness: .7, polygonOffset: true, polygonOffsetFactor: -6, polygonOffsetUnits: -12, depthWrite: false }));
+    m.rotation.x = -Math.PI / 2; m.position.set(73, .012, 12.5); m.receiveShadow = true; m.renderOrder = 2; m.visible = false; vivo.add(m); W.mejora.pintura = m;
+  }
+  { // gestión de tráfico: baranda entre la calle y el sendero (con las bocas de los pasillos abiertas), puertas inteligentes en el cruce y sensor de grúa
+    const g = grupo(0, 0, 0, 0, vivo); g.visible = false; W.mejora.trafico = g;
+    for (const [a, b] of [[56.8, 59.75], [62.25, 63.75], [66.25, 67.45], [70.55, 71.75], [74.25, 75.75], [78.25, 79.75], [82.25, 84]]) md.barrera(g, a, 8.78, b, 8.78);
+    W.mejora.puertas = [eq.puertaInteligente(g, 67.55, 8.95, -Math.PI / 2, 1.15), eq.puertaInteligente(g, 70.45, 10.1, Math.PI / 2, 1.15)];
+    W.mejora.sensor = eq.sensorGrua(g, 67.62, 10.55, -Math.PI / 2);
+  }
+  { // Lúmina: una cámara en la columna, mirando el cruce
+    const g = grupo(66, 0, 4.5, 0, vivo); g.visible = false; W.mejora.camara = g;
+    caja(.1, .1, .5, 0, 5.3, .35, M.tinta, g, .02); const cuerpo = caja(.26, .24, .5, 0, 5.15, .78, std(0xF2F3F5, { roughness: .4 }), g, .06); cuerpo.rotation.x = .45;
+    const ojo = luz(0xEC6D27, 0x4a2a15); const o = cil(.07, .04, 0, 5.03, 1.05, ojo, g, 14); o.rotation.x = Math.PI / 2 + .45; ojo.emissiveIntensity = 1.4; W.mejora.ojo = ojo;
+  }
+
   k.fusionar(base);
 
   /* lo que se mueve solo, siempre: cinta, robot, autopista, globos, extractores y nubes */

@@ -40,6 +40,7 @@ const TOMAS = {
   frio:      { sola: 'frio', vista: () => V.frio, modo: () => 'despues', luz: () => 1 },
   eventos:   { sola: 'eventos', vista: () => V.eventos, modo: () => 'despues', luz: () => 1 },
   todo:      { vista: () => V.planta, modo: () => 'despues', luz: () => 1, compacto: true },
+  trafico:   { vista: () => ({ ...PT('cruce'), zoom: 10.5, desplaza: .3 }), modo: () => 'despues', luz: () => 0, orbita: true },   // TILSE 14: gestión de tráfico, sin Lúmina
   cierre:    { vista: () => ({ ...V.planta, zoom: 27, desplaza: .38 }), modo: () => 'despues', luz: () => 1, compacto: true, orbita: true },
 };
 const AVISO = { 'Riesgo de atropello': 'Cruce de pasillo', 'Persona en punto ciego': 'Grúa en retroceso', 'Exceso de velocidad': 'Calle A', 'Camión en movimiento': 'Andén 2',

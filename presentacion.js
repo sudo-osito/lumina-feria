@@ -1,11 +1,10 @@
-/* Neisstech × Lumina · presentación de feria. Motor: escenario 1920×1080 escalado, láminas con pasos, malla de puntos,
-   clips de video por paso, dibujos en canvas (data-vis) y la planta 3D (escena/lumina5.js).
-   Notas del presentador (N) y mapa (G), ocultos por defecto. ?apertura=pregunta|historia deja una sola apertura. */
+/* Neisstech · TILSE 2026. Motor: escenario 1920×1080 escalado, láminas con pasos, clips de video por paso, dibujos en
+   canvas (data-vis), la planta 3D de Neisstech (escena/lumina5.js) y la historia de Don Salva (historia/historia.js).
+   Las láminas con data-guion (02 y 22) recorren varias tomas de la historia, una por paso.
+   Notas del presentador (N) y mapa (G), ocultos por defecto. */
 (() => {
   const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const escenario = $("#escenario");
-  const apertura = new URLSearchParams(location.search).get("apertura");
-  if (apertura) $$("[data-opcion]").forEach((l) => { if (l.dataset.opcion !== apertura) l.remove(); });
   const lams = $$(".lam");
   let i = 0, paso = 0, tLam = 0, tPaso = 0;
 
@@ -19,77 +18,28 @@
     for (let n = 1; n < vs.length; n++) l.insertAdjacentHTML("beforeend", '<i data-paso class="norma__marca" hidden></i>');
     l.insertAdjacentHTML("beforeend", `<div class="historias">${vs.map(() => "<i></i>").join("")}</div>`);
   });
-  // desafíos: cada tarjeta entra desde su borde y al final viaja al centro
-  $$(".reto").forEach((el) => {
-    const [dx, dy] = (el.dataset.desde || "0,0").split(",").map(Number);
-    el.style.setProperty("--dx", dx); el.style.setProperty("--dy", dy);
-    const x = parseFloat(el.style.getPropertyValue("--x")), y = parseFloat(el.style.getPropertyValue("--y"));
-    el.style.setProperty("--hx", `${960 - (x + 230)}px`); el.style.setProperty("--hy", `${470 - (y + 80)}px`);
-  });
-  // logos de clientes: cuatro bandas que corren, una a la derecha y otra a la izquierda; cada banda con marcas distintas.
-  // Se mueven desde el bucle (no con animación CSS: la invertida se desfasaba y dejaba huecos)
-  const cintas = [];
-  function moverCintas(t) {
-    for (const c of cintas) { if (!c.mitad) { const h = c.pista.children, n = h.length / 2; c.mitad = h[n].offsetLeft - h[0].offsetLeft; } if (!c.mitad) continue;
-      const x = ((t / 1000) * c.vel) % c.mitad; c.pista.style.transform = `translate3d(${c.dir > 0 ? -x : x - c.mitad}px,0,0)`; }
-  }
-  $$(".muro").forEach((m) => {
-    const imgs = $$("img", m), filas = [[], [], [], []];
-    imgs.forEach((im, n) => filas[n < 7 ? 0 : n < 13 ? 1 : n < 20 ? 2 : 3].push(im));
-    m.innerHTML = "";
-    filas.forEach((f, k) => { const b = document.createElement("div"); b.className = `cinta cinta--${k % 2 ? "izq" : "der"}`; b.style.setProperty("--dur", `${42 + k * 5}s`);
-      const pista = document.createElement("div"); pista.className = "cinta__pista";
-      for (let c = 0; c < 2; c++) f.forEach((im) => { const x = im.cloneNode(); if (c) x.setAttribute("aria-hidden", "true"); pista.appendChild(x); });
-      cintas.push({ pista, dir: k % 2 ? -1 : 1, vel: 46 + k * 6, mitad: 0 });
-      b.appendChild(pista); m.appendChild(b); if (k === 1) { const hueco = document.createElement("div"); hueco.className = "cinta__hueco"; m.appendChild(hueco); } });
-  });
-
+  // láminas con guion: un paso por toma de la historia (marcadores ocultos para contar los pasos)
+  lams.forEach((l) => { if (!l.dataset.guion) return; l._guion = JSON.parse(l.dataset.guion); for (let n = 1; n < l._guion.length; n++) l.insertAdjacentHTML("beforeend", '<i data-paso class="norma__marca" hidden></i>'); });
+  const tomaHist = (l, p) => (l._guion ? l._guion[Math.min(p, l._guion.length - 1)] : [l.dataset.escena, p]);
+  // video que todavía no llega (Pucargo): la lámina muestra el aviso en vez de un cuadro negro
+  $$(".clips video").forEach((v) => v.addEventListener("error", () => v.closest(".lam").classList.add("sin-video")));
   /* ── Planta 3D: se carga al inicio en segundo plano; solo dibuja cuando una lámina la usa ── */
   let planta = null;
-  const pedirPlanta = import("./escena/lumina5.js?v=41").then((m) => m.crear($("#planta3d"))).then((p) => { planta = p; sincronizar3d(); return planta; }).catch((e) => console.error("planta 3D:", e));
+  const pedirPlanta = import("./escena/lumina5.js?v=42").then((m) => m.crear($("#planta3d"))).then((p) => { planta = p; sincronizar3d(); return planta; }).catch((e) => console.error("planta 3D:", e));
   // La historia de Don Salva: otra escena 3D, con cámara de cine (historia/historia.js); una toma por paso
   let historia = null;
-  const pedirHistoria = import("./historia/historia.js?v=4").then((m) => m.crear($("#historia3d"))).then((h) => { historia = h; sincronizar3d(); return h; }).catch((e) => console.error("historia 3D:", e));
+  const pedirHistoria = import("./historia/historia.js?v=6").then((m) => m.crear($("#historia3d"))).then((h) => { historia = h; sincronizar3d(); return h; }).catch((e) => console.error("historia 3D:", e));
   function sincronizar3d() {
     const esc = lams[i].dataset.escena;
     escenario.classList.toggle("conhistoria", !!esc);
-    if (historia) { if (esc) { historia.ir(esc, paso); historia.activo(true); } else historia.activo(false); }
+    if (historia) { if (esc) { historia.ir(...tomaHist(lams[i], paso)); historia.activo(true); } else historia.activo(false); }
     const toma = lams[i].dataset.toma;
     escenario.classList.toggle("con3d", !!toma);
     if (!planta) return;
     if (toma) { planta.toma(toma, paso); planta.activo(true); } else planta.activo(false);
   }
 
-  /* ── Malla de puntos: la sala. La fracción encendida la define cada lámina (data-malla).
-        En el tema naranjo es la malla blanca de Lumina, con una luz que la recorre (como en la one-page). ── */
-  const malla = $("#malla"), mc = malla.getContext("2d"); malla.width = 1920; malla.height = 1080;
-  const PASO = 48, puntos = [];
-  for (let y = PASO / 2; y < 1080; y += PASO) for (let x = PASO / 2; x < 1920; x += PASO) puntos.push({ x, y, u: Math.random(), d: Math.hypot(x - 960, y - 540) / 1100, k: 0, fase: Math.random() * 6.28 });
-  let fraccion = 0, tCambio = 0, centrada = false, tema = "";
-  function pintarMalla(t) {
-    mc.clearRect(0, 0, 1920, 1080);
-    if (tema !== "naranjo") return;   // v5: sin puntos de fondo (Max: «ya no hacen sentido»); solo la malla de Lumina en el naranjo
-    {
-      const s = t / 1000, lx = 960 + 620 * Math.sin(s * .17), ly = 540 + 300 * Math.sin(s * .21 + 1), R = 380;
-      const g = mc.createRadialGradient(lx, ly, 0, lx, ly, R * 1.8); g.addColorStop(0, "rgba(255,255,255,.16)"); g.addColorStop(1, "rgba(255,255,255,0)");
-      mc.fillStyle = g; mc.fillRect(0, 0, 1920, 1080);
-      for (let y = 12; y < 1080; y += 24) for (let x = 12; x < 1920; x += 24) {
-        const d = Math.hypot(x - lx, y - ly) / R, k = d < 1 ? Math.pow(1 - d, 1.6) : 0;
-        mc.fillStyle = `rgba(255,255,255,${.16 + .7 * k})`; mc.beginPath(); mc.arc(x, y, 1.6 + 1.8 * k, 0, 6.3); mc.fill();
-      }
-      return;
-    }
-    const oscuro = tema === "lumina", dt = (t - tCambio) / 1000;
-    for (const p of puntos) {
-      const meta = p.u < fraccion && dt > p.d * .9 ? 1 : (p.u < fraccion ? p.k : 0);
-      p.k += (meta - p.k) * .07;
-      const el = Math.hypot((p.x - 960) / 900, (p.y - 540) / 330), claro = centrada ? Math.min(1, Math.max(.06, (el - .75) * 2.2)) : 1;   // se atenúan detrás del texto
-      const resp = .5 + .5 * Math.sin(t / 900 + p.fase), a = (.1 + .05 * resp + p.k * (.7 + .3 * resp)) * claro;
-      mc.fillStyle = p.k > .03 ? `rgba(${oscuro ? "236,109,39" : "5,108,242"},${a})` : `rgba(${oscuro ? "255,255,255" : "24,24,24"},${(.07 + .04 * resp) * claro})`;
-      mc.beginPath(); mc.arc(p.x, p.y, 2.2 + p.k * 2.6, 0, 6.3); mc.fill();
-    }
-  }
-
+  let tema = "";
   /* ── Navegación ── */
   const pasosDe = (l) => $$("[data-paso]", l);
   function mostrar(n, p = 0, alFinal = false) {
@@ -97,14 +47,12 @@
     const l = lams[i], ps = pasosDe(l); paso = alFinal ? ps.length : Math.min(p, ps.length);
     lams.forEach((x, j) => x.classList.toggle("activa", j === i));
     aplicarPaso();
-    fraccion = parseFloat(l.dataset.malla || "0"); tCambio = performance.now(); centrada = l.classList.contains("lam--centro");
     tema = l.dataset.tema || ""; escenario.dataset.tema = tema;
     escenario.classList.toggle("sin-firma", l.hasAttribute("data-sin-firma"));
     contar(l); contarN(l);
     $("#avance").style.width = `${((i + 1) / lams.length) * 100}%`;
     $("#numero").innerHTML = `<b>${String(i + 1).padStart(2, "0")}</b> / ${lams.length}`;
-    escenario.classList.toggle("fondo-oscuro", l.classList.contains("lam--video") || tema === "naranjo" || l.hasAttribute("data-oscuro"));
-    $("#notas p").textContent = l.dataset.notas || "";
+
     $$(".mapa__lam").forEach((b, j) => b.classList.toggle("aqui", j === i));
     sincronizar3d();
   }
@@ -113,7 +61,12 @@
     pasosDe(l).forEach((el, j) => { el.classList.toggle("dado", j < paso); el.classList.toggle("ultimo", j === paso - 1); });
     for (let n = 1; n <= 8; n++) l.classList.toggle(`p${n}`, paso >= n);
     if (planta && l.dataset.toma) planta.paso(paso);
-    if (historia && l.dataset.escena) historia.ir(l.dataset.escena, paso);
+    if (historia && l.dataset.escena) historia.ir(...tomaHist(l, paso));
+    // guion: se ve solo el texto del paso actual; algunos pasos van en negro (data-guion[2])
+    const g = l._guion && l._guion[paso], oscuro = l.classList.contains("lam--video") || tema === "naranjo" || (g && g[2]);
+    if (l._guion) { $$("[data-h]", l).forEach((el) => el.classList.toggle("ve", +el.dataset.h === paso)); l.classList.toggle("oscura", !!(g && g[2])); }
+    escenario.classList.toggle("fondo-oscuro", !!oscuro);
+    const nota = l._guion && $(`[data-h="${paso}"]`, l); $("#notas p").textContent = (nota && nota.dataset.n) || l.dataset.notas || "";
     sincronizarVideos();
     history.replaceState(null, "", `${location.search}#${i + 1}${paso ? "." + paso : ""}`);
   }
@@ -169,27 +122,6 @@
   // el cursor se esconde; vuelve solo mientras se mueve el mouse
   let cursorT = 0; addEventListener("mousemove", () => { document.body.classList.add("raton"); clearTimeout(cursorT); cursorT = setTimeout(() => document.body.classList.remove("raton"), 1500); });
 
-  /* ── Pirámide de Bird: 1 · 10 · 30 · 600 puntos, una capa por paso. El lienzo parte 120 px antes que la lámina. ── */
-  const pir = $(".piramide canvas"), pc = pir && pir.getContext("2d"), PS = 23, PX0 = 450, PY0 = 30, CORRE = 120, TOTAL = 641;
-  const DOTS = [];
-  if (pir) {
-    for (let r = 0, n = 0; n < TOTAL; r++) {
-      const enFila = Math.min(r + 1, TOTAL - n);   // la última fila, incompleta, va centrada
-      for (let c = 0; c < enFila; c++, n++) DOTS.push({ x: PX0 + (c - (enFila - 1) / 2) * PS, y: PY0 + r * PS * .9, n, capa: n < 1 ? 0 : n < 11 ? 1 : n < 41 ? 2 : 3, k: 0 });
-    }
-    $$(".capa-pir", pir.parentNode).forEach((el) => { const f = parseFloat(el.dataset.fila); el.style.top = `${PY0 + f * PS * .9 - (el.classList.contains("capa-pir--600") ? 110 : 40)}px`; el.style.left = `${PX0 - CORRE + (f / 2) * PS + 70}px`; });
-  }
-  let pirVisto = 0;
-  function pintarPiramide() {
-    const meta = [0, 1, 11, 41, TOTAL][Math.min(paso, 4)]; pirVisto += (meta - pirVisto) * .06 + Math.sign(meta - pirVisto) * .4;
-    pc.clearRect(0, 0, pir.width, pir.height);
-    const COL = ["229,72,77", "24,24,24", "24,24,24", "24,24,24"], R = [11, 6.5, 5.5, 4.2];
-    for (const d of DOTS) {
-      d.k += ((d.n < pirVisto ? 1 : 0) - d.k) * .18; if (d.k < .01) continue;
-      pc.fillStyle = `rgba(${COL[d.capa]},${[1, .85, .6, .38][d.capa] * d.k})`; pc.beginPath(); pc.arc(d.x, d.y, R[d.capa] * (.4 + .6 * d.k), 0, 6.3); pc.fill();
-    }
-  }
-
   /* ── Cifras que cuentan hasta su valor ── */
   function contar(l) {
     $$("[data-contar]", l).forEach((el) => {
@@ -231,82 +163,76 @@
   const aro = (c, x, y, r, rgb, a = 1, lw = 1.6) => { c.strokeStyle = `rgba(${rgb},${a})`; c.lineWidth = lw; c.beginPath(); c.arc(x, y, r, 0, 6.3); c.stroke(); };
   const ir = (v, meta, f = .08) => v + (meta - v) * f;
   const VIS = {
-    // 5 de cada 10: diez esferas de partículas (una por persona); en el paso 1 la fila de arriba se vuelve roja
-    diez: (() => { const k = new Float32Array(10), q = new Float32Array(10);
-      return (c, t, w, h) => { c.clearRect(0, 0, w, h); const s = w / 5;
-        for (let n = 0; n < 10; n++) { const x = s / 2 + (n % 5) * s, y = 130 + Math.floor(n / 5) * 270;
-          k[n] = ir(k[n], t > n * 90 + 300 ? 1 : 0, .1); q[n] = ir(q[n], paso >= 1 && n < 5 && performance.now() - tPaso > 250 + n * 260 ? 1 : 0, .1);
-          const rgb = q[n] > .5 ? ROJO : CARBON; esfera(c, x, y, 64 * (.6 + .4 * k[n]), P160, t / 1400 + n * .7, rgb, k[n], 2.3); }
-        const l = Math.min(1, Math.max(0, (performance.now() - tPaso - 1500) / 600)) * (paso >= 1 ? 1 : 0);
-        rotulo(c, w / 2, 222, "Con un vehículo involucrado", ROJO, l); rotulo(c, w / 2, 492, "Otras causas", GRIS, l); }; })(),
-    // 23,9 días: un punto por día; la línea es el promedio del país
-    calendario: (c, t, w, h) => { c.clearRect(0, 0, w, h); const cel = w / 24, f = Math.min(23.9, Math.max(0, (t - 300) / 1000 * 13));
-      for (let d = 0; d < 24; d++) { const x = d * cel + cel / 2, llen = Math.min(1, Math.max(0, f - d)); aro(c, x, 96, 15, CARBON, .2); if (llen > 0) punto(c, x, 96, 15 * llen, AZUL); }
-      const xp = 18.5 * cel; c.strokeStyle = `rgba(${CARBON},.5)`; c.lineWidth = 1.5; c.beginPath(); c.moveTo(xp, 52); c.lineTo(xp, 140); c.stroke();
-      rotulo(c, xp, 22, "Promedio del país · 18,5", CARBON, .7, 15); rotulo(c, cel / 2, 150, "Día 1", GRIS, .8, 14); rotulo(c, 23.5 * cel, 150, "Día 24", GRIS, .8, 14); },
-    // iceberg: la línea del agua; arriba una esfera chica (lo que se ve), abajo una enorme (lo que no se ve)
+    // 05 · 154 personas fallecidas: 76 con vehículo (azul) y 15 de ellas dentro de la faena (rojo)
+    fatales: (() => { const N = 154, k = new Float32Array(N), q = new Float32Array(N), rr = new Float32Array(N);
+      return (c, t, w, h) => { c.clearRect(0, 0, w, h); const C = 14, s = 56, ox = (w - (C - 1) * s) / 2, oy = 40, ahora = performance.now() - tPaso;
+        for (let n = 0; n < N; n++) { const x = ox + (n % C) * s, y = oy + Math.floor(n / C) * s * .92;
+          k[n] = ir(k[n], t > n * 9 + 200 ? 1 : 0, .12); q[n] = ir(q[n], paso >= 1 && n < 76 && (paso > 1 || ahora > n * 14) ? 1 : 0, .1); rr[n] = ir(rr[n], paso >= 2 && n < 15 && ahora > 200 + n * 60 ? 1 : 0, .1);
+          const rgb = rr[n] > .5 ? ROJO : q[n] > .5 ? AZUL : CARBON, a = (rr[n] > .5 || q[n] > .5 ? 1 : paso >= 1 ? .22 : .7) * k[n];
+          punto(c, x, y, 12 * (.5 + .5 * k[n]) * (rr[n] > .5 ? 1.15 : 1), rgb, a); } }; })(),
+    // 06 · iceberg: la línea del agua; arriba una esfera chica (lo que se ve), abajo una enorme (lo que no se ve)
     iceberg: (() => { let u = 0; return (c, t, w, h) => { c.clearRect(0, 0, w, h); u = ir(u, paso >= 1 ? 1 : 0, .04); const g = t / 1600;
       c.strokeStyle = `rgba(${CARBON},.45)`; c.lineWidth = 1.6; c.beginPath(); for (let x = 0; x <= w; x += 8) { const y = 430 + Math.sin(x / 90 + t / 900) * 4; x ? c.lineTo(x, y) : c.moveTo(x, y); } c.stroke();
-      esfera(c, 760, 330, 74, P160, g, CARBON, 1, 2.2); rotulo(c, 760, 228, "Lo que se ve", GRIS, 1);
-      esfera(c, 760, 720, 270 * (.3 + .7 * u), P900, -g * .7, AZUL, u, 2.4); rotulo(c, 760, 1004, "Lo que no se ve", AZUL, u); }; })(),
-    // rotación: cada punto es una persona; aros vacíos = recién llegados, puntos azules = con experiencia (y se van)
-    rotacion: (() => { const r = azar(3), P = [...Array(100)].map(() => ({ edad: r() < .16 ? .45 + r() * .5 : r() * .25, s: 1, sale: false })); let prox = 0;
-      return (c, t, w) => { c.clearRect(0, 0, w, w); const s = 78, o = (w - s * 10) / 2 + s / 2;
-        if (t > prox) { prox = t + 130; for (let k = 0; k < 6; k++) { const p = P[Math.floor(r() * 100)]; if (!p.sale && (p.edad > .4 || r() < .35)) { p.sale = true; break; } } }
-        P.forEach((p, n) => { if (p.sale) { p.s -= .07; if (p.s <= 0) { p.sale = false; p.s = .01; p.edad = 0; } } else { p.s = Math.min(1, p.s + .05); p.edad = Math.min(1, p.edad + .0011); }
-          const x = o + (n % 10) * s, y = o + Math.floor(n / 10) * s - 30; if (p.edad < .4) aro(c, x, y, 12 * p.s, CARBON, .32); else punto(c, x, y, 12 * p.s, AZUL, .4 + .6 * p.edad); });
-        aro(c, o - 10, w - 42, 9, CARBON, .4); rotulo(c, o + 8, w - 50, "Recién llegados", GRIS, 1, 15, "left");
-        punto(c, o + 330, w - 42, 9, AZUL); rotulo(c, o + 348, w - 50, "Con experiencia", AZUL, 1, 15, "left"); }; })(),
-    // cobertura: la planta entera dibujada en puntos; solo el aro (la mirada del supervisor) la ve completa
-    cobertura: (() => { const img = new Image(); img.src = "recursos/planta-cenital.jpg"; let D = null; const r = azar(11), riesgos = [...Array(9)].map(() => ({ x: 90 + r() * 920, y: 90 + r() * 680, f: r() * 6 }));
-      const muestrear = (w, h) => { const o = document.createElement("canvas"), P = 15; o.width = w; o.height = h; const x = o.getContext("2d", { willReadFrequently: true }), e = Math.max(w / img.naturalWidth, h / img.naturalHeight);
-        x.drawImage(img, (w - img.naturalWidth * e) / 2, (h - img.naturalHeight * e) / 2, img.naturalWidth * e, img.naturalHeight * e); const d = x.getImageData(0, 0, w, h).data; D = [];
-        for (let yy = P / 2; yy < h; yy += P) for (let xx = P / 2; xx < w; xx += P) { const i = (Math.floor(yy) * w + Math.floor(xx)) * 4, l = (d[i] * .3 + d[i + 1] * .59 + d[i + 2] * .11) / 255; D.push([xx, yy, 1 + 3.4 * (1 - l)]); } };
-      return (c, t, w, h) => { c.clearRect(0, 0, w, h); if (!D && img.complete && img.naturalWidth) muestrear(w, h); const s = t / 1000, lx = w / 2 + w * .33 * Math.sin(s * .45), ly = h / 2 + h * .3 * Math.sin(s * .33 + 1), R = 150;
-        if (D) for (const [x, y, rr] of D) { const dentro = Math.hypot(x - lx, y - ly) < R; punto(c, x, y, rr, CARBON, dentro ? .9 : .2); }
-        riesgos.forEach((q) => { const p = .5 + .5 * Math.sin(s * 2 + q.f), dentro = Math.hypot(q.x - lx, q.y - ly) < R; punto(c, q.x, q.y, dentro ? 9 : 5 + 3 * p, ROJO, dentro ? 1 : .35 + .4 * p); if (dentro) aro(c, q.x, q.y, 18, ROJO, .8); });
-        aro(c, lx, ly, R, CARBON, .7, 1.6); rotulo(c, lx, ly + R + 14, "Lo que ve el supervisor", CARBON, .8, 15); }; })(),
-    // cultura: un prevencionista (azul) para casi 200 personas; los pasos suman rotación, gente nueva y demarcación gastada
-    cultura: (() => { const r = azar(5), C = 20, F = 10, G = [...Array(C * F)].map(() => ({ s: 1, sale: false, nuevo: r() < .3 })), PV = 87; let prox = 0;
-      return (c, t, w, h) => { c.clearRect(0, 0, w, h); const sx = w / C, sy = 56, oy = 70;
-        if (false) { c.lineWidth = 2; c.strokeStyle = `rgba(${CARBON},.3)`; for (const y of [oy - 36, oy + F * sy - 10]) for (let x = 0; x < w; x += 38) { if (Math.sin(x * 7.13 + y) > .35) continue; c.beginPath(); c.moveTo(x, y); c.lineTo(x + 18, y); c.stroke(); } }
-        if (paso >= 1 && t > prox) { prox = t + 70; const q = G[Math.floor(r() * G.length)]; if (q !== G[PV] && !q.sale) q.sale = true; }
-        G.forEach((q, n) => { if (q.sale) { q.s -= .09; if (q.s <= 0) { q.sale = false; q.s = .01; q.nuevo = true; } } else q.s = Math.min(1, q.s + .06);
-          if (n === PV) return; const x = sx / 2 + (n % C) * sx, y = oy + Math.floor(n / C) * sy, nuevo = paso >= 2 ? q.nuevo || n % 9 !== 0 : q.nuevo;
-          if (nuevo) aro(c, x, y, 7 * q.s, CARBON, .3, 1.4); else punto(c, x, y, 7 * q.s, CARBON, .75); });
-        const x = sx / 2 + (PV % C) * sx, y = oy + Math.floor(PV / C) * sy, pul = (t / 1400) % 1;
-        aro(c, x, y, 14 + pul * 40, AZUL, 1 - pul, 1.6); punto(c, x, y, 11, AZUL); rotulo(c, x, y + 26, "1 prevencionista", AZUL, 1, 15); }; })(),
-    // balanza: Lumina (naranjo) es el pivote; seguridad (azul) pesa y la privacidad (naranjo) la equilibra
-    balanza: (() => { let ang = -.12, v = 0, rb = 30; return (c, t, w, h) => { c.clearRect(0, 0, w, h); const meta = paso >= 1 ? 0 : -.12; v += (meta - ang) * .02; v *= .9; ang += v; rb = ir(rb, paso >= 1 ? 130 : 34, .06);
-      const cx = w / 2, cy = 400, L = 560, dx = Math.cos(ang) * L, dy = Math.sin(ang) * L, nx = Math.sin(ang), ny = -Math.cos(ang), g = t / 1500;
-      c.strokeStyle = `rgba(${CARBON},.8)`; c.lineWidth = 2.5; c.beginPath(); c.moveTo(cx - dx, cy - dy); c.lineTo(cx + dx, cy + dy); c.stroke();
-      c.lineWidth = 1.6; c.beginPath(); c.moveTo(cx, cy); c.lineTo(cx - 60, cy + 150); c.lineTo(cx + 60, cy + 150); c.closePath(); c.stroke();
-      esfera(c, cx, cy, 30, P90, g * 1.4, NAR, 1, 2);
-      const A = [cx - dx, cy - dy], B = [cx + dx, cy + dy];
-      esfera(c, A[0] + nx * 136, A[1] + ny * 136, 130, P420, g, AZUL, 1, 2.4); esfera(c, B[0] + nx * (rb + 6), B[1] + ny * (rb + 6), rb, rb < 70 ? P90 : P420, -g, NAR, paso >= 1 ? 1 : .5, 2.4);
-      rotulo(c, A[0], A[1] + 26, "Seguridad", AZUL, 1, 18); rotulo(c, A[0], A[1] + 60, "DS 594 · ISO 45001 · BSI PAS 13 · OSHA 1910.178", GRIS, 1, 14);
-      rotulo(c, B[0], B[1] + 26, "Privacidad", NAR, 1, 18); rotulo(c, B[0], B[1] + 60, "Ley 21.719 · Dictámenes DT · Rostros pixelados", GRIS, paso >= 1 ? 1 : .35, 14);
-      rotulo(c, cx, cy + 172, "Lumina", NAR, 1, 15); }; })(),
-    // el ciclo: cinco soluciones de Neisstech (azul) conectadas a Lumina (naranjo)
-    ciclo: (() => { const N = [["Gestión visual", 430, 330], ["Gestión de tráfico", 1490, 330], ["Barreras y andenes", 360, 790], ["Flujo e intralogística", 1560, 790], ["IA Cam", 960, 900]]; let u = 0;
-      return (c, t, w, h) => { c.clearRect(0, 0, w, h); u = ir(u, paso >= 1 ? 1 : 0, .05); const g = t / 1500, cx = 960, cy = 560;
-        N.forEach(([txt, x, y], i) => { const a = Math.min(1, Math.max(0, (t - 300 - i * 140) / 500));
-          c.strokeStyle = u > .02 ? `rgba(${NAR},${.15 + .5 * u})` : `rgba(${CARBON},.12)`; c.lineWidth = 1.5; c.setLineDash([2, 10]); c.beginPath(); c.moveTo(x, y); c.lineTo(cx, cy); c.stroke(); c.setLineDash([]);
-          if (u > .3) for (let k = 0; k < 3; k++) { const f = ((t / 1600) + k / 3 + i * .13) % 1; punto(c, x + (cx - x) * f, y + (cy - y) * f, 3.5, NAR, u * Math.sin(f * Math.PI)); }
-          esfera(c, x, y, 52, P160, g + i, AZUL, a, 2); rotulo(c, x, y + 70, txt, CARBON, a * .85, 16); });
-        esfera(c, cx, cy, 130 * u, P420, -g, NAR, u, 2.4); rotulo(c, cx, cy + 150, "Lumina", NAR, u, 18); }; })(),
+      esfera(c, 760, 330, 74, P160, g, CARBON, 1, 2.2);
+      esfera(c, 760, 720, 270 * (.3 + .7 * u), P900, -g * .7, AZUL, u, 2.4); }; })(),
+    // 07 · los cuatro desafíos, cada uno con su dibujo chico
+    d1: (c, t, w, h) => { c.clearRect(0, 0, w, h); const s = t / 1000, px = w * (.5 + .42 * Math.sin(s * .9)), fy = h * (.5 + .4 * Math.sin(s * .7 + 1.3)), fx = w * .5;
+      for (let x = 20; x < w; x += 22) punto(c, x, h / 2, 2.6, CARBON, .2); for (let y = 14; y < h; y += 22) punto(c, fx, y, 2.6, CARBON, .2);
+      for (let a = 0; a < 4; a++) for (let b = 0; b < 3; b++) punto(c, fx - 30 + a * 20, fy - 20 + b * 20, 7.5, CARBON, .85);
+      const cerca = Math.hypot(px - fx, h / 2 - fy) < 90; punto(c, px, h / 2, 13, cerca ? ROJO : AZUL); if (cerca) aro(c, (px + fx) / 2, (h / 2 + fy) / 2, 70, ROJO, .8, 2.4); },
+    d2: (c, t, w, h) => { c.clearRect(0, 0, w, h); const s = t / 1000, lx = w / 2 + w * .32 * Math.sin(s * .6), ly = h / 2 + h * .25 * Math.sin(s * .45 + 1), R = 70;
+      for (let y = 30; y < h; y += 30) for (let x = 30; x < w; x += 30) punto(c, x, y, 3.2, CARBON, Math.hypot(x - lx, y - ly) < R ? .9 : .16);
+      [[90, 70], [470, 90], [140, 240], [400, 230]].forEach(([x, y], n) => { const dentro = Math.hypot(x - lx, y - ly) < R; punto(c, x, y, 7, ROJO, dentro ? 1 : .3 + .3 * Math.sin(s * 3 + n)); });
+      aro(c, lx, ly, R, AZUL, .8, 2); },
+    d3: (c, t, w, h) => { c.clearRect(0, 0, w, h); const s = t / 1000, y = h / 2;
+      const forma = (n, x, sz, a) => { c.strokeStyle = `rgba(${CARBON},${a})`; c.lineWidth = 3; c.beginPath();
+        if (n === 0) { c.moveTo(x, y - sz); c.lineTo(x + sz, y + sz * .8); c.lineTo(x - sz, y + sz * .8); c.closePath(); }
+        else if (n === 1) c.arc(x, y, sz, 0, 6.3); else if (n === 2) { c.moveTo(x, y - sz); c.lineTo(x + sz, y); c.lineTo(x, y + sz); c.lineTo(x - sz, y); c.closePath(); } else c.rect(x - sz, y - sz * .75, sz * 2, sz * 1.5); c.stroke(); };
+      [0, 1, 2, 3, 0].forEach((n, i) => forma(n, 70 + i * 105, 26 + 10 * Math.sin(s + i * 1.7) + (i % 2) * 8, .35 + .4 * (i % 3) / 2)); },
+    d4: (() => { const r = azar(9), P = [...Array(72)].map(() => ({ s: 1, sale: false, nuevo: r() < .5 })); let prox = 0;
+      return (c, t, w, h) => { c.clearRect(0, 0, w, h); if (t > prox) { prox = t + 140; const p = P[Math.floor(r() * P.length)]; if (!p.sale) p.sale = true; }
+        P.forEach((p, n) => { if (p.sale) { p.s -= .08; if (p.s <= 0) { p.sale = false; p.s = .01; p.nuevo = true; } } else p.s = Math.min(1, p.s + .05);
+          const x = 40 + (n % 12) * 44, y = 40 + Math.floor(n / 12) * 44; if (p.nuevo) aro(c, x, y, 9 * p.s, CARBON, .35, 1.6); else punto(c, x, y, 9 * p.s, AZUL, .9); }); }; })(),
+    // 09 · 10 · 13 · 16 · los tres pilares; data-pilar destaca uno (0 = los tres)
+    pilares: (() => { const L = [["Personas y prácticas", "Gestión visual", "Capacitación · procedimientos · inducción", AZUL], ["Ingeniería", "Gestión de tráfico", "Intervenir el entorno y las tareas", AZUL], ["Analítica y respuesta", "Lúmina", "Datos · medidas · respuestas", NAR]];
+      return (c, t, w, h, cv) => { c.clearRect(0, 0, w, h); const sel = +(cv.dataset.pilar || 0), s = t / 1000, X = [w * .22, w * .5, w * .78], top = 90, base = 470;
+        for (let x = X[0] - 260; x <= X[2] + 260; x += 18) { punto(c, x, top - 26, 2.6, CARBON, .45); punto(c, x, top - 6, 2.6, CARBON, .3); punto(c, x, base + 18, 2.6, CARBON, .45); punto(c, x, base + 38, 2.6, CARBON, .3); }
+        L.forEach(([capa, sol, det, rgb], k) => { const on = sel === 0 || sel === k + 1, x0 = X[k], a = on ? 1 : .18, entra = Math.min(1, Math.max(0, (t - 200 - k * 180) / 900));
+          for (let col = -3; col <= 3; col++) for (let row = 0; row < 14; row++) { const y = base - row * 26, vis = row / 14 < entra; if (!vis) continue;
+            const puls = on && sel ? .6 + .4 * Math.sin(s * 2.4 - row * .35 + col) : 1; punto(c, x0 + col * 22, y, (col === -3 || col === 3 ? 3.8 : 3.1) * (on && sel ? 1.12 : 1), on ? rgb : CARBON, a * (.55 + .45 * puls)); }
+          rotulo(c, x0, base + 66, capa, on ? rgb : GRIS, on ? 1 : .45, 17);
+          c.save(); c.font = `500 ${sel === k + 1 ? 52 : 44}px Poppins`; c.textAlign = "center"; c.textBaseline = "top"; c.fillStyle = `rgba(${on ? (k === 2 ? NAR : CARBON) : CARBON},${on ? 1 : .3})`; c.fillText(sol, x0, base + 104); c.restore();
+          c.save(); c.font = "400 22px Poppins"; c.textAlign = "center"; c.textBaseline = "top"; c.fillStyle = `rgba(${GRIS},${on ? .95 : .35})`; c.fillText(det, x0, base + 176); c.restore(); }); }; })(),
+    // 19 · infraestructura: cámaras → procesamiento → respuesta y dashboard
+    infra: (() => { const N = [["Cámaras", "Existentes o nuevas, según compatibilidad", 300, 300, CARBON], ["Procesamiento de imágenes", "Detecta eventos de riesgo", 860, 300, NAR], ["Dispositivos de respuesta", "Semáforos · puertas · balizas · avisos", 1480, 130, AZUL], ["Dashboard", "Eventos, horarios y tendencias", 1480, 440, NAR]];
+      return (c, t, w, h) => { c.clearRect(0, 0, w, h); const g = t / 1500;
+        [[0, 1], [1, 2], [1, 3]].forEach(([a, b], k) => { const A = N[a], B = N[b], al = Math.min(1, Math.max(0, (t - 600 - k * 250) / 600));
+          c.strokeStyle = `rgba(${CARBON},${.25 * al})`; c.lineWidth = 1.6; c.setLineDash([2, 10]); c.beginPath(); c.moveTo(A[2] + 90, A[3]); c.lineTo(B[2] - 90, B[3]); c.stroke(); c.setLineDash([]);
+          for (let j = 0; j < 3; j++) { const f = ((t / 1800) + j / 3 + k * .2) % 1; punto(c, A[2] + 90 + (B[2] - 90 - A[2] - 90) * f, A[3] + (B[3] - A[3]) * f, 4, B[4], al * Math.sin(f * Math.PI)); } });
+        N.forEach(([tit, sub, x, y, rgb], k) => { const a = Math.min(1, Math.max(0, (t - 150 - k * 200) / 600)); esfera(c, x, y, 84, P420, g + k, rgb, a, 2.2);
+          rotulo(c, x, y + 106, tit, rgb === CARBON ? CARBON : rgb, a, 20); c.save(); c.font = "400 25px Poppins"; c.textAlign = "center"; c.textBaseline = "top"; c.fillStyle = `rgba(${GRIS},${a})`; c.fillText(sub, x, y + 142); c.restore(); }); }; })(),
+    // 20 · analítica (ilustrativa, sin datos reales): dónde, a qué hora y con qué frecuencia se repiten los eventos
+    analitica: (() => { const r = azar(21), focos = [[150, 150, 1], [330, 300, .7], [420, 120, .45]], pts = [...Array(140)].map(() => { const f = focos[Math.floor(r() * 3)]; return [f[0] + (r() - .5) * 120 * f[2], f[1] + (r() - .5) * 100 * f[2], f[2]]; });
+      const hora = [...Array(24)].map((_, hh) => Math.round(1 + 6 * Math.exp(-((hh - 8.5) ** 2) / 3) + 4 * Math.exp(-((hh - 17) ** 2) / 4) + r() * 1.2)), dias = [...Array(35)].map((_, d) => (d % 7 === 0 || d % 7 === 4) && r() < .85 ? 1 : r() < .12 ? .5 : 0);
+      return (c, t, w, h) => { c.clearRect(0, 0, w, h); const a = (k) => Math.min(1, Math.max(0, (t - 200 - k * 300) / 700));
+        // dónde
+        c.save(); c.translate(0, 40); c.strokeStyle = `rgba(${CARBON},${.3 * a(0)})`; c.setLineDash([2, 8]); c.lineWidth = 1.6; c.strokeRect(20, 20, 500, 380); c.setLineDash([]);
+        pts.forEach(([x, y, k], n) => { if (n / pts.length < a(0)) punto(c, x, y, 3 + 2 * k, NAR, .25 + .55 * k); }); rotulo(c, 270, 420, "Dónde se repite", NAR, a(0), 16); c.restore();
+        // cuándo
+        c.save(); c.translate(600, 40); hora.forEach((v, hh) => { for (let j = 0; j < v; j++) if (j / 8 < a(1)) punto(c, 20 + hh * 20.5, 390 - j * 26, 6, hh >= 7 && hh <= 9 || hh >= 16 && hh <= 18 ? NAR : CARBON, hh >= 7 && hh <= 9 || hh >= 16 && hh <= 18 ? .9 : .3); });
+        rotulo(c, 250, 420, "A qué hora", NAR, a(1), 16); c.restore();
+        // cada cuánto
+        c.save(); c.translate(1180, 40); dias.forEach((v, d) => { const x = 40 + (d % 7) * 66, y = 60 + Math.floor(d / 7) * 72; if (v && a(2) > d / 35) punto(c, x, y, 13 * (v > .6 ? 1 : .6), NAR, v > .6 ? .9 : .4); else aro(c, x, y, 13, CARBON, .2 * a(2), 1.4); });
+        rotulo(c, 240, 420, "Con qué frecuencia", NAR, a(2), 16); c.restore(); }; })(),
   };
   function pintarVis(t) {
-    $$(".vis", lams[i]).forEach((cv) => { const f = VIS[cv.dataset.vis]; if (f) f(cv.getContext("2d"), t - tLam, cv.width, cv.height); });
+    $$(".vis", lams[i]).forEach((cv) => { const f = VIS[cv.dataset.vis]; if (f) f(cv.getContext("2d"), t - tLam, cv.width, cv.height, cv); });
   }
 
   /* ── Bucle ── */
   function cuadro(t) {
     if (!document.hidden) {
-      if (!escenario.classList.contains("con3d") && !escenario.classList.contains("conhistoria")) pintarMalla(t);
-      if (pir && pir.closest(".lam").classList.contains("activa")) pintarPiramide();
       pintarVis(t);
-      if (lams[i].classList.contains("lam--clientes")) moverCintas(t);
       const vs = $$(".clips video.ve", lams[i]);   // barra de la historia en curso
       if (vs.length) { const v = vs[0], b = $$(".historias i", lams[i])[$$(".clips video", lams[i]).indexOf(v)]; if (b && v.duration) b.style.setProperty("--p", v.currentTime / v.duration); }
     }
