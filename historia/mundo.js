@@ -468,36 +468,99 @@ export function construir(k, md, m2, eq) {
   for (let i = 0; i < 6; i++) { const pista = [-15.7, -7.3][i % 2], sur = pista < -11.5, t = eq.camion(vivo, [0x2F6FB0, 0xC9603A, 0xE9EDF2][i % 3]); t.g.rotation.y = sur ? -Math.PI / 2 : Math.PI / 2; t.g.position.x = pista; W.transito.push({ g: t.g, z: -900 + R() * 1800, v: (sur ? 1 : -1) * (15 + R() * 4) }); }
   for (let i = 0; i < 3; i++) { const g = eq.auto(vivo, 16.6 + (i % 2) * 4, 0, i % 2 ? Math.PI / 2 : -Math.PI / 2, COL[i + 4]); W.transito.push({ g, z: -300 + i * 220, v: (i % 2 ? -1 : 1) * 8 }); }
 
-  /* ───────── el rebobinado (FILCE 22): la misma planta con Neisstech. Todo parte oculto. ───────── */
+  /* ───────── el rebobinado (FILCE 22): la MISMA planta, completa con Neisstech. Todo parte oculto. ─────────
+     Gestión visual en toda la nave (pintura nueva), gestión de tráfico en todos los cruces (puertas inteligentes, barandas,
+     protecciones, letreros) y Lúmina (cámaras con su cono en los puntos de riesgo). */
   W.mejora = {};
-  { // gestión visual: pintura nueva sobre el piso gastado (franja de los racks y los andenes)
-    const t = lienzo(55, 0, 36, 25, 2048, (c) => {
-      const borde = (x0, z0, x1, z1, col, w = .12) => { c.fillStyle = col; if (x1 - x0 > z1 - z0) { c.fillRect(x0, z0 - w / 2, x1 - x0, w); c.fillRect(x0, z1 - w / 2, x1 - x0, w); } else { c.fillRect(x0 - w / 2, z0, w, z1 - z0); c.fillRect(x1 - w / 2, z0, w, z1 - z0); } };
-      // calle transversal: bordes amarillos nítidos y flechas
-      borde(58.5, 6.25, 90, 9.75, '#F5C400', .14);
-      c.fillStyle = 'rgba(255,255,255,.92)'; for (const x of [62, 72, 82]) { c.beginPath(); c.moveTo(x + 1.2, 7.4); c.lineTo(x - .4, 6.75); c.lineTo(x - .4, 7.15); c.lineTo(x - 1.6, 7.15); c.lineTo(x - 1.6, 7.65); c.lineTo(x - .4, 7.65); c.lineTo(x - .4, 8.05); c.closePath(); c.fill(); }
-      // sendero peatonal verde, con bordes y pictogramas
-      c.fillStyle = 'rgba(31,164,90,.38)'; c.fillRect(56.5, 8.9, 32, 1.2); c.fillRect(56.4, 7.5, 1.2, 17); borde(56.5, 8.9, 88.5, 10.1, '#1FA45A', .1); borde(56.4, 7.5, 57.6, 24.5, '#1FA45A', .1);
-      c.fillStyle = 'rgba(255,255,255,.9)'; for (let x = 59; x < 88; x += 8) { c.beginPath(); c.arc(x, 9.27, .12, 0, 7); c.fill(); c.fillRect(x - .07, 9.4, .14, .38); }
-      // pasos de cebra nítidos en la boca de cada pasillo, línea de PARE y «PARE» para la grúa
+  { // gestión visual: toda la nave repintada
+    const t = lienzo(35, 0, 75, 40, 4096, (c) => {
+      const caja2 = (x0, z0, x1, z1, col, w = .13) => { c.strokeStyle = col; c.lineWidth = w; c.strokeRect(x0, z0, x1 - x0, z1 - z0); };
+      const linea = (x0, z0, x1, z1, col, w = .13, dash) => { c.strokeStyle = col; c.lineWidth = w; c.setLineDash(dash || []); c.beginPath(); c.moveTo(x0, z0); c.lineTo(x1, z1); c.stroke(); c.setLineDash([]); };
+      const flecha = (x, z, ang, s = 1) => { c.save(); c.translate(x, z); c.rotate(ang); c.scale(s, s); c.fillStyle = 'rgba(255,255,255,.92)'; c.beginPath(); c.moveTo(1.2, 0); c.lineTo(-.4, -.65); c.lineTo(-.4, -.25); c.lineTo(-1.6, -.25); c.lineTo(-1.6, .25); c.lineTo(-.4, .25); c.lineTo(-.4, .65); c.closePath(); c.fill(); c.restore(); };
+      const AM = '#F5C400', VE = '#1FA45A', BL = '#FFFFFF';
+      // calles de grúas: bordes nítidos y flechas de sentido
+      for (const [x0, z0, x1, z1] of [[35, .15, 88, 7], [58.5, 6.25, 110, 9.75], [84, 8, 88, 40], [40.2, 20.25, 85, 22.75], [35, 33.25, 85, 36.75]]) caja2(x0, z0, x1, z1, AM, .14);
+      for (const x of [62, 72, 82, 96, 104]) { flecha(x, 7.3, Math.PI); flecha(x + 2, 8.7, 0); }
+      for (const x of [46, 62, 74]) { flecha(x, 21.0, Math.PI, .8); flecha(x + 2, 22.0, 0, .8); flecha(x, 34.4, Math.PI, .9); flecha(x + 2, 35.6, 0, .9); }
+      for (const z of [14, 28]) { flecha(85.3, z, -Math.PI / 2, .8); flecha(86.7, z + 2, Math.PI / 2, .8); }
+      // pasillos de racks: bordes amarillos y PARE en cada salida
       c.font = '800 .55px Poppins, Arial'; c.textAlign = 'center'; c.textBaseline = 'middle';
-      for (const x of [61, 65, 69, 73, 77, 81]) { c.fillStyle = '#FFFFFF'; c.fillRect(x - 1.25, 8.9, 2.5, 1.2); c.fillStyle = '#F5C400'; for (let k = x - 1.15; k < x + 1.1; k += .5) c.fillRect(k, 8.98, .25, 1.04);
-        c.fillStyle = '#FFFFFF'; c.fillRect(x - 1.2, 10.45, 2.4, .14); c.fillText('PARE', x, 11.0); }
-      c.fillStyle = '#FFFFFF'; c.fillRect(56.4, 20.25, 1.2, 2.5); c.fillStyle = '#F5C400'; for (let z = 20.35; z < 22.6; z += .5) c.fillRect(56.48, z, 1.04, .25);
+      for (const x of [61, 65, 69, 73, 77, 81]) { for (const [a, b] of [[10.1, 20.25], [22.75, 33.25]]) { linea(x - 1.25, a, x - 1.25, b, AM, .1); linea(x + 1.25, a, x + 1.25, b, AM, .1); }
+        c.fillStyle = BL; for (const [z, zt] of [[10.45, 11.0], [19.75, 19.2], [23.25, 23.8], [32.75, 32.2]]) { c.fillRect(x - 1.2, z - .07, 2.4, .14); c.fillText('PARE', x, zt); } }
+      // senderos peatonales: verdes, con borde y pictogramas
+      const sendero = (x0, z0, x1, z1) => { c.fillStyle = 'rgba(31,164,90,.36)'; c.fillRect(x0, z0, x1 - x0, z1 - z0); caja2(x0, z0, x1, z1, VE, .1);
+        const h = x1 - x0 > z1 - z0, L = h ? x1 - x0 : z1 - z0; c.fillStyle = 'rgba(255,255,255,.9)'; for (let k = 2.5; k < L - 1; k += 7) { const px = h ? x0 + k : (x0 + x1) / 2, pz = h ? (z0 + z1) / 2 : z0 + k; c.beginPath(); c.arc(px, pz - .18, .12, 0, 7); c.fill(); c.fillRect(px - .07, pz - .05, .14, .36); } };
+      for (const r of [[56.5, 8.9, 88.5, 10.1], [88, 0, 89, 40], [45, 36.9, 88.5, 38.1], [40, 6.9, 57, 8.1], [56.4, 7.5, 57.6, 37.5], [50.9, 0, 52.1, 7.5], [88.5, 11.4, 110, 12.6]]) sendero(...r);
+      // pasos de cebra nítidos donde un sendero cruza una calle
+      const cebra = (x0, z0, x1, z1) => { c.fillStyle = BL; c.fillRect(x0, z0, x1 - x0, z1 - z0); c.fillStyle = AM; const h = x1 - x0 > z1 - z0;
+        if (h) for (let x = x0 + .1; x < x1 - .2; x += .5) c.fillRect(x, z0 + .08, .25, z1 - z0 - .16); else for (let z = z0 + .1; z < z1 - .2; z += .5) c.fillRect(x0 + .08, z, x1 - x0 - .16, .25); };
+      for (const x of [61, 65, 69, 73, 77, 81]) cebra(x - 1.25, 8.9, x + 1.25, 10.1);
+      cebra(84, 8.9, 88, 10.1); cebra(56.4, 20.25, 57.6, 22.75); cebra(56.4, 33.25, 57.6, 36.75); cebra(84, 36.9, 88, 38.1); cebra(50.9, .3, 52.1, 6.9); cebra(88, 6.25, 89, 9.75);
+      // zonas demarcadas: sala de reunión, ensamble, despacho por andén, baterías, pallets vacíos
+      linea(40.4, 23.1, 57.8, 23.1, '#056CF2', .12, [.6, .3]); linea(40.4, 23.1, 40.4, 29.8, '#056CF2', .12, [.6, .3]);
+      caja2(40.4, 8.4, 55.8, 20.0, AM, .1);
+      ANDENES.forEach((x, i) => { caja2(x - 1.6, 2.6, x + 1.6, 6.1, BL, .1); c.fillStyle = 'rgba(255,255,255,.75)'; c.font = '800 1.1px Poppins, Arial'; c.fillText(String(i + 1), x, 4.35); });
+      for (let i = 0; i < 5; i++) caja2(91 + i * 3.4, .2, 94 + i * 3.4, 5.6, AM, .09);
+      c.fillStyle = 'rgba(245,196,0,.22)'; c.fillRect(59.4, 38.4, 12.2, 1.4); caja2(59.4, 38.4, 71.6, 39.8, AM, .08);
+      c.fillStyle = 'rgba(40,44,52,.35)'; c.font = '700 1.1px Poppins, Arial'; c.fillText('RECEPCIÓN', 42, 4.2); c.fillText('BATERÍAS', 100, 3.2); c.fillText('DESPACHO', 72.5, 1.2); c.fillText('ENSAMBLE', 48, 19.4);
     });
-    const m = new THREE.Mesh(new THREE.PlaneGeometry(36, 25), new THREE.MeshStandardMaterial({ map: t, transparent: true, opacity: 0, roughness: .7, polygonOffset: true, polygonOffsetFactor: -6, polygonOffsetUnits: -12, depthWrite: false }));
-    m.rotation.x = -Math.PI / 2; m.position.set(73, .012, 12.5); m.receiveShadow = true; m.renderOrder = 2; m.visible = false; vivo.add(m); W.mejora.pintura = m;
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(75, 40), new THREE.MeshStandardMaterial({ map: t, transparent: true, opacity: 0, roughness: .7, polygonOffset: true, polygonOffsetFactor: -6, polygonOffsetUnits: -12, depthWrite: false }));
+    m.rotation.x = -Math.PI / 2; m.position.set(72.5, .012, 20); m.receiveShadow = true; m.renderOrder = 2; m.visible = false; vivo.add(m); W.mejora.pintura = m;
   }
-  { // gestión de tráfico: baranda entre la calle y el sendero (con las bocas de los pasillos abiertas), puertas inteligentes en el cruce y sensor de grúa
-    const g = grupo(0, 0, 0, 0, vivo); g.visible = false; W.mejora.trafico = g;
-    for (const [a, b] of [[56.8, 59.75], [62.25, 63.75], [66.25, 67.45], [70.55, 71.75], [74.25, 75.75], [78.25, 79.75], [82.25, 84]]) md.barrera(g, a, 8.78, b, 8.78);
-    W.mejora.puertas = [eq.puertaInteligente(g, 67.55, 8.95, -Math.PI / 2, 1.15), eq.puertaInteligente(g, 70.45, 10.1, Math.PI / 2, 1.15)];
-    W.mejora.sensor = eq.sensorGrua(g, 67.62, 10.55, -Math.PI / 2);
+  { // gestión de tráfico en toda la planta
+    const g = grupo(0, 0, 0, 0, vivo); g.visible = false; W.mejora.trafico = g; const piezas = W.mejora.piezas = [];
+    const pieza = (obj, x, z) => { piezas.push({ o: obj.g || obj, d: Math.hypot(x - 69, z - 9.5) }); return obj; };
+    // barandas entre calle y sendero (bocas de pasillo abiertas) y a lo largo del sendero sur
+    for (const [a, b] of [[56.8, 59.75], [62.25, 63.75], [66.25, 67.45], [70.55, 71.75], [74.25, 75.75], [78.25, 79.75], [82.25, 83.7]]) pieza(md.barrera(g, a, 8.78, b, 8.78), (a + b) / 2, 8.78);
+    for (const [a, b] of [[45.3, 56.2], [57.8, 83.7]]) pieza(md.barrera(g, a, 36.82, b, 36.82), (a + b) / 2, 36.82);
+    // puertas inteligentes en cada cruce del sendero con una calle (las de la boca del pasillo 69 son las que actúan en la historia)
+    W.mejora.puertas = [];
+    const par = (xo, xe, z0 = 8.95, z1 = 10.1) => [eq.puertaInteligente(g, xo, z0, -Math.PI / 2, z1 - z0), eq.puertaInteligente(g, xe, z1, Math.PI / 2, z1 - z0)];
+    for (const x of [61, 65, 69, 73, 77, 81]) { const pp = par(x - 1.45, x + 1.45); pp.forEach((q) => pieza(q, x, 9.5)); if (x === 69) W.mejora.puertas = pp; else W.mejora.puertasResto = (W.mejora.puertasResto || []).concat(pp); }
+    for (const [xo, xe, z0, z1] of [[83.85, 88.15, 8.95, 10.1], [83.85, 88.15, 36.95, 38.1]]) par(xo, xe, z0, z1).forEach((q) => { pieza(q, 86, z0); W.mejora.puertasResto.push(q); });
+    for (const [z, ry, x] of [[20.1, Math.PI, 57.6], [22.9, 0, 56.45]]) { const q = eq.puertaInteligente(g, x, z, ry, 1.15); pieza(q, 57, z); W.mejora.puertasResto.push(q); }
+    W.mejora.sensor = eq.sensorGrua(g, 67.62, 10.55, -Math.PI / 2); pieza(W.mejora.sensor, 67.6, 10.5);
+    // protecciones: columnas en zonas de tránsito y cabeceras de rack
+    for (const [x, z] of COLUMNAS) if (!(x < 49 && z > 8 && z < 24)) pieza(md.protectorColumna(g, x, z), x, z);
+    for (const x of RACKS_X) for (const z of [20.15, 22.85, 33.15]) pieza(md.protectorRack(g, x - .5, x + .5, z), x, z);
+    // letreros en poste
+    for (const [url, x, z, ry] of [['img/letreros/p-montacargas.webp', 59.6, 10.4, -Math.PI / 2], ['img/letreros/p-peatones.webp', 66.3, 8.6, Math.PI / 2], ['img/letreros/p-montacargas.webp', 75.6, 10.4, -Math.PI / 2],
+      ['img/letreros/o-casco.webp', 52.6, .7, -Math.PI / 2], ['img/letreros/o-chaleco.webp', 50.3, .7, -Math.PI / 2], ['img/letreros/s-encuentro.webp', 44.2, 23.5, Math.PI / 2], ['img/letreros/p-peatones.webp', 58.4, 20.0, 0], ['img/letreros/s-salida.webp', 88.0, .8, -Math.PI / 2]])
+      pieza(md.letrero(g, url, .42, x, 1.7, z, ry, 'poste'), x, z);
   }
-  { // Lúmina: una cámara en la columna, mirando el cruce
-    const g = grupo(71, 0, 4.5, -.55, vivo); g.visible = false; W.mejora.camara = g;
-    caja(.1, .1, .5, 0, 5.3, .35, M.tinta, g, .02); const cuerpo = caja(.26, .24, .5, 0, 5.15, .78, std(0xF2F3F5, { roughness: .4 }), g, .06); cuerpo.rotation.x = .45;
-    const ojo = luz(0xEC6D27, 0x4a2a15); const o = cil(.07, .04, 0, 5.03, 1.05, ojo, g, 14); o.rotation.x = Math.PI / 2 + .45; ojo.emissiveIntensity = 1.4; W.mejora.ojo = ojo;
+  { // el arsenal funcionando: Safetygate, SmartDock, X-KUBE con proyecciones, estaciones 5S y tren logístico
+    const g = W.mejora.trafico, A = W.mejora;
+    // Safetygate frente al portón poniente: la barra colgante frena la carga alta
+    A.sg = md.safetygate(g, 36.9, 33.35, 36.65, 3.3, .45, 35.15); A.piezas.push({ o: A.sg.g, d: 33 });
+    // SmartDock: la cuña en la rueda de cada camión en el andén
+    A.cunas = [63.5, 73, 82].map((x) => { const c = eq.cunaSmart(g, x + 1.02, -2.95); /* frente a la rueda trasera (camión girado: ruedas en z −2,12 y −0,97) */ A.piezas.push({ o: c.g, d: Math.hypot(x - 69, 11) }); return c; });
+    // X-KUBE: cruce del sendero x = 57 con la calle z = 21,5, cruce de la calle x = 86, y cambios de área (portón poniente y baterías)
+    A.proy = [];
+    const kb1 = eq.xkube(g, 57, 21.5, 4.7, ALERO - .55), kb2 = eq.xkube(g, 86, 9.5, 4.7, ALERO - .55);
+    A.kb = [kb1, kb2];
+    A.cebra1 = eq.proyeccion(g, eq.cebraTex(9), 1.15, 2.4, 57, 21.5, 0, kb1.origen, 0xFFE27A); A.tri1 = eq.proyeccion(g, eq.TX.grua, 2.1, 2.1, 57, 21.5, 0, kb1.origen, 0xFFE27A, .04);
+    A.cebra2 = eq.proyeccion(g, eq.cebraTex(9), 1.15, 3.9, 86, 9.5, Math.PI / 2, kb2.origen, 0xFFE27A);
+    const kb3 = eq.xkube(g, 39.2, 35, 4.0, ALERO - .55), kb4 = eq.xkube(g, 91.6, 8, 4.0, ALERO - .55);
+    A.area1 = eq.proyeccion(g, eq.TX.grua, 2.2, 2.2, 39.2, 35, Math.PI / 2, kb3.origen, 0xFFE27A, .04); A.area2 = eq.proyeccion(g, eq.TX.grua, 2.2, 2.2, 91.6, 8, -Math.PI / 2, kb4.origen, 0xFFE27A, .04);
+    for (const kb of [kb1, kb2, kb3, kb4]) A.piezas.push({ o: kb.g, d: 20 });
+    // orden: estaciones 5S junto al sendero y en baterías
+    for (const [x, z, ry, cc] of [[58.6, 27.5, -Math.PI / 2, '#F5C400'], [88.6, 30.5, -Math.PI / 2, '#056CF2'], [108.9, 3.6, -Math.PI / 2, '#F5C400']]) A.piezas.push({ o: eq.estacion5S(g, x, z, ry, cc), d: 25 });
+    // tren logístico con carros de kitting (en lugar del carro a mano): recorre la calle de producción
+    const tren = grupo(0, 0, 0, 0, vivo); tren.visible = false; A.tren = { g: tren, partes: [md.tractor(tren), md.carroKitting(tren, M.azul), md.carroKitting(tren, M.amarillo), md.carroKitting(tren, M.azul)] };
+  }
+  { // Lúmina: cámaras en las columnas, con su cono sobre los puntos de riesgo
+    const g = grupo(0, 0, 0, 0, vivo); g.visible = false; W.mejora.camara = g; const conos = W.mejora.conos = [];
+    const ojoM = luz(0xEC6D27, 0x4a2a15); ojoM.emissiveIntensity = 1.4; W.mejora.ojo = ojoM;
+    const conoM = new THREE.MeshBasicMaterial({ color: 0xEC6D27, transparent: true, opacity: .12, depthWrite: false, side: THREE.DoubleSide, toneMapped: false });
+    for (const [x, z, tx, tz] of [[71, 4.5, 68.6, 11], [84, 4.5, 86, 12], [56, 14.5, 57, 21.5], [89.5, 19, 86, 26], [56, 32.5, 61, 35], [61.5, 4.5, 61, 9.5]]) {
+      const yaw = Math.atan2(tx - x, tz - z), c = grupo(x, 0, z, yaw, g);
+      caja(.1, .1, .45, 0, 5.3, .3, M.tinta, c, .02); const cu = caja(.26, .24, .5, 0, 5.15, .72, std(0xF2F3F5, { roughness: .4 }), c, .06); cu.rotation.x = .45; const o = cil(.07, .04, 0, 5.03, .98, ojoM, c, 14); o.rotation.x = Math.PI / 2 + .45;
+      const L = Math.hypot(tx - x, tz - z, 5), geo = new THREE.ConeGeometry(L * .42, L, 28, 1, true); geo.translate(0, -L / 2, 0);
+      const cono = new THREE.Mesh(geo, conoM); cono.position.set(0, 5.05, .95); c.add(cono);   // la punta en la cámara, abriéndose hacia el punto mirado
+      cono.quaternion.setFromUnitVectors(new THREE.Vector3(0, -1, 0), new THREE.Vector3(0, -5.05, Math.hypot(tx - x, tz - z) - .95).normalize());
+      conos.push(cono);
+    }
+    W.mejora.conoM = conoM;
   }
 
   k.fusionar(base);

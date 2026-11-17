@@ -28,7 +28,7 @@
   const pedirPlanta = import("./escena/lumina5.js?v=42").then((m) => m.crear($("#planta3d"))).then((p) => { planta = p; sincronizar3d(); return planta; }).catch((e) => console.error("planta 3D:", e));
   // La historia de Don Salva: otra escena 3D, con cámara de cine (historia/historia.js); una toma por paso
   let historia = null;
-  const pedirHistoria = import("./historia/historia.js?v=16").then((m) => m.crear($("#historia3d"))).then((h) => { historia = h; sincronizar3d(); return h; }).catch((e) => console.error("historia 3D:", e));
+  const pedirHistoria = import("./historia/historia.js?v=18").then((m) => m.crear($("#historia3d"))).then((h) => { historia = h; sincronizar3d(); return h; }).catch((e) => console.error("historia 3D:", e));
   function sincronizar3d() {
     const esc = lams[i].dataset.escena;
     escenario.classList.toggle("conhistoria", !!esc);
@@ -162,6 +162,21 @@
   const punto = (c, x, y, r, rgb, a = 1) => { c.fillStyle = `rgba(${rgb},${a})`; c.beginPath(); c.arc(x, y, r, 0, 6.3); c.fill(); };
   const aro = (c, x, y, r, rgb, a = 1, lw = 1.6) => { c.strokeStyle = `rgba(${rgb},${a})`; c.lineWidth = lw; c.beginPath(); c.arc(x, y, r, 0, 6.3); c.stroke(); };
   const ir = (v, meta, f = .08) => v + (meta - v) * f;
+  // una persona y una grúa horquilla dibujadas solo con puntos (para los dibujos chicos)
+  function persona(c, x, y, k, rgb, a, pixel) {
+    const hy = y - 64 * k, hr = 19 * k;
+    if (pixel) { const tonos = ["168,150,138", "140,124,114", "190,172,160", "120,108,100"], q = 9.5 * k; for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) { c.fillStyle = `rgba(${tonos[(i * 3 + j * 5) % 4]},${a + .3})`; c.fillRect(x - 2 * q + i * q, hy - 2 * q + j * q, q - 1, q - 1); } }
+    else for (let i = -3; i <= 3; i++) for (let j = -3; j <= 3; j++) { const dx = i * 6.4 * k, dy = j * 6.4 * k; if (dx * dx + dy * dy <= hr * hr) punto(c, x + dx, hy + dy, 2.5 * k, rgb, a); }
+    for (let r = 0; r < 9; r++) { const yy = y - 36 * k + r * 8.4 * k, wd = (24 - r * .9) * k; for (let xx = -wd; xx <= wd + .1; xx += 8.4 * k) punto(c, x + xx, yy, 2.5 * k, rgb, a); }
+    for (const sx of [-9, 9]) for (let r = 0; r < 7; r++) punto(c, x + sx * k, y + 42 * k + r * 8.4 * k, 2.5 * k, rgb, a);
+  }
+  function grua(c, x, y, rgb, a) {
+    for (let i = 0; i < 9; i++) for (let j = 0; j < 6; j++) { const borde = i === 0 || i === 8 || j === 0 || j === 5; punto(c, x - 62 + i * 9, y - 36 + j * 9, borde ? 2.8 : 2.2, rgb, a * (borde ? 1 : .35)); }
+    for (let yy = y - 92; yy <= y + 10; yy += 9) { punto(c, x + 20, yy, 2.8, rgb, a); punto(c, x + 29, yy, 2.8, rgb, a); }
+    for (let xx = x + 38; xx <= x + 80; xx += 9) punto(c, xx, y + 12, 2.8, rgb, a);
+    for (let xx = x - 52; xx <= x + 4; xx += 9) punto(c, xx, y - 80, 2.6, rgb, a); for (let yy = y - 71; yy < y - 36; yy += 9) { punto(c, x - 52, yy, 2.4, rgb, a); punto(c, x + 4, yy, 2.4, rgb, a); }
+    for (const wx of [x - 44, x + 2]) aro(c, wx, y + 30, 13, rgb, a, 3);
+  }
   const VIS = {
     // 05 · 154 personas fallecidas: 76 con vehículo (azul) y 15 de ellas dentro de la faena (rojo)
     fatales: (() => { const N = 154, k = new Float32Array(N), q = new Float32Array(N), rr = new Float32Array(N);
@@ -193,37 +208,100 @@
       return (c, t, w, h) => { c.clearRect(0, 0, w, h); if (t > prox) { prox = t + 140; const p = P[Math.floor(r() * P.length)]; if (!p.sale) p.sale = true; }
         P.forEach((p, n) => { if (p.sale) { p.s -= .08; if (p.s <= 0) { p.sale = false; p.s = .01; p.nuevo = true; } } else p.s = Math.min(1, p.s + .05);
           const x = 40 + (n % 12) * 44, y = 40 + Math.floor(n / 12) * 44; if (p.nuevo) aro(c, x, y, 9 * p.s, CARBON, .35, 1.6); else punto(c, x, y, 9 * p.s, AZUL, .9); }); }; })(),
-    // 09 · 10 · 13 · 16 · los tres pilares; data-pilar destaca uno (0 = los tres)
+    // 09 · 10 · 13 · 16 · los tres pilares como torres de partículas que giran; data-pilar enciende uno (0 = los tres)
     pilares: (() => { const L = [["Personas y prácticas", "Gestión visual", "Capacitación · procedimientos · inducción", AZUL], ["Ingeniería", "Gestión de tráfico", "Intervenir el entorno y las tareas", AZUL], ["Analítica y respuesta", "Lúmina", "Datos · medidas · respuestas", NAR]];
-      return (c, t, w, h, cv) => { c.clearRect(0, 0, w, h); const sel = +(cv.dataset.pilar || 0), s = t / 1000, X = [w * .22, w * .5, w * .78], top = 90, base = 470;
-        for (let x = X[0] - 260; x <= X[2] + 260; x += 18) { punto(c, x, top - 26, 2.6, CARBON, .45); punto(c, x, top - 6, 2.6, CARBON, .3); punto(c, x, base + 18, 2.6, CARBON, .45); punto(c, x, base + 38, 2.6, CARBON, .3); }
-        L.forEach(([capa, sol, det, rgb], k) => { const on = sel === 0 || sel === k + 1, x0 = X[k], a = on ? 1 : .18, entra = Math.min(1, Math.max(0, (t - 200 - k * 180) / 900));
-          for (let col = -3; col <= 3; col++) for (let row = 0; row < 14; row++) { const y = base - row * 26, vis = row / 14 < entra; if (!vis) continue;
-            const puls = on && sel ? .6 + .4 * Math.sin(s * 2.4 - row * .35 + col) : 1; punto(c, x0 + col * 22, y, (col === -3 || col === 3 ? 3.8 : 3.1) * (on && sel ? 1.12 : 1), on ? rgb : CARBON, a * (.55 + .45 * puls)); }
-          rotulo(c, x0, base + 66, capa, on ? rgb : GRIS, on ? 1 : .45, 17);
-          c.save(); c.font = `500 ${sel === k + 1 ? 52 : 44}px Poppins`; c.textAlign = "center"; c.textBaseline = "top"; c.fillStyle = `rgba(${on ? (k === 2 ? NAR : CARBON) : CARBON},${on ? 1 : .3})`; c.fillText(sol, x0, base + 104); c.restore();
-          c.save(); c.font = "400 22px Poppins"; c.textAlign = "center"; c.textBaseline = "top"; c.fillStyle = `rgba(${GRIS},${on ? .95 : .35})`; c.fillText(det, x0, base + 176); c.restore(); }); }; })(),
+      const FIL = 19, ANG = 28;
+      return (c, t, w, h, cv) => { c.clearRect(0, 0, w, h); const sel = +(cv.dataset.pilar || 0), s = t / 1000, X = [w * .2, w * .5, w * .8], base = 470, alto = 380, R = 96;
+        // el suelo común: una línea de puntos que une las tres capas
+        for (let x = X[0] - 200; x <= X[2] + 200; x += 16) punto(c, x, base + 40, 2.2, CARBON, .28);
+        L.forEach(([capa, sol, det, rgb], k) => { const on = sel === 0 || sel === k + 1, foco = sel === k + 1, a = on ? 1 : .3, entra = Math.min(1, Math.max(0, (t - 200 - k * 200) / 1100)), x0 = X[k], col = on ? rgb : CARBON;
+          for (let j = 0; j < 44; j++) { const th = j / 44 * 6.283 + s * .25 * (k % 2 ? -1 : 1), z = Math.sin(th); punto(c, x0 + Math.cos(th) * R * 1.75, base + 14 + z * R * .34, 1.6 + 1.4 * (z + 1) / 2, col, a * (.2 + .35 * (z + 1) / 2)); }
+          const giro = s * (foco ? .8 : .3) + k * 2;
+          for (let row = 0; row < FIL; row++) { let fy = row / (FIL - 1); if (foco) fy = ((row + s * 1.4) % FIL) / (FIL - 1); if (fy > entra) continue;
+            const yy = base - fy * alto, fade = foco ? Math.min(1, (1 - fy) * 4) * Math.min(1, fy * 8 + .2) : 1;
+            for (let j = 0; j < ANG; j++) { const th = j / ANG * 6.283 + giro + row * .19, z = Math.sin(th), d = (z + 1) / 2;
+              punto(c, x0 + Math.cos(th) * R, yy + z * R * .3, (foco ? 3.1 : 2.6) * (.45 + .7 * d), col, a * fade * (.15 + .85 * d)); } }
+          if (foco) esfera(c, x0, base - alto - 46, 30, P160, s * .9, rgb, Math.min(1, entra * 1.3), 1.7);
+          rotulo(c, x0, base + 72, capa, on ? rgb : GRIS, on ? 1 : .45, 17);
+          c.save(); c.font = `500 ${foco ? 54 : 44}px Poppins`; c.textAlign = "center"; c.textBaseline = "top"; c.fillStyle = `rgba(${on ? (k === 2 ? NAR : CARBON) : CARBON},${on ? 1 : .3})`; c.fillText(sol, x0, base + 108); c.restore();
+          c.save(); c.font = "400 22px Poppins"; c.textAlign = "center"; c.textBaseline = "top"; c.fillStyle = `rgba(${GRIS},${on ? .95 : .35})`; c.fillText(det, x0, base + 178); c.restore(); }); }; })(),
     // 19 · infraestructura: cámaras → procesamiento → respuesta y dashboard
-    infra: (() => { const N = [["Cámaras", "Existentes o nuevas, según compatibilidad", 300, 300, CARBON], ["Procesamiento de imágenes", "Detecta eventos de riesgo", 860, 300, NAR], ["Dispositivos de respuesta", "Semáforos · puertas · balizas · avisos", 1480, 130, AZUL], ["Dashboard", "Eventos, horarios y tendencias", 1480, 440, NAR]];
+    infra: (() => { const N = [["Cámaras", "Existentes o nuevas, según compatibilidad", 290, 360, CARBON], ["Procesamiento de imágenes", "Detecta eventos de riesgo", 860, 360, NAR], ["Dispositivos de respuesta", "Semáforos · puertas · balizas · avisos", 1460, 190, AZUL], ["Dashboard", "Eventos, horarios y tendencias", 1460, 560, NAR]];
       return (c, t, w, h) => { c.clearRect(0, 0, w, h); const g = t / 1500;
         [[0, 1], [1, 2], [1, 3]].forEach(([a, b], k) => { const A = N[a], B = N[b], al = Math.min(1, Math.max(0, (t - 600 - k * 250) / 600));
-          c.strokeStyle = `rgba(${CARBON},${.25 * al})`; c.lineWidth = 1.6; c.setLineDash([2, 10]); c.beginPath(); c.moveTo(A[2] + 90, A[3]); c.lineTo(B[2] - 90, B[3]); c.stroke(); c.setLineDash([]);
-          for (let j = 0; j < 3; j++) { const f = ((t / 1800) + j / 3 + k * .2) % 1; punto(c, A[2] + 90 + (B[2] - 90 - A[2] - 90) * f, A[3] + (B[3] - A[3]) * f, 4, B[4], al * Math.sin(f * Math.PI)); } });
-        N.forEach(([tit, sub, x, y, rgb], k) => { const a = Math.min(1, Math.max(0, (t - 150 - k * 200) / 600)); esfera(c, x, y, 84, P420, g + k, rgb, a, 2.2);
-          rotulo(c, x, y + 106, tit, rgb === CARBON ? CARBON : rgb, a, 20); c.save(); c.font = "400 25px Poppins"; c.textAlign = "center"; c.textBaseline = "top"; c.fillStyle = `rgba(${GRIS},${a})`; c.fillText(sub, x, y + 142); c.restore(); }); }; })(),
+          c.strokeStyle = `rgba(${CARBON},${.25 * al})`; c.lineWidth = 1.6; c.setLineDash([2, 10]); c.beginPath(); c.moveTo(A[2] + 110, A[3]); c.lineTo(B[2] - 110, B[3]); c.stroke(); c.setLineDash([]);
+          for (let j = 0; j < 7; j++) { const f = ((t / 2200) + j / 7 + k * .2) % 1; punto(c, A[2] + 110 + (B[2] - 110 - A[2] - 110) * f, A[3] + (B[3] - A[3]) * f, 3 + 2.5 * Math.sin(f * Math.PI), B[4], al * Math.sin(f * Math.PI)); } });
+        N.forEach(([tit, sub, x, y, rgb], k) => { const a = Math.min(1, Math.max(0, (t - 150 - k * 200) / 600)); esfera(c, x, y, 96, P900, g + k, rgb, a, 1.9); aro(c, x, y, 118 + 4 * Math.sin(t / 700 + k), rgb, .18 * a, 1.4);
+          rotulo(c, x, y - 160, "0" + (k + 1), rgb, a * .9, 15); rotulo(c, x, y + 128, tit, rgb === CARBON ? CARBON : rgb, a, 20); c.save(); c.font = "400 25px Poppins"; c.textAlign = "center"; c.textBaseline = "top"; c.fillStyle = `rgba(${GRIS},${a})`; c.fillText(sub, x, y + 164); c.restore(); }); }; })(),
     // 20 · analítica (ilustrativa, sin datos reales): dónde, a qué hora y con qué frecuencia se repiten los eventos
     analitica: (() => { const r = azar(21), focos = [[150, 150, 1], [330, 300, .7], [420, 120, .45]], pts = [...Array(140)].map(() => { const f = focos[Math.floor(r() * 3)]; return [f[0] + (r() - .5) * 120 * f[2], f[1] + (r() - .5) * 100 * f[2], f[2]]; });
       const hora = [...Array(24)].map((_, hh) => Math.round(1 + 6 * Math.exp(-((hh - 8.5) ** 2) / 3) + 4 * Math.exp(-((hh - 17) ** 2) / 4) + r() * 1.2)), dias = [...Array(35)].map((_, d) => (d % 7 === 0 || d % 7 === 4) && r() < .85 ? 1 : r() < .12 ? .5 : 0);
       return (c, t, w, h) => { c.clearRect(0, 0, w, h); const a = (k) => Math.min(1, Math.max(0, (t - 200 - k * 300) / 700));
         // dónde
         c.save(); c.translate(0, 40); c.strokeStyle = `rgba(${CARBON},${.3 * a(0)})`; c.setLineDash([2, 8]); c.lineWidth = 1.6; c.strokeRect(20, 20, 500, 380); c.setLineDash([]);
-        pts.forEach(([x, y, k], n) => { if (n / pts.length < a(0)) punto(c, x, y, 3 + 2 * k, NAR, .25 + .55 * k); }); rotulo(c, 270, 420, "Dónde se repite", NAR, a(0), 16); c.restore();
+        for (let k = 0; k < 6; k++) for (let y = 70; y < 360; y += 12) if (y < 190 || y > 230) punto(c, 90 + k * 70, y, 1.6, CARBON, .22 * a(0));
+        pts.forEach(([x, y, k], n) => { if (n / pts.length < a(0)) punto(c, x, y, 3 + 2 * k, NAR, .25 + .55 * k); }); rotulo(c, 270, 444, "Dónde se repite", NAR, a(0), 16); c.restore();
         // cuándo
         c.save(); c.translate(600, 40); hora.forEach((v, hh) => { for (let j = 0; j < v; j++) if (j / 8 < a(1)) punto(c, 20 + hh * 20.5, 390 - j * 26, 6, hh >= 7 && hh <= 9 || hh >= 16 && hh <= 18 ? NAR : CARBON, hh >= 7 && hh <= 9 || hh >= 16 && hh <= 18 ? .9 : .3); });
-        rotulo(c, 250, 420, "A qué hora", NAR, a(1), 16); c.restore();
+        [0, 6, 12, 18].forEach((hh) => { c.font = "500 15px Poppins"; c.textAlign = "center"; c.fillStyle = `rgba(${GRIS},${.8 * a(1)})`; c.fillText(String(hh).padStart(2, "0") + ":00", 20 + hh * 20.5, 412); });
+        rotulo(c, 250, 444, "A qué hora", NAR, a(1), 16); c.restore();
         // cada cuánto
         c.save(); c.translate(1180, 40); dias.forEach((v, d) => { const x = 40 + (d % 7) * 66, y = 60 + Math.floor(d / 7) * 72; if (v && a(2) > d / 35) punto(c, x, y, 13 * (v > .6 ? 1 : .6), NAR, v > .6 ? .9 : .4); else aro(c, x, y, 13, CARBON, .2 * a(2), 1.4); });
-        rotulo(c, 240, 420, "Con qué frecuencia", NAR, a(2), 16); c.restore(); }; })(),
+        "LMMJVSD".split("").forEach((d, k) => { c.font = "600 15px Poppins"; c.textAlign = "center"; c.fillStyle = `rgba(${GRIS},${.8 * a(2)})`; c.fillText(d, 40 + k * 66, 22); });
+        rotulo(c, 240, 444, "Con qué frecuencia", NAR, a(2), 16); c.restore(); }; })(),
+    // 04 · accidentabilidad 2024 por rubro (SUSESO): cada punto = 0,1 accidentes por cada 100 personas; la línea es el promedio del país (2,5).
+    //      Al avanzar, las filas se apagan y aparece la mortalidad: 88 puntos (8,8) contra 21 (2,1) por cada 100.000.
+    accid: (() => { const R = [["Industria manufacturera", 3.5], ["Agricultura y pesca", 3.3], ["Transporte", 3.1, 1], ["Comercio", 2.8], ["Construcción", 2.8], ["Servicios", 2.0], ["Electricidad, gas y agua", 1.1], ["Minería", .9]];
+      let u = 0; return (c, t, w, h) => { c.clearRect(0, 0, w, h); u = ir(u, paso >= 1 ? 1 : 0, .07); const x0 = 470, s = 30, f = 70, y0 = 96, ahora = performance.now() - tPaso;
+        const v = 1 - u, xp = x0 + 24.5 * s;
+        if (v > .01) {
+          c.strokeStyle = `rgba(${CARBON},${.35 * v})`; c.lineWidth = 1.6; c.setLineDash([3, 8]); c.beginPath(); c.moveTo(xp, y0 - 46); c.lineTo(xp, y0 + R.length * f - 30); c.stroke(); c.setLineDash([]);
+          rotulo(c, xp, y0 - 78, "Promedio del país · 2,5", GRIS, v * Math.min(1, t / 900), 15);
+          R.forEach(([nom, val, top], r) => { const y = y0 + r * f, n = Math.round(val * 10), a = v * (top ? 1 : .9);
+            c.save(); c.font = `${top ? 600 : 400} 28px Poppins`; c.textAlign = "right"; c.textBaseline = "middle"; c.fillStyle = `rgba(${top ? AZUL : CARBON},${a * (top ? 1 : .8)})`; c.fillText(nom, x0 - 40, y); c.restore();
+            let ult = -1; for (let i = 0; i < n; i++) { const e = Math.min(1, Math.max(0, (t - 250 - r * 70 - i * 22) / 260)); if (e <= 0) break; ult = i;
+              const sobre = i >= 25; punto(c, x0 + i * s, y, (top ? 9.4 : 8) * (.4 + .6 * e) * (top ? 1 + .08 * Math.sin(t / 300 - i * .3) : 1), top ? AZUL : CARBON, a * e * (top ? 1 : sobre ? .7 : .42)); }
+            if (ult === n - 1) { c.save(); c.font = `${top ? 600 : 500} ${top ? 44 : 34}px Poppins`; c.textBaseline = "middle"; c.fillStyle = `rgba(${top ? AZUL : CARBON},${a})`; c.fillText(val.toFixed(1).replace(".", ","), x0 + n * s + 18, y + 1); c.restore(); } });
+        }
+        if (u > .01) {   // mortalidad: un punto = 0,1 muertes por cada 100.000 personas protegidas
+          const g = (n, y, rgb, nom, val, k) => { for (let i = 0; i < n; i++) { const e = Math.min(1, Math.max(0, (ahora - 150 - k * 500 - i * 14) / 300)); punto(c, x0 + (i % 22) * 34, y + Math.floor(i / 22) * 34, 11 * (.4 + .6 * e), rgb, u * e * (rgb === AZUL ? 1 : .55)); }
+            c.save(); c.font = "400 28px Poppins"; c.textAlign = "right"; c.textBaseline = "middle"; c.fillStyle = `rgba(${rgb},${u})`; c.fillText(nom, x0 - 40, y); c.restore();
+            c.save(); c.font = "500 96px Poppins"; c.textBaseline = "middle"; c.fillStyle = `rgba(${rgb},${u * Math.min(1, Math.max(0, (ahora - 400 - k * 500) / 500))})`; c.fillText(val, x0 + 22 * 34 + 40, y + (n > 22 ? 50 : 6)); c.restore(); };
+          rotulo(c, x0 - 14, y0 - 78, "Muertes por cada 100.000 personas protegidas · un punto = 0,1", GRIS, u, 15, "left");
+          g(88, y0 + 10, AZUL, "Transportes y comunicaciones", "8,8", 0); g(21, y0 + 250, CARBON, "Promedio del país", "2,1", 1);
+        }
+      }; })(),
+    // 08 · jerarquía de controles: cinco bandas de puntos, de la más efectiva (arriba) a la menos; la ingeniería, encendida
+    jerarquia: (() => { const N = ["Eliminación", "Sustitución", "Controles de ingeniería", "Controles administrativos", "EPP"];
+      return (c, t, w, h) => { c.clearRect(0, 0, w, h); const ahora = performance.now() - tPaso, cx = w / 2 + 40, H = 92, G = 16, y0 = 70;
+        rotulo(c, 30, 14, "Jerarquía de controles", GRIS, Math.min(1, ahora / 600), 15, "left");
+        // flecha de efectividad, a la izquierda
+        for (let y = y0 + 10; y < y0 + 5 * (H + G) - 20; y += 14) punto(c, 40, y, 2.2, CARBON, .3); c.fillStyle = `rgba(${CARBON},.45)`; c.beginPath(); c.moveTo(40, y0 - 8); c.lineTo(32, y0 + 8); c.lineTo(48, y0 + 8); c.fill();
+        c.save(); c.translate(70, y0 + 2.5 * (H + G)); c.rotate(-Math.PI / 2); c.font = "500 15px Poppins"; c.textAlign = "center"; c.fillStyle = `rgba(${GRIS},.85)`; try { c.letterSpacing = "3px"; } catch (e) {} c.fillText("MÁS EFECTIVO", 0, 0); c.restore();
+        N.forEach((nom, k) => { const e = Math.min(1, Math.max(0, (ahora - 150 - k * 160) / 500)), ing = k === 2, W = 600 - k * 92, y = y0 + k * (H + G), rgb = ing ? AZUL : CARBON, a = e * (ing ? 1 : .55);
+          const puls = ing ? 1 + .25 * Math.max(0, Math.sin(t / 380)) : 1;
+          for (let x = cx - W / 2; x <= cx + W / 2 + .1; x += 15) { punto(c, x, y, (ing ? 3.2 : 2.5) * puls, rgb, a); punto(c, x, y + H, (ing ? 3.2 : 2.5) * puls, rgb, a); }
+          for (let yy = y + 15; yy < y + H - 6; yy += 15) { punto(c, cx - W / 2, yy, ing ? 3.2 : 2.5, rgb, a); punto(c, cx + W / 2, yy, ing ? 3.2 : 2.5, rgb, a); }
+          c.save(); c.font = `${ing ? 600 : 400} ${ing ? 32 : 28}px Poppins`; c.textAlign = "center"; c.textBaseline = "middle"; c.fillStyle = `rgba(${rgb},${e * (ing ? 1 : .8)})`; c.fillText(nom, cx, y + H / 2 + 1); c.restore(); });
+      }; })(),
+    // 21 · uso responsable: cuidar (no vigilar) · el foco es el riesgo (rostros pixelados) · datos protegidos
+    u1: (c, t, w, h) => { c.clearRect(0, 0, w, h); const s = t / 1000, cx = w / 2, cy = h / 2 + 6;
+      persona(c, cx, cy + 4, 1.15, AZUL, 1);
+      for (let j = 0; j < 46; j++) { const th = j / 46 * 6.283 + s * .5, z = Math.sin(th); punto(c, cx + Math.cos(th) * 150, cy + 18 + z * 36, 2.2 + 1.6 * (z + 1) / 2, AZUL, .25 + .55 * (z + 1) / 2); }
+      for (let j = 0; j < 30; j++) { const th = j / 30 * 6.283 - s * .35; punto(c, cx + Math.cos(th) * 205, cy + 18 + Math.sin(th) * 52, 1.8, CARBON, .18); } },
+    u2: (c, t, w, h) => { c.clearRect(0, 0, w, h); const s = t / 1000, px = 150, gx = 375, y = h / 2 + 10;
+      persona(c, px, y, 1.05, CARBON, .55, true);
+      grua(c, gx, y + 18, NAR, 1);
+      const L = 22, x0 = gx - 92, y0 = y - 92, x1 = gx + 92, y1 = y + 78; c.strokeStyle = `rgba(${NAR},${.75 + .25 * Math.sin(s * 3)})`; c.lineWidth = 3;
+      for (const [qx, qy, dx, dy] of [[x0, y0, 1, 1], [x1, y0, -1, 1], [x0, y1, 1, -1], [x1, y1, -1, -1]]) { c.beginPath(); c.moveTo(qx, qy + dy * L); c.lineTo(qx, qy); c.lineTo(qx + dx * L, qy); c.stroke(); }
+      rotulo(c, gx, y0 - 30, "Riesgo", NAR, 1, 14); rotulo(c, px, y0 - 30, "Persona", GRIS, .8, 14);
+      c.setLineDash([2, 9]); c.strokeStyle = `rgba(${CARBON},.3)`; c.lineWidth = 1.6; c.beginPath(); c.moveTo(px + 50, y + 10); c.lineTo(x0 - 12, y + 10); c.stroke(); c.setLineDash([]); },
+    u3: (c, t, w, h) => { c.clearRect(0, 0, w, h); const s = t / 1000, cx = w / 2, cy = h / 2 + 30;
+      for (let j = 0; j <= 20; j++) { const th = Math.PI + j / 20 * Math.PI; punto(c, cx + Math.cos(th) * 62, cy - 70 + Math.sin(th) * 66, 3.2, CARBON, .55); }
+      for (const sx of [-62, 62]) for (let yy = cy - 70; yy < cy - 50; yy += 10) punto(c, cx + sx, yy, 3.2, CARBON, .55);
+      for (let x = cx - 104; x <= cx + 104; x += 13) { punto(c, x, cy - 50, 3, CARBON, .55); punto(c, x, cy + 96, 3, CARBON, .55); }
+      for (let y = cy - 37; y < cy + 96; y += 13) { punto(c, cx - 104, y, 3, CARBON, .55); punto(c, cx + 104, y, 3, CARBON, .55); }
+      esfera(c, cx, cy + 23, 54, P420, s * .6, AZUL, 1, 1.9); },
   };
   function pintarVis(t) {
     $$(".vis", lams[i]).forEach((cv) => { const f = VIS[cv.dataset.vis]; if (f) f(cv.getContext("2d"), t - tLam, cv.width, cv.height, cv); });

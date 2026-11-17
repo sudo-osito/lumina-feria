@@ -11,7 +11,7 @@ import { nucleo, THREE, clamp, lerp } from '../js/planta/nucleo.js';
 import { modelos } from '../js/planta/modelos.js';
 import { modelos2 } from '../js/planta/modelos2.js';
 import { equipos } from '../js/planta5/equipos.js';
-import { construir, SOL, ALERO } from './mundo.js?v=6';
+import { construir, SOL, ALERO } from './mundo.js?v=8';
 import { gente } from './gente.js?v=4';
 
 const PI = Math.PI, H = PI / 2;
@@ -125,6 +125,7 @@ export async function crear(cont) {
     // el rebobinado: todo lo de Neisstech parte oculto
     const Mj = W.mejora; Mj.pintura.visible = false; Mj.pintura.material.opacity = 0; Mj.trafico.visible = false; Mj.camara.visible = false; Mj.pk = 1;
     Mj.puertas.forEach((q) => { q.abrir(1); q.rojo.emissiveIntensity = .05; q.verde.emissiveIntensity = 2.4; }); est.lumina = null; fx.rew = 0;
+    Mj.tren.g.visible = false; Mj.conoM.opacity = 0; Mj.sg.piv.rotation.z = 0; for (const p of Mj.piezas) p.o.scale.y = 1; for (const k of ['cebra1', 'tri1', 'cebra2', 'area1', 'area2']) Mj[k].pintar(0, 0); fondo[0].levantar(.12); fondo[0].carga.visible = false;
   }
   const enRonda = (flojo = 0) => turno.forEach((p, i) => pon(p.g, LUGAR[i][0], LUGAR[i][1], rumbo(S0[0] - LUGAR[i][0], S0[1] - LUGAR[i][1]) + flojo * Math.sin(i * 2.7) * .9));
   const trabajar = (t) => turno.forEach((p, i) => { P.respirar(p, t); p.bi.rotation.x = -.55 + Math.sin(t * 1.4 + i) * .2; p.bd.rotation.x = -.6 + Math.cos(t * 1.7 + i) * .22; });
@@ -220,14 +221,14 @@ export async function crear(cont) {
     },
   }, {            // hoy quiere irse temprano: saca el pallet a la rápida
     ini() { pon(salva.g, 65.2, 9.45, 0); est.fondo = 'fuera'; },
-    cam: claves([[0, 67.95, 2.6, 19.4, 70.3, 2.4, 15.2, 46], [6.4, 68.0, 2.1, 18.7, 70.1, 1.9, 15.3, 44], [30, 68.0, 2.0, 18.5, 70.1, 1.8, 15.3, 44]]),
+    cam: claves([[0, 68.1, 3.0, 21.8, 70.4, 2.4, 15.2, 42], [6.4, 68.2, 2.7, 21.4, 70.0, 1.9, 15.4, 42], [30, 68.2, 2.6, 21.2, 70.0, 1.8, 15.4, 42]]),
     tick(t) { trabajar(t); P.respirar(salva, t); salva.cab.rotation.y = -.15; sacar(t); },
   }];
   function sacar(t) {   // gira hacia el rack, sube, toma, baja de golpe y gira hacia el sur para salir de espalda
     const g = grua; let ry = lerp(-H, 0, suave(tr(t, .2, 1.1))), m = lerp(.12, 3.22, suave(tr(t, 1.0, 2.3))), x = lerp(68.95, 69.5, suave(tr(t, 2.3, 2.9))), con = false;
-    if (t > 2.9) { con = true; m += .1 * suave(tr(t, 2.9, 3.1)); x = lerp(69.5, 68.95, suave(tr(t, 3.1, 3.8))); }
+    if (t > 2.9) { con = true; m += .1 * suave(tr(t, 2.9, 3.1)); x = lerp(69.5, 68.5, suave(tr(t, 3.1, 3.8))); }   // sale entero del rack antes de bajar
     if (t > 3.8) { const u = tr(t, 3.8, 4.5); m = lerp(3.32, 1.15, entra(u)) + (u >= 1 ? Math.exp(-(t - 4.5) * 5) * Math.sin((t - 4.5) * 22) * .07 : 0); }
-    if (t > 4.5) ry = lerp(0, -H, suave(tr(t, 4.6, 5.8)));
+    if (t > 4.5) { ry = lerp(0, -H, suave(tr(t, 4.6, 5.8))); x = lerp(68.5, 68.95, suave(tr(t, 4.6, 5.8))); }
     pon(g.g, x, 15.4, ry); g.levantar(m); g.carga.visible = con; W.palletPick.visible = !con; g.carga.rotation.z = con ? Math.exp(-Math.max(0, t - 4.5) * 3) * Math.sin(t * 20) * .03 * (t > 3.1 ? 1 : 0) : 0;
     P.manejar(aleS, t, 0); baliza(t, t > .2);
   }
@@ -292,18 +293,35 @@ export async function crear(cont) {
   }];
 
   /* ───────── FILCE 22 · volvamos a la historia: se rebobina y la misma mañana ocurre con Neisstech ─────────
-     0 rebobinar · 1 gestión visual · 2 gestión de tráfico · 3 Lúmina · 4 al día siguiente (1.001 días) */
+     0 rebobinar · 1 gestión visual · 2 gestión de tráfico · 3 Lúmina (cada capa: primero la planta COMPLETA desde el aire,
+     después el cruce de Don Salva) · 4 el arsenal funcionando (SmartDock, Safetygate, X-KUBE con tren logístico, la planta
+     entera con Lúmina) · 5 al día siguiente (1.001 días) */
   const Mj = W.mejora, R_S2 = ruta([[61.6, 9.45], [69.55, 9.45]]);
   function puertas(cerradas) { Mj.pk += ((cerradas ? 0 : 1) - Mj.pk) * .09; Mj.puertas.forEach((q) => { q.abrir(suave(Mj.pk)); q.rojo.emissiveIntensity = cerradas ? 2.6 : .05; q.verde.emissiveIntensity = cerradas ? .05 : 2.4; });
     Mj.sensor.led.emissiveIntensity = cerradas ? (Math.sin(reloj * 10) > 0 ? 2.6 : .3) : .6; }
-  function pintura(t, t0 = 0) { Mj.pintura.visible = true; Mj.pintura.material.opacity = suave(tr(t, t0, t0 + 1.6)); }
+  function puertasResto() { (Mj.puertasResto || []).forEach((q) => { q.abrir(1); q.rojo.emissiveIntensity = .05; q.verde.emissiveIntensity = 2.4; }); }
+  function pintura(t, t0 = 0, dur = 1.6) { Mj.pintura.visible = true; Mj.pintura.material.opacity = suave(tr(t, t0, t0 + dur)); }
+  function traficoArriba(t, t0 = 0) { Mj.trafico.visible = true; for (const p of Mj.piezas) p.o.scale.y = Math.max(.01, suave(tr(t, t0 + p.d * .028, t0 + .7 + p.d * .028))); }
+  function traficoListo() { Mj.trafico.visible = true; for (const p of Mj.piezas) p.o.scale.y = 1; }
+  function proyecciones(t, alerta1 = false) { Mj.cebra1.pintar(alerta1 ? 0 : 1, reloj); Mj.tri1.pintar(alerta1 ? 1 : 0, reloj); Mj.cebra2.pintar(1, reloj); Mj.area1.pintar(1, reloj); Mj.area2.pintar(1, reloj);
+    Mj.kb[0].ojo.emissiveIntensity = alerta1 ? (Math.sin(reloj * 8) > 0 ? 2.8 : .6) : .15; for (const kb of Mj.kb) kb.lente.emissiveIntensity = 2.2; }
+  function luminaArriba(t, t0 = 0) { Mj.camara.visible = true; Mj.conoM.opacity = .13 * suave(tr(t, t0, t0 + 1.2)); Mj.ojo.emissiveIntensity = 1 + .6 * Math.sin(reloj * 4); }
   function salvaHasta(t, xMax, vel = 1.15, t0 = .6) {   // camina por el sendero hasta xMax (si hay que esperar, espera ahí)
     const meta = distA(R_S2, xMax, 9.45), d = Math.min(meta, Math.max(0, (t - t0) * vel)), q = en(R_S2, d); pon(salva.g, q.x, q.z, 0);
     if (d < meta) P.andar(salva, 1, t); else { P.quieto(salva); P.respirar(salva, t); }
     return d >= meta;
   }
   function retrocede(t, t0, t1, z0 = 15.4, z1 = 7.4) { const u = suave(tr(t, t0, t1)); cargado(z0 + (z1 - z0) * u); P.manejar(aleS, t, .9); baliza(t, u > 0 && u < 1); return grua.g.position.z; }
+  function tren(x, ry = PI) {   // tren logístico: tractor adelante y tres carros detrás (frente +x local)
+    Mj.tren.g.visible = true; const ax = Math.cos(ry), az = -Math.sin(ry);
+    Mj.tren.partes.forEach((p, i) => { const d = i === 0 ? 0 : .65 + 1.3 * i; pon(p.g, x - ax * d, 21.0 - az * d, ry); });
+    Mj.tren.partes[0].balMat.emissiveIntensity = .6 + .6 * Math.sin(reloj * 6);
+  }
+  const dip = (t, ...cs) => Math.max(0, ...cs.map((c) => 1 - Math.abs(t - c) / .3));
   const CAM_CRUCE = [68.0, 9.0, 1.6, 70.6, .2, 9.6, 44];   // desde la calle, alta, mirando el cruce y la boca del pasillo (sin racks en medio)
+  const AEREO = [[0, 47, 46, 66, 65, 0, 15, 40], [5.4, 53, 41, 59, 66, 0, 15, 40]], aereo = claves(AEREO), CORTE = 5.4;
+  const deAire = (cruce) => { const c = claves(cruce); return (t) => (t < CORTE ? aereo(t) : c(t - CORTE)); };   // primero la planta entera; corte; después el cruce
+  const camCCTV = claves([[0, 71.0, 5.0, 5.35, 67.6, .5, 10.9, 52], [30, 71.0, 5.0, 5.35, 67.7, .5, 11.0, 50]]);
   E.rewind = [{   // ◀◀ se rebobina desde lo que quedó
     corte: true, casa: 0,
     ini() { est.fondo = 'fuera'; est.amb = 'frio'; },
@@ -317,32 +335,53 @@ export async function crear(cont) {
       salva.g.visible = vuelto; const x = 69.55 - 7.9 * sale(tr(u, .3, 1)); pon(salva.g, x, 9.45, 0); if (u > .3 && u < 1) { P.andar(salva, 1, -t * 1.4); } else { P.quieto(salva); P.foto(salva, u < .3 ? 1 : 0); }
       fono.g.visible = vuelto && u < .3;
     },
-  }, {            // gestión visual: el sendero y el cruce se ven; la grúa se detiene en la línea de PARE
+  }, {            // gestión visual: toda la nave se repinta; en el cruce, la grúa se detiene en la línea de PARE
     casa: 0,
-    ini() { est.fondo = 'fuera'; cargado(15.4); },
-    trans: 'mezcla',
-    cam: claves([[0, ...CAM_CRUCE], [20, 67.2, 8.7, 2.0, 70.5, .2, 9.6, 43]]),
-    tick(t) { trabajar(t); pintura(t, .3); salvaHasta(t, 66.6, 1.1, 2.2); const z = retrocede(t, 2.6, 7.4, 15.4, 11.85); grua.balMat.emissiveIntensity = z > 11.9 ? grua.balMat.emissiveIntensity : .4; },
-  }, {            // gestión de tráfico: el sensor ve la grúa, el cruce se cierra; pasa la grúa y se abre
+    ini() { est.fondo = 'ronda'; cargado(15.4); },
+    cam: deAire([[0, ...CAM_CRUCE], [25, 67.2, 8.7, 2.0, 70.5, .2, 9.6, 43]]),
+    tick(t) { trabajar(t); pintura(t, .5, 2.6); fx.negro = dip(t, CORTE); if (t > CORTE) est.fondo = 'fuera'; salvaHasta(t, 66.6, 1.1, 5.9); const z = retrocede(t, 6.2, 10.8, 15.4, 11.85); if (z <= 11.9) grua.balMat.emissiveIntensity = .4; },
+  }, {            // gestión de tráfico: aparecen las soluciones en toda la planta; en el cruce, el sensor ve la grúa y las puertas se cierran
     casa: 0,
-    ini() { est.fondo = 'fuera'; cargado(15.4); pintura(9); Mj.trafico.visible = true; Mj.pk = 1; },
-    trans: 'mezcla',
-    cam: claves([[0, 67.2, 8.7, 2.0, 70.5, .2, 9.6, 43], [20, 66.6, 8.5, 2.4, 70.4, .2, 9.8, 43]]),
+    ini() { est.fondo = 'ronda'; cargado(15.4); pintura(99); Mj.pk = 1; },
+    cam: deAire([[0, ...CAM_CRUCE], [25, 66.6, 8.5, 2.4, 70.4, .2, 9.8, 43]]),
     tick(t) {
-      trabajar(t); pintura(9);
-      const sube = suave(tr(t, .2, 1.1)); Mj.trafico.scale.y = Math.max(.01, sube); Mj.trafico.visible = true;
-      const z = retrocede(t, 2.4, 8.8, 15.4, 7.4), viene = z < 14.4 && z > 7.6 + .2, libre = t > 9.6; puertas(viene || (!libre && t > 2.6));
-      if (!libre) salvaHasta(t, 67.0, 1.1, 1.6); else { const d = Math.min(R_S2.largo, distA(R_S2, 67, 9.45) + (t - 9.6) * 1.15), q = en(R_S2, d); pon(salva.g, q.x, q.z, 0); d < R_S2.largo ? P.andar(salva, 1, t) : (P.quieto(salva), P.respirar(salva, t)); }
+      trabajar(t); pintura(99); traficoArriba(t, .4); puertasResto(); proyecciones(t); fx.negro = dip(t, CORTE); if (t > CORTE) est.fondo = 'fuera';
+      const z = retrocede(t, 6.0, 12.4, 15.4, 7.4), viene = z < 14.4 && z > 7.8, libre = t > 13.2; puertas(viene || (!libre && t > 6.2));
+      if (!libre) salvaHasta(t, 67.0, 1.1, 5.4); else { const d = Math.min(R_S2.largo, distA(R_S2, 67, 9.45) + (t - 13.2) * 1.15), q = en(R_S2, d); pon(salva.g, q.x, q.z, 0); d < R_S2.largo ? P.andar(salva, 1, t) : (P.quieto(salva), P.respirar(salva, t)); }
     },
-  }, {            // Lúmina: la cámara ve a la persona y a la grúa en retroceso, avisa y activa la respuesta
+  }, {            // Lúmina: las cámaras sobre toda la planta; luego, desde la cámara del cruce, ve el riesgo y activa la respuesta
+    ini() { est.fondo = 'ronda'; cargado(15.4); pintura(99); traficoListo(); Mj.pk = 1; est.lumina = { alerta: 0, evento: 0, desde: CORTE }; },
     casa: 0,
-    ini() { est.fondo = 'fuera'; cargado(15.4); pintura(9); Mj.trafico.visible = true; Mj.trafico.scale.y = 1; Mj.camara.visible = true; Mj.pk = 1; est.lumina = { alerta: 0, evento: 0 }; },
-    cam: claves([[0, 71.0, 5.0, 5.35, 67.6, .5, 10.9, 52], [30, 71.0, 5.0, 5.35, 67.7, .5, 11.0, 50]]),
+    cam(t) { return t < CORTE ? aereo(t) : camCCTV(t - CORTE); },
     tick(t) {
-      trabajar(t); pintura(9); Mj.ojo.emissiveIntensity = 1 + .6 * Math.sin(reloj * 4);
-      const L = est.lumina, z = retrocede(t, 2.0, 5.2, 15.4, 12.0); salvaHasta(t, 66.9, 1.1, .8);
-      const riesgo = t > 3.3; if (riesgo && !L.alerta) L.alerta = t; if (L.alerta && !L.evento && t > L.alerta + 2.2) L.evento = t;
+      trabajar(t); pintura(99); traficoListo(); puertasResto(); proyecciones(t); luminaArriba(t, .3); fx.negro = dip(t, CORTE); if (t > CORTE) est.fondo = 'fuera';
+      const L = est.lumina, z = retrocede(t, 7.2, 10.4, 15.4, 12.0); salvaHasta(t, 66.9, 1.1, 6.0);
+      const riesgo = t > 8.5; if (riesgo && !L.alerta) L.alerta = t; if (L.alerta && !L.evento && t > L.alerta + 2.2) L.evento = t;
       puertas(riesgo); if (riesgo) grua.balMat.emissiveIntensity = Math.sin(reloj * 12) > 0 ? 2.6 : .1;
+    },
+  }, {            // el arsenal funcionando: SmartDock · Safetygate · X-KUBE con el tren logístico · la planta completa con Lúmina
+    casa: (t) => (t < 17 ? 1 : 0),
+    ini() { est.fondo = 'arsenal'; pon(fondo[1].g, 102.7, 15.2, H); pintura(99); traficoListo(); grua.g.visible = false; salva.g.visible = false; Mj.pk = 1; est.lumina = null; fondo[0].levantar(2.2); fondo[0].carga.visible = true; },
+    cam(t) {
+      if (t < 5.5) return claves([[0, 79.0, 2.4, -8.6, 74.6, .45, -2.6, 36], [5.5, 78.6, 2.2, -8.1, 74.6, .45, -2.6, 34]])(t);
+      if (t < 11.5) return claves([[0, 45.5, 3.8, 30.6, 38.6, 1.5, 35.6, 42], [6, 45.0, 3.6, 30.9, 38.6, 1.5, 35.6, 41]])(t - 5.5);
+      if (t < 17) return claves([[0, 50.4, 4.6, 22.6, 61.0, .2, 20.0, 46], [5.5, 50.9, 4.4, 22.4, 61.0, .2, 20.0, 45]])(t - 11.5);
+      const a = (200 + (t - 17) * 1.6) * PI / 180; return { p: [72 + Math.cos(a) * 62, 44, 18 + Math.sin(a) * 62], m: [72, 0, 17], f: 40 };
+    },
+    tick(t) {
+      trabajar(t); pintura(99); traficoListo(); puertasResto(); puertas(false); luminaArriba(t, 16.5); fx.negro = dip(t, 5.5, 11.5, 17);
+      // SmartDock: la cuña entra y la luz pasa a verde
+      Mj.cunas.forEach((c, i) => { c.g.userData.bx ??= c.g.position.x; const u = suave(tr(t, .6 + i * .3, 1.8 + i * .3)); c.g.position.x = c.g.userData.bx + .7 * (1 - u); c.led.emissiveIntensity = u >= 1 ? 2.4 : .2; });
+      // Safetygate: una grúa con la carga alta va hacia el portón; la barra la frena y avisa
+      const u2 = t - 5.5, g0 = fondo[0], toca = u2 > 3.0;
+      if (u2 > -1 && u2 < 7) { const x = toca ? lerp(38.86, 39.4, suave(tr(u2, 3.6, 4.6))) : lerp(46.5, 38.86, sale(tr(u2, .2, 3.0))); pon(g0.g, x, 35, PI); g0.levantar(toca ? lerp(2.2, .9, suave(tr(u2, 4.4, 5.6))) : 2.2); g0.carga.visible = true; g0.balMat.emissiveIntensity = .5 + .5 * Math.sin(reloj * 6); }
+      else pon(g0.g, 79.5, 35, PI);
+      const golpe = toca ? Math.exp(-(u2 - 3.0) * 1.6) : 0; Mj.sg.piv.rotation.z = -.42 * golpe * Math.cos((u2 - 3.0) * 5); Mj.sg.balizas.forEach((m) => (m.emissiveIntensity = toca && u2 < 9 ? (Math.sin(reloj * 14) > 0 ? 3 : .2) : .12));
+      // X-KUBE: el tren logístico pasa por el cruce; la cebra se apaga y aparece el aviso; el operario espera y cruza
+      const u3 = t - 11.5, xt = 66.5 - Math.max(0, u3) * 2.4; tren(t < 11.5 ? 70 : t < 17 ? xt : 84 - ((t - 17) * 2.2) % 44, PI);
+      const ocupado = t >= 11.5 && t < 17 && xt < 61.5 && xt + 4.6 > 55.5; proyecciones(t, ocupado);
+      const op = turno[0], zEsp = 19.55; if (t >= 11.5 && t < 17) { const zq = Math.min(ocupado || xt > 61.5 ? zEsp : 24, 14 + u3 * 1.25); const libre = !ocupado && xt <= 55.5; const z = libre ? Math.min(25, zEsp + (u3 - 4.6) * 1.25) : Math.min(zq, zEsp); pon(op.g, 57, Math.max(14, z), -H); (z < 24.9 && !(ocupado && z >= zEsp - .01)) ? P.andar(op, 1, t) : (P.quieto(op), P.respirar(op, t)); }
+      if (t >= 17) { est.fondo = 'ronda'; est.lumina = est.lumina || { modo: 'resumen' }; }
     },
   }, {            // al día siguiente: 1.001 días sin accidentes
     corte: true,
@@ -351,7 +390,7 @@ export async function crear(cont) {
     tick(t) { P.hablar(salva, t); turno.forEach((p, i) => { P.respirar(p, t); p.cab.rotation.x = Math.max(0, Math.sin(t * 1.3 + i * 2)) * .12; }); P.respirar(ale, t); W.tablero.mat.emissiveIntensity = .22 + .5 * Math.exp(-t * 1.2); },
   }];
 
-  /* Lúmina sobre la imagen: marcos con esquinas, rostros pixelados, la línea del riesgo y el aviso (solo en el rebobinado) */
+  /* Lúmina sobre la imagen: marcos con esquinas, rostros pixelados, la línea del riesgo y el aviso; o, desde el aire, el resumen de la planta */
   const V3 = new THREE.Vector3();
   function proyectar(pts) { let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; for (const [x, y, z] of pts) { V3.set(x, y, z).project(cam); const sx = (V3.x + 1) / 2 * 1920, sy = (1 - V3.y) / 2 * 1080; x0 = Math.min(x0, sx); y0 = Math.min(y0, sy); x1 = Math.max(x1, sx); y1 = Math.max(y1, sy); } return [x0, y0, x1, y1]; }
   const cajaMundo = (x, z, r, h, y = 0) => { const p = []; for (const a of [-r, r]) for (const b of [-r, r]) for (const yy of [y, y + h]) p.push([x + a, yy, z + b]); return proyectar(p); };
@@ -360,10 +399,24 @@ export async function crear(cont) {
     c.fillStyle = 'rgba(236,109,39,.07)'; c.fillRect(x0, y0, x1 - x0, y1 - y0);
     c.font = '600 21px Poppins, Arial'; const w = c.measureText(txt).width + 44; c.fillStyle = 'rgba(24,24,24,.86)'; c.beginPath(); c.roundRect(x0, y0 - 46, w, 36, 18); c.fill();
     c.fillStyle = col; c.beginPath(); c.arc(x0 + 18, y0 - 28, 6, 0, 7); c.fill(); c.fillStyle = '#fff'; c.textBaseline = 'middle'; c.fillText(txt, x0 + 32, y0 - 27); }
+  function etiqueta(c, x, y, z, txt, col = '#EC6D27') { V3.set(x, y, z).project(cam); if (V3.z > 1) return; const sx = (V3.x + 1) / 2 * 1920, sy = (1 - V3.y) / 2 * 1080;
+    c.strokeStyle = col; c.lineWidth = 2; c.beginPath(); c.arc(sx, sy, 9, 0, 7); c.stroke(); c.fillStyle = col; c.beginPath(); c.arc(sx, sy, 3.5, 0, 7); c.fill();
+    c.font = '600 18px Poppins, Arial'; const w = c.measureText(txt).width + 34; c.fillStyle = 'rgba(24,24,24,.82)'; c.beginPath(); c.roundRect(sx + 14, sy - 44, w, 30, 15); c.fill();
+    c.fillStyle = col; c.beginPath(); c.arc(sx + 29, sy - 29, 5, 0, 7); c.fill(); c.fillStyle = '#fff'; c.textBaseline = 'middle'; c.fillText(txt, sx + 42, sy - 28); }
   function pixel(c, x, y, s = 7) { const tonos = ['#c9a58a', '#b38e75', '#d8b89f', '#a07c66']; for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) { c.fillStyle = tonos[(i * 3 + j * 5) % 4]; c.fillRect(x - 2 * s + i * s, y - 2 * s + j * s, s, s); } }
   function dibujarLumina(t) {
-    lc.clearRect(0, 0, 1920, 1080); const L = est.lumina; if (!L) return;
+    lc.clearRect(0, 0, 1920, 1080); const L = est.lumina; if (!L || (L.desde && t < L.desde)) return;
     cam.updateMatrixWorld(); const NAR = '#EC6D27';
+    if (L.modo === 'resumen') {   // desde el aire: lo que Lúmina está viendo en toda la planta
+      const tp = Mj.tren.partes[0].g.position; etiqueta(lc, tp.x, 2.2, tp.z, 'Tren logístico · en ruta');
+      fondo.forEach((g, i) => { const p = g.g.position; etiqueta(lc, p.x, 2.6, p.z, i ? 'Grúa · en ruta' : 'Grúa · carga baja'); });
+      [turno[3], turno[5], turno[8]].forEach((p) => etiqueta(lc, p.g.position.x, 1.9, p.g.position.z, 'Persona · EPP ok', '#3DD07A'));
+      etiqueta(lc, 69, .4, 9.5, 'Cruce C1 · libre', '#3DD07A'); etiqueta(lc, 73, 1.5, -1.4, 'Andén 3 · camión fijo', '#3DD07A');
+      const X = 1340, Y = 110; lc.fillStyle = 'rgba(255,255,255,.97)'; lc.beginPath(); lc.roundRect(X, Y, 500, 110, 22); lc.fill();
+      lc.fillStyle = NAR; lc.beginPath(); lc.arc(X + 50, Y + 55, 24, 0, 7); lc.fill(); lc.fillStyle = '#fff'; lc.beginPath(); lc.arc(X + 50, Y + 55, 9, 0, 7); lc.fill();
+      lc.fillStyle = '#6c6c6c'; lc.font = '600 16px Poppins, Arial'; lc.textBaseline = 'middle'; lc.fillText('LÚMINA · TURNO MAÑANA', X + 94, Y + 36); lc.fillStyle = '#181818'; lc.font = '600 28px Poppins, Arial'; lc.fillText('Planta sin alertas', X + 94, Y + 72);
+      return;
+    }
     // marco de cámara (CCTV)
     lc.fillStyle = 'rgba(255,255,255,.92)'; lc.font = '600 22px Poppins, Arial'; lc.textBaseline = 'middle'; lc.fillText('CAM 04 · CRUCE C1', 1150, 60);
     if (Math.sin(reloj * 5) > -.2) { lc.fillStyle = '#FF3B3B'; lc.beginPath(); lc.arc(1130, 60, 8, 0, 7); lc.fill(); }
@@ -374,7 +427,6 @@ export async function crear(cont) {
     V3.set(bs.x, 1.62, bs.z).project(cam); pixel(lc, (V3.x + 1) / 2 * 1920, (1 - V3.y) / 2 * 1080);
     V3.set(bg.x, 1.36, bg.z + .38).project(cam); pixel(lc, (V3.x + 1) / 2 * 1920, (1 - V3.y) / 2 * 1080, 6);
     if (L.alerta) { const a = Math.min(1, (t - L.alerta) * 3); lc.globalAlpha = a; lc.setLineDash([10, 10]); lc.strokeStyle = '#FF4D4F'; lc.lineWidth = 3; lc.beginPath(); lc.moveTo((rS[0] + rS[2]) / 2, rS[3]); lc.lineTo((rG[0] + rG[2]) / 2, rG[3]); lc.stroke(); lc.setLineDash([]);
-      // aviso
       const X = 1340, Y = 110; lc.fillStyle = 'rgba(255,255,255,.97)'; lc.beginPath(); lc.roundRect(X, Y, 500, 132, 22); lc.fill();
       lc.fillStyle = NAR; lc.beginPath(); lc.arc(X + 52, Y + 66, 26, 0, 7); lc.fill(); lc.fillStyle = '#fff'; lc.beginPath(); lc.arc(X + 52, Y + 66, 10, 0, 7); lc.fill();
       lc.fillStyle = '#6c6c6c'; lc.font = '600 17px Poppins, Arial'; lc.fillText('LÚMINA · AVISO AL JEFE DE TURNO', X + 98, Y + 36);
@@ -407,8 +459,8 @@ export async function crear(cont) {
     cam.position.set(ahora.p[0] + Math.sin(reloj * .53) * pul, ahora.p[1] + Math.sin(reloj * .71 + 1) * pul * .7, ahora.p[2] + Math.cos(reloj * .47) * pul); cam.lookAt(ahora.m[0], ahora.m[1], ahora.m[2]);
     if (cam.fov !== ahora.f) { cam.fov = ahora.f; cam.updateProjectionMatrix(); }
     // casa de muñecas: adentro y abajo, techo y murallas; desde el aire, lo que pida la toma
-    const meta = DENTRO(cam.position.x, cam.position.z) && cam.position.y < ALERO - .4 ? 1 : (clip.casa ?? 0);
-    est.casa += (meta - est.casa) * Math.min(1, dt * 2.6); W.casa(suave(est.casa), suave(est.casa));
+    const meta = DENTRO(cam.position.x, cam.position.z) && cam.position.y < ALERO - .4 ? 1 : (typeof clip.casa === 'function' ? clip.casa(est.t) : clip.casa ?? 0);
+    if (est.t < .06 && !est.de) est.casa = meta; else est.casa += (meta - est.casa) * Math.min(1, dt * 2.6); W.casa(suave(est.casa), suave(est.casa));
     W.cielo.position.copy(cam.position);
     // luz y ambiente
     const A = AMB[est.amb], kk = Math.min(1, dt * 3); luzAmb.isol += (A.isol - luzAmb.isol) * kk; luzAmb.hemi += (A.hemi - luzAmb.hemi) * kk; luzAmb.vin += (A.vin - luzAmb.vin) * kk; luzAmb.sol.lerp(cTmp.set(A.sol), kk); luzAmb.niebla.lerp(cTmp.set(A.niebla), kk);
