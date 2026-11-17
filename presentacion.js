@@ -371,7 +371,7 @@
   (() => {
     const lam = $(".lam--pucargo"), v = lam && $("video", lam), cv = lam && $(".lu-capa", lam); if (!cv) return;
     const c = cv.getContext("2d"), px = document.createElement("canvas"); px.width = px.height = 5; const pc = px.getContext("2d");
-    let D = null; fetch("recursos/clips/pucargo-lumina.json").then((r) => r.json()).then((j) => (D = j)).catch(() => {});
+    let D = null; fetch("recursos/clips/pucargo-lumina.json?v=4").then((r) => r.json()).then((j) => (D = j)).catch(() => {});
     const NAR = "236,109,39", ROJ = "255,77,79", VER = "61,208,122", AMA = "245,180,0", BLA = "255,255,255";
     const dentro = (x, y, p) => { let d = false; for (let i = 0, j = p.length - 1; i < p.length; j = i++) { const [xi, yi] = p[i], [xj, yj] = p[j]; if ((yi > y) !== (yj > y) && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) d = !d; } return d; };
     const en = (tr, f) => { const k = f - tr.t0; if (k < 0 || k > tr.b.length - 1) return null; const i = Math.floor(k), u = k - i, a = tr.b[i], b = tr.b[Math.min(i + 1, tr.b.length - 1)]; return a.map((x, j) => x + (b[j] - x) * u); };

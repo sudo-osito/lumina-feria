@@ -22,7 +22,8 @@ def reescribir(txt, ruta):
         for p in destino.parts:
             if p == '..': partes.pop()
             elif p != '.': partes.append(p)
-        return f"{m.group(1)}./{plano('/'.join(partes))}{m.group(3)}"
+        q = esp[len(limpio):]   # se conserva el ?v= del import: el CDN de Shopify guarda en caché los archivos sin versión
+        return f"{m.group(1)}./{plano('/'.join(partes))}{q}{m.group(3)}"
     txt = re.sub(r"""((?:\bfrom\s*|\bimport\s*\(\s*)['"])(\.{1,2}/[^'"]+)(['"])""", imp, txt)
     # rutas de recursos relativas a la raíz de la presentación (imágenes, videos, fuentes, letreros)
     txt = re.sub(r"(?<![\w/.:-])(img|recursos|vendor)/([\w-]+)/", lambda m: f"feria__{m.group(1)}__{m.group(2)}__", txt)
@@ -40,6 +41,10 @@ for a in archivos:
     if dst.stat().st_size > 19_000_000: sys.exit(f'demasiado grande para Shopify: {a}')
 
 html = reescribir((RAIZ / 'index.html').read_text(), 'index.html')
+import hashlib, re as _re   # versión = huella del contenido: cada cambio rompe la caché del CDN de Shopify
+for nombre in ('feria__presentacion.js', 'feria__presentacion.css'):
+    h8 = hashlib.sha1((sal / 'assets' / nombre).read_bytes()).hexdigest()[:8]
+    html = _re.sub(_re.escape(nombre) + r'\?v=[\w]+', f'{nombre}?v={h8}', html)
 cabeza = ("{%- layout none -%}{%- capture base -%}{{ 'feria__presentacion.js' | asset_url | split: 'feria__presentacion.js' | first }}{%- endcapture -%}")
 limpia = ("<script>(function(){var q=new URLSearchParams(location.search),pv=q.get('preview_theme_id');"
           "if(q.get('nt3r')==='/presentacion-feria')history.replaceState(null,'','/presentacion-feria'+(pv?'?preview_theme_id='+pv:'')+location.hash);})();</script>")
