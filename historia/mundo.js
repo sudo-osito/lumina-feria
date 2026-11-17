@@ -164,7 +164,10 @@ export function construir(k, md, m2, eq) {
     // autos en los estacionamientos de los vecinos (cajitas, de lejos se leen como autos)
     const autos = [], ac = [0xF2F2F2, 0x2B2F36, 0x8FA3BC, 0xB9C0C8, 0xC8553D, 0x2F6FB0, 0x6B7380];
     for (const [x, z, w, d] of lotes) { const fila = z + d + 30; for (let i = 0; i < w / 3.2 - 4; i++) if (R() < .7) autos.push({ x: x + 6 + i * 3.2, z: fila + (i % 2) * .3, sx: 1.8, sy: 1.4, sz: 4.3, c: ac[Math.floor(R() * ac.length)] }); }
-    const g = new THREE.BoxGeometry(1, 1, 1); g.translate(0, .5, 0); instancias(g, mat(0xFFFFFF, { roughness: .4 }), autos, false);
+    for (const a of autos) { a.sy = 1; a.ry = Math.PI / 2; a.sx = 1; a.sz = 1; }
+    const gc = new THREE.BoxGeometry(4.2, .62, 1.75); gc.translate(0, .52, 0); instancias(gc, mat(0xFFFFFF, { roughness: .35 }), autos, false);
+    const gv = new THREE.BoxGeometry(2.2, .5, 1.55); gv.translate(-.2, 1.07, 0); instancias(gv, mat(0x39424F, { roughness: .2, metalness: .3 }), autos.map((a) => ({ ...a, c: null })), false);
+    const gr = new THREE.BoxGeometry(3.3, .42, 1.82); gr.translate(0, .21, 0); instancias(gr, mat(0x1E2126, { roughness: .8 }), autos.map((a) => ({ ...a, c: null })), false);
   }
 
   /* ───────── árboles (instanciados): redondos, álamos y pinos ───────── */
@@ -286,10 +289,13 @@ export function construir(k, md, m2, eq) {
     const L = x1 - x0, largo = Math.hypot(zB - zA, yB - yA), ang = Math.atan2(yB - yA, zB - zA);
     const g = new THREE.BoxGeometry(L, .12, largo); const t = chapa.clone(); t.repeat.set(L / 4, 1); t.needsUpdate = true; const m = mChapa.clone(); m.map = t; m.userData.op = 1; mTecho.push(m);
     const o = new THREE.Mesh(g, m); o.position.set((x0 + x1) / 2, (yA + yB) / 2, (zA + zB) / 2); o.rotation.x = -ang; o.receiveShadow = true; techo.add(o);
-    for (const x of tragaluces) { const s = new THREE.Mesh(new THREE.BoxGeometry(2.2, .14, largo - 2.4), mTraga); s.position.copy(o.position); s.position.x = x; s.rotation.x = -ang; s.translateY(.03); techo.add(s); }
+    for (const x of tragaluces) { const s = new THREE.Mesh(new THREE.BoxGeometry(2.2, .14, largo - 2.4), mTraga); s.position.copy(o.position); s.position.x = x; s.position.y += .09; s.rotation.x = -ang; techo.add(s); }
   }
   const TRG = []; for (let x = 39.5; x < 90; x += 7.5) TRG.push(x);
   agua(34.6, 90.4, -.45, 20, ALERO - .15, CUMBRE, TRG); agua(34.6, 90.4, 40.45, 20, ALERO - .15, CUMBRE, TRG);
+  { const sh = new THREE.Shape(); sh.moveTo(-.3, 0); sh.lineTo(40.3, 0); sh.lineTo(20, CUMBRE - ALERO + .1); sh.closePath();
+    const geo = new THREE.ExtrudeGeometry(sh, { depth: .3, bevelEnabled: false }), mh = tmat(0xE9EAEC, { roughness: .75 });
+    for (const x of [35.15, 90.15]) { const h = new THREE.Mesh(geo, mh); h.rotation.y = -Math.PI / 2; h.position.set(x, ALERO - .2, 0); h.castShadow = true; techo.add(h); } }
   caja(55.8, .3, .5, 62.5, CUMBRE - .05, 20, mAcero, techo, .05);                           // cumbrera
   for (const z of [-.45, 40.45]) caja(55.8, .28, .3, 62.5, ALERO - .3, z, mCanal, techo, .04);   // canaletas
   // anexo oriente (baterías y oficina): techo de un agua
@@ -444,9 +450,7 @@ export function construir(k, md, m2, eq) {
   { const g = grupo(30.5, 0, 25.6, 0, base); caja(2.6, 2.7, 2.6, 0, 0, 0, mat(0xF1F2F4), g, .08); caja(3.1, .2, 3.1, 0, 2.7, 0, M.tinta, g, .05); caja(2.0, 1.0, .06, 0, 1.2, 1.31, mat(0x9DB9D6, { roughness: .15 }), g, .02);
     for (const z of [-19, 34]) { caja(.3, 1.1, .3, 26.4, 0, z - 4, mat(0xF5C400), base, .05); const b = caja(.1, .1, 7.5, 26.4, 1.0, z, mat(0xE5383B), base, .02); b.castShadow = false; } }
   { const n = new THREE.Mesh(new THREE.PlaneGeometry(4.6, 1.5), numero('CD LOS ANDES', 4.6, 1.5, '#ffffff', '#3A4150')); n.position.set(25.2, 1.6, 30.5); n.rotation.y = -Math.PI / 2; base.add(n); caja(.4, 2.6, 5, 25.5, 0, 30.5, mat(0xE9EAEC), base, .05); }
-  for (const [x, z] of [[30.2, 6], [30.2, 12.2]]) { cil(2.4, 9, x, 1.4, z, mat(0xE9EEF3, { roughness: .45, metalness: .25 }), base, 32); cil(2.4, 1.6, x, 10.4, z, mat(0xDDE3EA), base, 32, .25); for (const [a, b] of [[1.7, 1.7], [-1.7, 1.7], [1.7, -1.7], [-1.7, -1.7]]) caja(.18, 1.5, .18, x + a, 0, z + b, M.tinta, base, .02); }
   { const cc = [0x2F6FB0, 0xC8553D, 0xE9EDF2, 0x2B8A66, 0xD9A441];
-    for (let i = 0; i < 9; i++) { const x = 39 + (i % 5) * 6.8, z = 59 + Math.floor(i / 5) * 3.2; caja(6.1, 2.6, 2.44, x, 0, z, mat(cc[i % 5], { roughness: .6 }), base, .04); if (i % 3 === 0) caja(6.1, 2.6, 2.44, x + .3, 2.6, z, mat(cc[(i + 2) % 5], { roughness: .6 }), base, .04); }
     for (const x of [50, 56.5, 63, 74]) { const g = grupo(x, 0, 48.5, Math.PI / 2, base); caja(11, 2.6, 2.5, 0, 1.15, 0, mat(0xEEF1F4), g, .05); caja(11, .14, 2.5, 0, 1.0, 0, M.tinta, g, .02); for (const a of [-3.6, -2.5]) for (const s of [-1.05, 1.05]) { const r = cil(.48, .3, 0, 0, 0, goma, g, 16); r.rotation.x = Math.PI / 2; r.position.set(a, .48, s); } for (const s of [-.8, .8]) caja(.1, 1, .1, 4.2, 0, s, M.tinta, g, .01); } }
   for (const [x, z] of [[40, -30], [60, -30], [80, -30], [100, -30], [124, -4], [124, 12], [110, 32], [46, 44], [70, 44], [28, 22], [140, 20], [150, 5]]) { cil(.09, 8, x, 0, z, M.gris2, base, 8); caja(1.3, .1, .3, x + .5, 8, z, M.tinta, base, .03); }
   // estacionamientos con autos

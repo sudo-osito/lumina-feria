@@ -320,5 +320,76 @@
 
   const [h0, h1] = location.hash.slice(1).split(".");   // #7 o #7.2 (lámina.paso)
   mostrar((parseInt(h0, 10) || 1) - 1, parseInt(h1, 10) || 0);
+
+  /* ── 18 · Lúmina sobre la grabación real: zonas, grúas, camiones y personas (casco, chaleco, zona) con alertas.
+        Las trayectorias salen de un detector offline (YOLO-World) sobre el mismo video, revisadas a mano
+        (recursos/clips/pucargo-lumina.json, 4 cuadros por segundo); aquí solo se dibujan sincronizadas con el video. ── */
+  (() => {
+    const lam = $(".lam--pucargo"), v = lam && $("video", lam), cv = lam && $(".lu-capa", lam); if (!cv) return;
+    const c = cv.getContext("2d"), px = document.createElement("canvas"); px.width = px.height = 5; const pc = px.getContext("2d");
+    let D = null; fetch("recursos/clips/pucargo-lumina.json").then((r) => r.json()).then((j) => (D = j)).catch(() => {});
+    const NAR = "236,109,39", ROJ = "255,77,79", VER = "61,208,122", AMA = "245,180,0", BLA = "255,255,255";
+    const dentro = (x, y, p) => { let d = false; for (let i = 0, j = p.length - 1; i < p.length; j = i++) { const [xi, yi] = p[i], [xj, yj] = p[j]; if ((yi > y) !== (yj > y) && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) d = !d; } return d; };
+    const en = (tr, f) => { const k = f - tr.t0; if (k < 0 || k > tr.b.length - 1) return null; const i = Math.floor(k), u = k - i, a = tr.b[i], b = tr.b[Math.min(i + 1, tr.b.length - 1)]; return a.map((x, j) => x + (b[j] - x) * u); };
+    const rr = (x, y, w, h, r) => { c.beginPath(); c.roundRect(x, y, w, h, r); };
+    function esquinas(x0, y0, x1, y1, col, a = 1, lw = 3) { const L = Math.max(8, Math.min(26, (x1 - x0) / 3, (y1 - y0) / 3)); c.strokeStyle = `rgba(${col},${a})`; c.lineWidth = lw;
+      for (const [x, y, dx, dy] of [[x0, y0, 1, 1], [x1, y0, -1, 1], [x0, y1, 1, -1], [x1, y1, -1, -1]]) { c.beginPath(); c.moveTo(x, y + dy * L); c.lineTo(x, y); c.lineTo(x + dx * L, y); c.stroke(); }
+      c.fillStyle = `rgba(${col},${.07 * a})`; c.fillRect(x0, y0, x1 - x0, y1 - y0); }
+    function pill(x, y, txt, col, tam = 17, fondo = "rgba(18,20,24,.84)") { c.font = `600 ${tam}px Poppins, Arial`; const w = c.measureText(txt).width + tam * 2.2, h = tam * 1.75;
+      c.fillStyle = fondo; rr(x, y - h, w, h, h / 2); c.fill(); c.fillStyle = `rgb(${col})`; c.beginPath(); c.arc(x + tam * .8, y - h / 2, tam * .28, 0, 7); c.fill();
+      c.fillStyle = "#fff"; c.textBaseline = "middle"; c.fillText(txt, x + tam * 1.4, y - h / 2 + 1); return w; }
+    // cubitos de atributos: chaleco, casco y zona (verde = cumple, rojo = falta)
+    function cubo(x, y, tipo, ok) { const S = 34, col = ok ? VER : ROJ; c.fillStyle = "rgba(18,20,24,.86)"; rr(x, y, S, S, 9); c.fill(); c.strokeStyle = `rgba(${col},.95)`; c.lineWidth = 2; rr(x + 1, y + 1, S - 2, S - 2, 8); c.stroke();
+      c.fillStyle = `rgb(${col})`; c.strokeStyle = `rgb(${col})`; c.lineWidth = 2.2; const m = x + S / 2;
+      if (tipo === "chaleco") { c.beginPath(); c.moveTo(m - 9, y + 9); c.lineTo(m - 3, y + 7); c.lineTo(m, y + 13); c.lineTo(m + 3, y + 7); c.lineTo(m + 9, y + 9); c.lineTo(m + 9, y + 27); c.lineTo(m - 9, y + 27); c.closePath(); c.fill(); c.fillStyle = "rgba(18,20,24,.86)"; c.fillRect(m - 9, y + 18, 18, 2.5); }
+      else { c.beginPath(); c.arc(m, y + 22, 10, Math.PI, 0); c.fill(); c.fillRect(m - 13, y + 21, 26, 3.5); }
+      if (!ok) { c.strokeStyle = "#fff"; c.lineWidth = 2.4; c.beginPath(); c.moveTo(x + S - 11, y + 5); c.lineTo(x + S - 4, y + 12); c.moveTo(x + S - 4, y + 5); c.lineTo(x + S - 11, y + 12); c.stroke(); } }
+    let eventos = [], estados = new Map(), vistos = new Set(), ultT = 0, total = 0;
+    const evento = (txt, col) => { eventos.unshift({ txt, col, t: performance.now() }); eventos = eventos.slice(0, 4); total++; };
+    function cuadro() {
+      requestAnimationFrame(cuadro);
+      if (!lam.classList.contains("activa") || !D) return;
+      c.clearRect(0, 0, 1920, 1080);
+      const t = v.currentTime || 0; if (t < ultT - .5) { eventos = []; estados.clear(); vistos.clear(); total = 0; } ultT = t; const f = t * D.fps, ahora = performance.now();
+      const s = Math.max(1920 / D.ancho, 1080 / D.alto), ox = (1920 - D.ancho * s) / 2, oy = (1080 - D.alto * s) / 2, X = (n) => ox + n * D.ancho * s, Y = (n) => oy + n * D.alto * s;
+      // zonas en el piso
+      const ZC = { gruas: NAR, acopio: ROJ, peatonal: VER };
+      for (const z of D.zonas) { const col = ZC[z.id]; c.beginPath(); z.p.forEach(([a, b], i) => (i ? c.lineTo(X(a), Y(b)) : c.moveTo(X(a), Y(b)))); c.closePath();
+        c.fillStyle = `rgba(${col},.15)`; c.fill(); c.setLineDash([14, 9]); c.lineDashOffset = -t * 20; c.strokeStyle = `rgba(${col},.9)`; c.lineWidth = 3.5; c.stroke(); c.setLineDash([]);
+        const cx = z.p.reduce((m, q) => m + q[0], 0) / z.p.length, cy = z.p.reduce((m, q) => m + q[1], 0) / z.p.length; c.font = '600 16px Poppins, Arial'; pill(X(cx) - c.measureText(z.nombre).width / 2 - 18, Y(cy) + 14, z.nombre, col, 16); }
+      // camiones en el andén y grúas en movimiento (con su rastro)
+      for (const tr of D.camiones) { const b = en(tr, f); if (!b) continue; esquinas(X(b[0]), Y(b[1]), X(b[2]), Y(b[3]), BLA, .6, 2); }
+      const gr = [];
+      D.gruas.forEach((tr, i) => { const b = en(tr, f); if (!b) return; gr.push(b); const x0 = X(b[0]), y0 = Y(b[1]), x1 = X(b[2]), y1 = Y(b[3]);
+        for (let k = 1; k <= 14; k++) { const q = en(tr, f - k * .5); if (!q) break; c.fillStyle = `rgba(${NAR},${.55 * (1 - k / 15)})`; c.beginPath(); c.arc(X((q[0] + q[2]) / 2), Y(q[3]), 3.5, 0, 7); c.fill(); }
+        esquinas(x0, y0, x1, y1, NAR, 1, 3.5); pill(x0, y0 - 8, `Grúa horquilla · G-${String(i + 1).padStart(2, "0")}`, NAR, 16); });
+      // personas: rostro pixelado, atributos, zona y riesgo con las grúas cercanas
+      let nP = 0, nV = 0;
+      D.personas.forEach((tr, i) => { const b = en(tr, f); if (!b) return; nP++; if (tr.chaleco) nV++;
+        const id = `P-${String(i + 1).padStart(2, "0")}`, pie = [(b[0] + b[2]) / 2, b[3]]; const zona = D.zonas.find((z) => dentro(pie[0], pie[1], z.p));
+        let riesgo = null; if (zona && zona.id === "gruas") for (const g of gr) { const dx = Math.max(g[0] - pie[0], 0, pie[0] - g[2]) * D.ancho, dy = Math.max(g[1] - pie[1], 0, pie[1] - g[3]) * D.alto; if (Math.hypot(dx, dy) < 120) riesgo = g; }
+        const est = riesgo ? "riesgo" : zona && zona.id === "gruas" ? "gruas" : zona && zona.id === "acopio" ? "acopio" : "ok";
+        if (!vistos.has(i)) { vistos.add(i); if (tr.cerca && !tr.chaleco) evento(`Sin chaleco · ${id}`, ROJ); }
+        if (estados.get(i) !== est) { estados.set(i, est); if (est === "riesgo") evento(`Riesgo de atropello · ${id}`, ROJ); else if (est === "gruas" && tr.cerca) evento(`Persona en zona de grúas · ${id}`, AMA); else if (est === "acopio") evento(`Ingreso a zona restringida · ${id}`, AMA); }
+        const col = est === "riesgo" ? ROJ : est === "ok" ? BLA : AMA, x0 = X(b[0]), y0 = Y(b[1]), x1 = X(b[2]), y1 = Y(b[3]);
+        if (tr.cerca) { // rostro pixelado: la persona no es el foco
+          const hx = b[0] * D.ancho + (b[2] - b[0]) * D.ancho * .22, hw = (b[2] - b[0]) * D.ancho * .56, hy = b[1] * D.alto, hh = (b[3] - b[1]) * D.alto * .17;
+          try { pc.drawImage(v, hx, hy, hw, hh, 0, 0, 5, 5); c.imageSmoothingEnabled = false; c.drawImage(px, 0, 0, 5, 5, X(hx / D.ancho), Y(hy / D.alto), hw * s, hh * s); c.imageSmoothingEnabled = true; } catch (e) {} }
+        esquinas(x0, y0, x1, y1, col, est === "ok" ? .85 : 1, tr.cerca ? 3 : 2);
+        if (riesgo) { c.setLineDash([9, 7]); c.strokeStyle = `rgba(${ROJ},.95)`; c.lineWidth = 3; c.beginPath(); c.moveTo(X(pie[0]), Y(pie[1])); c.lineTo(X((riesgo[0] + riesgo[2]) / 2), Y(riesgo[3])); c.stroke(); c.setLineDash([]); }
+        if (!tr.cerca) return;
+        pill(x0, y0 - 8, est === "riesgo" ? `Riesgo de atropello · ${id}` : `Persona · ${id}`, col === BLA ? VER : col, 15, est === "riesgo" ? `rgba(${ROJ},.92)` : undefined);
+        cubo(x1 + 8, y0, "chaleco", tr.chaleco); cubo(x1 + 8, y0 + 40, "casco", tr.casco); });
+      // panel de Lúmina: lo que ve ahora la cámara y los últimos eventos
+      const PX = 64, PY = 86, PW = 470; c.fillStyle = "rgba(255,255,255,.96)"; rr(PX, PY, PW, 168, 24); c.fill();
+      c.fillStyle = `rgb(${NAR})`; c.beginPath(); c.arc(PX + 34, PY + 36, 9, 0, 7); c.fill(); c.fillStyle = "#6c6c6c"; c.font = "600 15px Poppins, Arial"; c.textBaseline = "middle"; c.fillText("LÚMINA · CAM 1D · PUERTA DE DESPACHO", PX + 54, PY + 37);
+      if (Math.sin(ahora / 300) > -.3) { c.fillStyle = "#FF3B3B"; c.beginPath(); c.arc(PX + PW - 64, PY + 37, 5, 0, 7); c.fill(); } c.fillStyle = "#181818"; c.font = "600 13px Poppins, Arial"; c.fillText("EN VIVO", PX + PW - 54, PY + 38);
+      [["Personas", nP], ["Grúas", gr.length], ["Con chaleco", `${nV}/${nP}`], ["Alertas", total]].forEach(([n, val], k) => { const x = PX + 30 + k * 108;
+        c.fillStyle = k === 3 && total ? `rgb(${ROJ})` : "#181818"; c.font = "600 38px Poppins, Arial"; c.fillText(String(val), x, PY + 98); c.fillStyle = "#6c6c6c"; c.font = "500 14px Poppins, Arial"; c.fillText(n, x, PY + 136); });
+      eventos.forEach((e, k) => { const a = Math.min(1, (ahora - e.t) / 300) * (k === 3 ? .55 : 1); c.globalAlpha = a; pill(PX, PY + 168 + 8 + (k + 1) * 42, e.txt, e.col, 16); c.globalAlpha = 1; });
+    }
+    requestAnimationFrame(cuadro);
+  })();
+
   window.PRES = { ir: (n, p) => mostrar(n - 1, p || 0), avanzar, volver, planta: () => pedirPlanta, historia: () => pedirHistoria, n: lams.length };   // para QA
 })();

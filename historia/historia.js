@@ -11,8 +11,8 @@ import { nucleo, THREE, clamp, lerp } from '../js/planta/nucleo.js';
 import { modelos } from '../js/planta/modelos.js';
 import { modelos2 } from '../js/planta/modelos2.js';
 import { equipos } from '../js/planta5/equipos.js';
-import { construir, SOL, ALERO } from './mundo.js?v=9';
-import { gente } from './gente.js?v=5';
+import { construir, SOL, ALERO } from './mundo.js?v=10';
+import { gente } from './gente.js?v=6';
 
 const PI = Math.PI, H = PI / 2;
 const suave = (x) => { x = clamp(x); return x * x * (3 - 2 * x); };
@@ -386,8 +386,8 @@ export async function crear(cont) {
           sd.poner(u); sd.cuna.position.y = .42 * alza; sd.tender(); sd.luz(t > 3.9);
           const c = sd.cuna.position, atras = suave(tr(t, 4.0, 4.9)); pon(op.g, c.x + .62 + .5 * atras, c.z + .3 + .3 * atras, rumbo(-.55, -1));
           P.quieto(op); if (u > 0 && u < 1 || (atras > 0 && atras < 1)) P.andar(op, .8, t);
-          if (alza > .02 || agacha > 0) { op.bi.rotation.x = op.bd.rotation.x = -.95; op.bi.rotation.z = .25; op.bd.rotation.z = -.25; }
-          const ka = suave(agacha); op.c.position.y = -.22 * ka; op.pi.rotation.x = -.95 * ka; op.pd.rotation.x = -.35 * ka; op.torso.rotation.x = .5 * ka; op.cab.rotation.x = .3 * suave(agacha);
+          if (alza > .02 || agacha > 0) { const k2 = Math.max(alza, suave(agacha)); op.bi.rotation.x = op.bd.rotation.x = -.95 + .7 * suave(agacha); op.bi.rotation.z = .12 * k2; op.bd.rotation.z = -.12 * k2; }
+          const ka = suave(agacha); op.torso.rotation.x = .78 * ka; op.pi.rotation.x = -.12 * ka; op.pd.rotation.x = .1 * ka;   // se inclina desde la cadera (piernas firmes) op.cab.rotation.x = -.35 * suave(agacha);
         } else if (op.g.position.z < 0) { P.quieto(op); pon(op.g, ...PUESTO[1]); sd.poner(1); sd.luz(true); } }
       // Safetygate: una grúa con la carga alta va hacia el portón; la barra la frena y avisa
       const u2 = t - 5.5, g0 = fondo[0], toca = u2 > 3.0;
@@ -474,7 +474,8 @@ export async function crear(cont) {
     for (let j = 0; j < 3; j++) { ahora.p[j] = est.de ? lerp(est.de.p[j], c.p[j], u) : c.p[j]; ahora.m[j] = est.de ? lerp(est.de.m[j], c.m[j], u) : c.m[j]; } ahora.f = est.de ? lerp(est.de.f, c.f, u) : c.f;
     const dist = Math.hypot(ahora.p[0] - ahora.m[0], ahora.p[1] - ahora.m[1], ahora.p[2] - ahora.m[2]), pul = Math.min(.05, dist * .0022);
     cam.position.set(ahora.p[0] + Math.sin(reloj * .53) * pul, ahora.p[1] + Math.sin(reloj * .71 + 1) * pul * .7, ahora.p[2] + Math.cos(reloj * .47) * pul); cam.lookAt(ahora.m[0], ahora.m[1], ahora.m[2]);
-    if (cam.fov !== ahora.f) { cam.fov = ahora.f; cam.updateProjectionMatrix(); }
+    const nr = clamp(dist * .012, .12, 2.5);   // plano cercano según la distancia: desde el aire, más precisión de profundidad (sin parpadeo de superficies)
+    if (cam.fov !== ahora.f || Math.abs(cam.near - nr) > .02) { cam.fov = ahora.f; cam.near = nr; cam.updateProjectionMatrix(); }
     // casa de muñecas: adentro y abajo, techo y murallas; desde el aire, lo que pida la toma
     const meta = DENTRO(cam.position.x, cam.position.z) && cam.position.y < ALERO - .4 ? 1 : (typeof clip.casa === 'function' ? clip.casa(est.t) : clip.casa ?? 0);
     if ((est.t < .06 && !est.de) || fx.negro > .6) est.casa = meta; else est.casa += (meta - est.casa) * Math.min(1, dt * 2.6); W.casa(suave(est.casa), suave(est.casa));
