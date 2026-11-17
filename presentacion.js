@@ -54,6 +54,8 @@
     $("#numero").innerHTML = `<b>${String(i + 1).padStart(2, "0")}</b> / ${lams.length}`;
 
     $$(".mapa__lam").forEach((b, j) => b.classList.toggle("aqui", j === i));
+    // videos: se cargan los de esta lámina y los de la siguiente (no todos a la vez: en la feria la red manda)
+    for (const l2 of [lams[i], lams[i + 1]]) if (l2) $$(".clips video", l2).forEach((v) => { if (v.preload !== "auto") { v.preload = "auto"; try { v.load(); } catch (e) {} } });
     sincronizar3d();
   }
   function aplicarPaso() {
