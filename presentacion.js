@@ -87,7 +87,7 @@
         if (on) v.play().catch(() => {}); else if (!v.paused) v.pause();
       });
       const pie = $(".pie", l), txt = vs[k].dataset.pie || "";
-      if (pie.textContent !== txt) { if (pie.textContent) { pie.classList.add("cambia"); setTimeout(() => { pie.textContent = txt; pie.classList.remove("cambia"); }, 320); } else pie.textContent = txt; }
+      if (pie && pie.textContent !== txt) { if (pie.textContent) { pie.classList.add("cambia"); setTimeout(() => { pie.textContent = txt; pie.classList.remove("cambia"); }, 320); } else pie.textContent = txt; }
       $$(".historias i", l).forEach((b, n) => { b.classList.toggle("visto", n < k); if (n !== k) b.style.setProperty("--p", 0); });
     });
   }
@@ -299,10 +299,10 @@
       c.strokeStyle = `rgba(${CARBON},.4)`; c.lineWidth = 1.6; c.beginPath(); for (let x = 0; x <= w; x += 8) { const y = yw + Math.sin(x / 90 + t / 900) * 4; x ? c.lineTo(x, y) : c.moveTo(x, y); } c.stroke();
       esfera(c, 400, 370, 92, P160, g, CARBON, 1, 2.4);
       esfera(c, 400, 790, 230 * (.3 + .7 * u), P900, -g * .7, AZUL, u, 2.4); }; })(),
-    // 09 · 11 · 13 · el embudo: partículas que suben por el embudo (de lo menos a lo más efectivo); la franja del pilar activo brilla. Cuenta los porcentajes.
+    // 08 · 10 · 12 · la pirámide de controles: partículas que suben por la pirámide (de lo menos a lo más efectivo); la franja del pilar activo brilla. Cuenta los porcentajes.
     embudo: (() => { const r = azar(31), P = [...Array(260)].map(() => ({ x: r(), y: r(), v: .4 + r() * .8, z: r() })); let on = [0, 0, 0], cuenta = 0;
       return (c, t, w, h, cv) => { c.clearRect(0, 0, w, h); const lam = cv.closest(".lam"), n = +lam.dataset.pilar, act = n === 0 ? (paso >= 1 ? 1 : 0) : n, cx = 390 + 410, bandas = [[0, 190], [204, 394], [408, 598]];
-        const ancho = (y) => 820 - (y / 598) * 540;   // ancho del embudo a la altura y (820 arriba, 280 abajo)
+        const ancho = (y) => 280 + (y / 598) * 540;   // pirámide: ancho a la altura y (280 arriba, 820 abajo)
         const COL = [NAR, AZUL, AZUL];   // franja 0 = Lúmina (arriba), 1 = tráfico, 2 = gestión visual (abajo)
         const activo = (b) => act === 0 || (act === 1 && b === 2) || (act === 2 && b === 1) || (act === 3 && b === 0);
         for (let b = 0; b < 3; b++) on[b] = ir(on[b], activo(b) ? 1 : 0, .06);

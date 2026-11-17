@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Neisstech · FILCE 2026</title>
 <link rel="icon" href="recursos/marcas/neisstech-isotipo.svg">
-<link rel="stylesheet" href="presentacion.css?v=59">
+<link rel="stylesheet" href="presentacion.css?v=62">
 </head>
 <body>
 <!-- FILCE 2026 · estructura de 23 láminas aprobada por Bastián Osorio el 17-nov-2026 (TILSE_Estructura_23_Slides_Max.pdf).
@@ -79,44 +79,25 @@
     <p class="barras__nota" data-e style="--i:2">SUSESO · Informe anual de seguridad y salud en el trabajo 2024 · mutualidades, sin trayecto</p>
   </section>
 
-  <section class="lam" data-acto="Apertura y dimensión del problema" data-titulo="05 · Accidentes en la industria en Chile" data-estado="cifras SUSESO 2024"
-    data-notas="Fuente: SUSESO, Informe anual SST 2024 (Observatorio SST, al 14/03/2025). Accidentes del trabajo con días perdidos en mutualidades, sin trayecto: 143.199 en 2024. Dividido por los días del año: cerca de 390 cada día (143.199 / 366 = 391). AVANZAR → de esos, 1.439 fueron graves (1 %): unos 4 cada día; el 43 % de los graves fueron amputaciones traumáticas. Cada punto del dibujo es una persona que se accidenta en un día cualquiera.">
-    <div class="humano">
-      <div class="humano__txt apilado">
-        <div class="sale" data-e><b class="humano__n">143.199</b><p class="humano__p">accidentes en la industria<br>en Chile en 2024.</p></div>
-        <div class="sale2" data-paso><b class="humano__n">390 <small>al día</small></b><p class="humano__p">Cerca de 390 personas<br>se accidentan <span class="acento">cada día.</span></p></div>
-        <div data-paso><b class="humano__n rojo">4 <small>al día</small></b><p class="humano__p">de ellas, en un<br>accidente <span class="rojo">grave.</span></p></div>
-      </div>
-      <canvas class="vis" data-vis="dia" width="900" height="620"></canvas>
-      <small class="fuente" data-e style="--i:2">Accidentes del trabajo con días perdidos, sin trayecto · mutualidades · SUSESO, Informe anual de seguridad y salud en el trabajo 2024</small>
-    </div>
-  </section>
-
-  <section class="lam" data-acto="Apertura y dimensión del problema" data-titulo="06 · Qué significa un accidente a nivel de costos" data-estado="sin multiplicadores"
-    data-notas="Primero lo que se ve a primera vista: una persona herida, la atención médica, el daño al equipo. AVANZAR → lo que no se ve: en transporte, cada accidente deja a la persona 23,9 días fuera en promedio (promedio del país: 18,5 · SUSESO 2024). Y la operación sigue: hay que reemplazar, detener, reorganizar e investigar. Sin multiplicadores universales (4× a 10×) mientras no haya respaldo.">
-    <div class="costo">
+  <section class="lam" data-acto="Apertura y dimensión del problema" data-titulo="05 · Qué significa un accidente a nivel de costos" data-estado="listas de Bastián (17-nov)"
+    data-notas="La bola chica, sobre la línea, son los problemas directos: lo que se ve a primera vista. AVANZAR → la bola grande, bajo la línea, son los problemas indirectos: lo que no se ve y es mucho más grande. Listas de Bastián.">
+    <div class="costo costo--v6">
       <canvas class="vis" data-vis="iceberg2" width="760" height="1080"></canvas>
       <div class="costo__col">
         <span class="eti" data-e>Costos de un accidente</span>
         <h2 class="t t--m" data-e style="--i:1">Qué significa un accidente.</h2>
         <div class="costo__arriba" data-e style="--i:2">
-          <h3>Lo que se ve a primera vista</h3>
-          <ul><li><i>01</i>Una persona herida</li><li><i>02</i>La atención médica</li><li><i>03</i>El daño al equipo</li></ul>
+          <h3>Lo que se ve a primera vista <small>Problemas directos</small></h3>
+          <ul><li>Lesión del trabajador</li><li>Atención y traslado</li><li>Tratamiento y rehabilitación</li><li>Ausencia laboral</li><li>Daño a equipos e infraestructura</li><li>Pérdida de productos</li><li>Aumento de la prima en seguros</li></ul>
         </div>
         <div class="costo__bajo" data-paso>
-          <h3>Lo que no se ve</h3>
-          <div class="costo__grid">
-            <div class="costo__dato"><b>23,9 <small>días</small></b><span>fuera, por cada accidente en transporte</span><em>Promedio del país: 18,5 · SUSESO 2024</em></div>
-            <ul><li><i>04</i>Reemplazos y horas extra</li><li><i>05</i>Detenciones y reorganización</li><li><i>06</i>Investigación del accidente</li></ul>
-          </div>
+          <h3>Lo que no se ve <small>Problemas indirectos</small></h3>
+          <ul><li>Interrupción de la operación</li><li>Atrasos y acumulación de trabajo</li><li>Horas extraordinarias</li><li>Reemplazo del trabajador</li><li>Capacitación del reemplazo</li><li>Menor productividad inicial</li><li>Investigación del accidente</li><li>Gestión administrativa</li><li>Reprogramación de la operación</li><li>Uso de recursos alternativos</li><li>Incumplimiento con clientes</li><li>Impacto en el equipo</li><li>Consecuencias legales o regulatorias</li></ul>
         </div>
       </div>
     </div>
   </section>
-
-  <!-- ═════════ DESAFÍOS, ENFOQUE Y GESTIÓN VISUAL ═════════ -->
-
-  <section class="lam" data-acto="Desafíos, enfoque y gestión visual" data-titulo="07 · Grandes desafíos en centros de distribución"
+  <section class="lam" data-acto="Desafíos, enfoque y gestión visual" data-titulo="06 · Grandes desafíos en centros de distribución"
     data-notas="Un desafío por avance. 1 · Personas y equipos móviles compartiendo el mismo espacio. 2 · Cobertura e inmediatez: nadie puede mirar todas las zonas, en todos los turnos, y actuar a tiempo. 3 · Estandarización: normas, señalización y prácticas distintas en cada lugar. 4 · Rotación, entrenamiento y cultura: entra gente nueva todo el tiempo y la cultura no alcanza a echar raíces.">
     <span class="eti" data-e>Centros de distribución</span>
     <h2 class="t t--m desafios__t" data-e style="--i:1">Grandes desafíos de seguridad.</h2>
@@ -128,7 +109,7 @@
     </div>
   </section>
 
-  <section class="lam" data-acto="Desafíos, enfoque y gestión visual" data-titulo="08 · Marco normativo de la prevención" data-estado="referencias y redacción jurídica por verificar"
+  <section class="lam" data-acto="Desafíos, enfoque y gestión visual" data-titulo="07 · Marco normativo de la prevención" data-estado="referencias y redacción jurídica por verificar"
     data-notas="La base de lo que viene. DS 594: condiciones sanitarias y ambientales básicas en los lugares de trabajo (entre ellas, vías de circulación demarcadas). DS 44 (reemplaza al DS 40): gestión preventiva de los riesgos laborales. ISO 45001: sistema de gestión y jerarquía de controles. BSI PAS 13: guía internacional para separar personas y vehículos. La jerarquía de controles viene en la lámina siguiente. VERIFICAR referencias y redacción antes del montaje definitivo.">
     <div class="marco marco--solo">
       <div class="marco__norma">
@@ -144,85 +125,67 @@
     </div>
   </section>
 
-  <section class="lam lam--embudo" data-pilar="0" data-acto="Los tres pilares" data-titulo="09 · Jerarquía de controles y los tres pilares"
-    data-notas="La jerarquía de controles, en tres niveles, y cómo calza cada pilar de Neisstech. Controles administrativos (gestión visual), controles de ingeniería (gestión de tráfico) y eliminación (Lúmina). Porcentajes del equipo: administrativos 30 %, ingeniería 60 %, eliminación 10 %. El flujo va de abajo hacia arriba. AVANZAR → se enciende el primer pilar: gestión visual.">
+  <section class="lam lam--embudo" data-pilar="0" data-acto="Los tres pilares" data-titulo="08 · Jerarquía de controles y los tres pilares"
+    data-notas="La jerarquía de controles en forma de pirámide: abajo los controles administrativos (30 %), al medio los de ingeniería (60 %), arriba la eliminación (10 %). A la izquierda el nivel, a la derecha cómo lo abordamos en Neisstech. AVANZAR → aparece y se enciende gestión visual.">
     <span class="eti" data-e>Jerarquía de controles · ISO 45001</span>
     <h2 class="t t--m emb__t" data-e style="--i:1">De lo menos a lo más <span class="acento">efectivo.</span></h2>
     <div class="emb">
       <canvas class="vis emb__cv" data-vis="embudo" width="1600" height="600"></canvas>
-      <div class="emb__f emb__f--3"><div class="emb__ctl"><b>Eliminación</b></div><b class="emb__pct" data-v="10">10<small>%</small></b></div>
-      <div class="emb__f emb__f--2"><div class="emb__ctl"><b>Controles de ingeniería</b></div><b class="emb__pct" data-v="60">60<small>%</small></b></div>
-      <div class="emb__f emb__f--1"><div class="emb__ctl"><b>Controles administrativos</b></div><b class="emb__pct" data-v="30">30<small>%</small></b></div>
+      <div class="emb__f emb__f--3"><div class="emb__ctl"><b>Eliminación</b></div><b class="emb__pct" data-v="10">10<small>%</small></b><div class="emb__pil emb__pil--lu"><img src="recursos/marcas/lumina-isotipo.svg" alt=""><span>Analítica y reportabilidad</span></div></div>
+      <div class="emb__f emb__f--2"><div class="emb__ctl"><b>Controles de ingeniería</b></div><b class="emb__pct" data-v="60">60<small>%</small></b><div class="emb__pil"><i>02</i><span>Gestión de tráfico</span></div></div>
+      <div class="emb__f emb__f--1"><div class="emb__ctl"><b>Controles administrativos</b></div><b class="emb__pct" data-v="30">30<small>%</small></b><div class="emb__pil"><i>01</i><span>Gestión visual</span></div></div>
     </div>
     <i data-paso hidden></i>
   </section>
-
-  <section class="lam lam--video" data-sin-firma data-acto="Desafíos, enfoque y gestión visual" data-titulo="10 · Gestión visual: video"
+  <section class="lam lam--video" data-sin-firma data-acto="Desafíos, enfoque y gestión visual" data-titulo="09 · Gestión visual: video"
     data-notas="Proyecto LOGINSA: gestión visual en terreno (demarcación, cruces, zonas). Avanzar → embudo, pilar 2.">
     <div class="clips">
-      <video data-pie="Proyecto · LOGINSA" src="recursos/clips/gv2.mp4" poster="recursos/clips/gv2.jpg" muted loop playsinline preload="metadata"></video>
+      <video src="recursos/clips/gv2.mp4" poster="recursos/clips/gv2.jpg" muted loop playsinline preload="metadata"></video>
     </div>
-    <div class="video__txt"><span class="eti" data-e>Gestión visual</span><h2 class="t" data-e style="--i:1">Gestión visual <span class="acento-claro">en terreno.</span></h2><p class="pie"></p></div>
+    <div class="video__txt"><span class="eti" data-e>Gestión visual</span><h2 class="t" data-e style="--i:1">Proyecto <span class="acento-claro">5S LOGINSA.</span></h2></div>
   </section>
 
-  <!-- ═════════ GESTIÓN DE TRÁFICO Y ENTRADA A LÚMINA ═════════ -->
-
-  <section class="lam lam--embudo" data-pilar="2" data-acto="Los tres pilares" data-titulo="11 · Pilar 2: gestión de tráfico"
-    data-notas="Volvemos al embudo y encendemos el segundo nivel: controles de ingeniería = gestión de tráfico. «Además de que se vea, hay que intervenir el entorno: separar a las personas de los equipos.»">
+  <section class="lam lam--embudo" data-pilar="2" data-acto="Los tres pilares" data-titulo="10 · Pirámide: gestión de tráfico"
+    data-notas="La misma pirámide: aparece y se enciende el segundo nivel, controles de ingeniería = gestión de tráfico. «Además de que se vea, hay que intervenir el entorno: separar a las personas de los equipos.»">
     <span class="eti" data-e>Jerarquía de controles · ISO 45001</span>
-    <h2 class="t t--m emb__t" data-e style="--i:1">Pilar 2 · <span class="acento">Gestión de tráfico.</span></h2>
+    <h2 class="t t--m emb__t" data-e style="--i:1">De lo menos a lo más <span class="acento">efectivo.</span></h2>
     <div class="emb">
       <canvas class="vis emb__cv" data-vis="embudo" width="1600" height="600"></canvas>
-      <div class="emb__f emb__f--3"><div class="emb__ctl"><b>Eliminación</b></div><b class="emb__pct" data-v="10">10<small>%</small></b></div>
-      <div class="emb__f emb__f--2"><div class="emb__ctl"><b>Controles de ingeniería</b></div><b class="emb__pct" data-v="60">60<small>%</small></b></div>
-      <div class="emb__f emb__f--1"><div class="emb__ctl"><b>Controles administrativos</b></div><b class="emb__pct" data-v="30">30<small>%</small></b></div>
+      <div class="emb__f emb__f--3"><div class="emb__ctl"><b>Eliminación</b></div><b class="emb__pct" data-v="10">10<small>%</small></b><div class="emb__pil emb__pil--lu"><img src="recursos/marcas/lumina-isotipo.svg" alt=""><span>Analítica y reportabilidad</span></div></div>
+      <div class="emb__f emb__f--2"><div class="emb__ctl"><b>Controles de ingeniería</b></div><b class="emb__pct" data-v="60">60<small>%</small></b><div class="emb__pil"><i>02</i><span>Gestión de tráfico</span></div></div>
+      <div class="emb__f emb__f--1"><div class="emb__ctl"><b>Controles administrativos</b></div><b class="emb__pct" data-v="30">30<small>%</small></b><div class="emb__pil"><i>01</i><span>Gestión visual</span></div></div>
     </div>
-    
   </section>
-
-  <section class="lam lam--video lam--subtitulado" data-sin-firma data-acto="Gestión de tráfico y entrada a Lúmina" data-titulo="12 · Gestión de tráfico: video"
-    data-notas="Video de Bastián, completo: «Cruce inteligente CD» de CIAL, antes y después (los subtítulos son los del video): el peatón solicita el paso, la señal virtual alerta del tráfico de equipos, 30 segundos de cruce con cuenta regresiva, y los equipos esperan su señal. Avanzar → embudo, pilar 3.">
+  <section class="lam lam--video lam--subtitulado" data-sin-firma data-acto="Gestión de tráfico y entrada a Lúmina" data-titulo="11 · Gestión de tráfico: video"
+    data-notas="Video de Bastián, solo el «después»: el cruce inteligente funcionando (cliente CIAL, no se nombra en pantalla) (los subtítulos son los del video): el peatón solicita el paso, la señal virtual alerta del tráfico de equipos, 30 segundos de cruce con cuenta regresiva, y los equipos esperan su señal. Avanzar → embudo, pilar 3.">
     <div class="clips">
-      <video data-pie="Proyecto · CIAL" src="recursos/clips/cial-dinamica.mp4" poster="recursos/clips/cial-dinamica.jpg" muted loop playsinline preload="metadata"></video>
+      <video src="recursos/clips/cial-dinamica.mp4" poster="recursos/clips/cial-dinamica.jpg" muted loop playsinline preload="metadata"></video>
     </div>
-    <div class="video__txt"><span class="eti" data-e>Gestión de tráfico</span><h2 class="t" data-e style="--i:1">Gestión de tráfico en <span class="acento-claro">un punto crítico.</span></h2><p class="pie"></p></div>
+    <div class="video__txt"><span class="eti" data-e>Gestión de tráfico</span><h2 class="t" data-e style="--i:1">Proyecto <span class="acento-claro">cruce inteligente.</span></h2></div>
   </section>
 
-  <section class="lam lam--embudo" data-pilar="3" data-acto="Los tres pilares" data-sin-firma data-titulo="13 · Pilar 3: Lúmina"
-    data-notas="El nivel más alto del embudo: Lúmina. AVANZAR → frase central aprobada: «La ingeniería interviene el riesgo; la analítica nos ayuda a comprobar cómo funciona y dónde mejorarla.»">
+  <section class="lam lam--embudo" data-pilar="3" data-sin-firma data-acto="Los tres pilares" data-titulo="12 · Pirámide: analítica y reportabilidad (Lúmina)"
+    data-notas="La cima de la pirámide: analítica y reportabilidad, y de ahí entra Lúmina. AVANZAR → «La ingeniería interviene el riesgo; la analítica nos ayuda a comprobar cómo funciona y dónde mejorarla.»">
     <span class="eti" data-e>Jerarquía de controles · ISO 45001</span>
-    <h2 class="t t--m emb__t" data-e style="--i:1">Pilar 3 · <span class="naranjo">Lúmina.</span></h2>
+    <h2 class="t t--m emb__t" data-e style="--i:1">De lo menos a lo más <span class="acento">efectivo.</span></h2>
     <div class="emb">
       <canvas class="vis emb__cv" data-vis="embudo" width="1600" height="600"></canvas>
-      <div class="emb__f emb__f--3"><div class="emb__ctl"><b>Eliminación</b></div><b class="emb__pct" data-v="10">10<small>%</small></b></div>
-      <div class="emb__f emb__f--2"><div class="emb__ctl"><b>Controles de ingeniería</b></div><b class="emb__pct" data-v="60">60<small>%</small></b></div>
-      <div class="emb__f emb__f--1"><div class="emb__ctl"><b>Controles administrativos</b></div><b class="emb__pct" data-v="30">30<small>%</small></b></div>
+      <div class="emb__f emb__f--3"><div class="emb__ctl"><b>Eliminación</b></div><b class="emb__pct" data-v="10">10<small>%</small></b><div class="emb__pil emb__pil--lu"><img src="recursos/marcas/lumina-isotipo.svg" alt=""><span>Analítica y reportabilidad</span></div></div>
+      <div class="emb__f emb__f--2"><div class="emb__ctl"><b>Controles de ingeniería</b></div><b class="emb__pct" data-v="60">60<small>%</small></b><div class="emb__pil"><i>02</i><span>Gestión de tráfico</span></div></div>
+      <div class="emb__f emb__f--1"><div class="emb__ctl"><b>Controles administrativos</b></div><b class="emb__pct" data-v="30">30<small>%</small></b><div class="emb__pil"><i>01</i><span>Gestión visual</span></div></div>
     </div>
     <p class="emb__frase" data-paso>La ingeniería interviene el riesgo; <span class="naranjo">la analítica nos ayuda a comprobar cómo funciona y dónde mejorarla.</span></p>
   </section>
-
-  <section class="lam lam--3d" data-toma="ve" data-acto="Gestión de tráfico y entrada a Lúmina" data-titulo="14 · Lúmina: qué es y qué aporta" data-estado="capacidades: confirmar disponibles vs en desarrollo"
-    data-notas="Bastián lo cuenta; en pantalla solo el logo. Dos aportes. 1 · Convierte lo que captan las cámaras en información: eventos para mejorar la prevención (en la planta: la grúa y la persona detectadas). AVANZAR → 2 · Según el riesgo, activa alertas o dispositivos mediante integraciones validadas (en la planta: el cruce se cierra). CONFIRMAR con Bastián qué está disponible hoy y qué está en desarrollo; no prometer capacidades que no estén validadas.">
+  <section class="lam lam--3d" data-toma="ve" data-acto="Gestión de tráfico y entrada a Lúmina" data-titulo="13 · Lúmina: mensaje de impacto" data-estado="capacidades: confirmar disponibles vs en desarrollo"
+    data-notas="Mensaje de impacto (como la one-page de Lúmina): «Convertimos cámaras en decisiones. Nuestra IA detecta riesgos y oportunidades y entrega acciones concretas para mejorar procesos y apoyar a tu equipo.» Dos aportes. 1 · Convierte lo que captan las cámaras en información: eventos para mejorar la prevención (en la planta: la grúa y la persona detectadas). AVANZAR → 2 · Según el riesgo, activa alertas o dispositivos mediante integraciones validadas (en la planta: el cruce se cierra). CONFIRMAR con Bastián qué está disponible hoy y qué está en desarrollo; no prometer capacidades que no estén validadas.">
     <div class="texto">
       <img class="logo-lu" src="recursos/marcas/lumina-logo.svg" alt="Lúmina" data-e>
-      <h2 class="t t--m" data-e style="--i:1">Qué es Lúmina.</h2>
+      <h2 class="t t--m" data-e style="--i:1">Convertimos cámaras<br>en <span class="naranjo">decisiones.</span></h2>
       <i data-paso hidden></i>
     </div>
   </section>
 
-  <section class="lam lam--video lam--pucargo" data-sin-firma data-acto="Gestión de tráfico y entrada a Lúmina" data-titulo="15 · Lúmina en acción: caso Pucargo" data-estado="nombre del caso: el video dice Depocargo · confirmar"
-    data-notas="La grabación de cámara que pasó Bastián (puerta de despacho interior, 6-mar-2026): grúas y personas compartiendo la puerta de despacho. Bastián explica la situación de riesgo y la intervención. No atribuir resultados ni capacidades que el video no muestre. OJO: la lista de cámaras del video dice «Depocargo»; confirmar el nombre del caso antes de la feria.">
-    <div class="clips">
-      <video data-pie="Lúmina sobre la cámara de la puerta de despacho" src="recursos/clips/pucargo.mp4" poster="recursos/clips/pucargo.jpg" muted loop playsinline preload="metadata"></video>
-    </div>
-    <canvas class="lu-capa" width="1920" height="1080"></canvas>
-    <div class="pucargo__falta"><b>Video del caso Pucargo</b><span>Por incorporar · recursos/clips/pucargo.mp4</span></div>
-    <div class="video__txt"><span class="eti eti--lu" data-e>Lúmina en acción</span><h2 class="t" data-e style="--i:1">Caso <span class="acento-claro acento-claro--lu">Pucargo.</span></h2><p class="pie"></p></div>
-  </section>
-
-  <!-- ═════════ DESARROLLO DE LÚMINA Y CIERRE ═════════ -->
-
-  <section class="lam lam--hoy" data-acto="Desarrollo de Lúmina y cierre" data-titulo="16 · El desafío: las cámaras graban, nadie mira"
+  <section class="lam lam--hoy" data-acto="Desarrollo de Lúmina y cierre" data-titulo="14 · El desafío: las cámaras graban, nadie mira"
     data-notas="Del sitio de Lúmina. «Sus cámaras lo graban todo. Pero nadie lo está mirando. Lo que pasa en la planta queda grabado y se revisa cuando ya es tarde.» Tres ejemplos: alguien trabaja sin casco; una grúa pasa junto a un peatón; entran a una zona restringida. AVANZAR → con Lúmina: lo detecta y avisa al instante, la baliza se enciende en el momento, queda registrado con video, hora y lugar. «Hacemos visible lo que hoy pasa inadvertido.»">
     <div class="hoy__cab">
       <span class="eti eti--lu" data-e>El desafío</span>
@@ -242,20 +205,30 @@
     <p class="hoy__frase" data-paso>Hacemos visible lo que hoy pasa inadvertido.</p>
   </section>
 
-  <section class="lam" data-acto="Desarrollo de Lúmina y cierre" data-sin-firma data-titulo="17 · De los eventos a las decisiones" data-estado="falta dashboard real o material validado"
-    data-notas="Los eventos, juntos, cuentan una historia: dónde se repiten, a qué hora, con qué frecuencia. Eso orienta las decisiones de prevención y las mejoras de gestión de tráfico (por ejemplo, dónde va el próximo cruce). Los dibujos son ilustrativos: NO son datos de un cliente. Cuando llegue una captura real del dashboard de Lúmina, va aquí.">
-    <span class="eti eti--lu" data-e>Analítica de Lúmina</span>
-    <h2 class="t t--m desafios__t" data-e style="--i:1">De los eventos a las <span class="naranjo">decisiones.</span></h2>
-    <div class="desafios desafios--lu">
-      <div class="desafio" data-e style="--i:2"><canvas class="vis" data-vis="a1" width="560" height="300"></canvas><i>01</i><b>Dónde se repite</b><span>Los puntos de la planta donde se concentran los eventos.</span></div>
-      <div class="desafio" data-e style="--i:3"><canvas class="vis" data-vis="a2" width="560" height="300"></canvas><i>02</i><b>A qué hora</b><span>Los turnos y horarios de mayor riesgo.</span></div>
-      <div class="desafio" data-e style="--i:4"><canvas class="vis" data-vis="a3" width="560" height="300"></canvas><i>03</i><b>Con qué frecuencia</b><span>Qué días se repite y si va bajando.</span></div>
-      <div class="desafio" data-e style="--i:5"><canvas class="vis" data-vis="a4" width="560" height="300"></canvas><i>04</i><b>Qué decidir</b><span>Dónde va el próximo cruce, barrera o capacitación.</span></div>
-    </div>
-    <small class="analitica__ilu" data-e style="--i:6">Ilustración · no son datos reales</small>
+  <section class="lam lam--lu-pasos" data-acto="Desarrollo de Lúmina y cierre" data-titulo="15 · Lúmina: funcionamiento"
+    data-notas="Como la one-page de Lúmina, «Cómo funciona». 1 · La cámara ve el riesgo: una grúa y un peatón están por cruzarse. 2 · Lúmina lo entiende y actúa: se enciende la baliza y la grúa frena a tiempo. 3 · Avisa al jefe de planta: le llega al celular, esté donde esté. 4 · Lo corrige en terreno: va al punto exacto con el video en la mano. Un paso por avance.">
+    <span class="eti eti--lu" data-e>Cómo funciona</span>
+    <h2 class="t t--m" data-e style="--i:1">De lo que ve la cámara <span class="naranjo">a tu equipo en terreno.</span></h2>
+    <ol class="lupasos">
+      <li data-paso><i>01</i><em>Ve</em><b>La cámara ve el riesgo</b><span>Una grúa y un peatón están por cruzarse.</span></li>
+      <li data-paso><i>02</i><em>Actúa</em><b>Lúmina lo entiende y actúa</b><span>Se enciende la baliza y la grúa frena a tiempo.</span></li>
+      <li data-paso><i>03</i><em>Avisa</em><b>Avisa al jefe de planta</b><span>Le llega al celular, esté donde esté.</span></li>
+      <li data-paso><i>04</i><em>Se corrige</em><b>Lo corrige en terreno</b><span>Va al punto exacto con el video en la mano.</span></li>
+    </ol>
   </section>
-
-  <section class="lam" data-acto="Desarrollo de Lúmina y cierre" data-titulo="18 · Privacidad: uso responsable de cámaras e IA" data-estado="redacción legal por validar"
+  <section class="lam lam--lu-alc" data-acto="Desarrollo de Lúmina y cierre" data-titulo="16 · Lúmina: alcances" data-estado="capacidades sujetas a validación técnica"
+    data-notas="Como la one-page de Lúmina, «Aplicaciones». Una misma tecnología, diferentes desafíos en terreno; cada aplicación se define según el entorno, los riesgos y los objetivos de la operación. Eventos críticos (humo, amagos de incendio, caídas, obstáculos, ergonomía): sujetos a validación técnica.">
+    <span class="eti eti--lu" data-e>Alcances</span>
+    <h2 class="t t--m" data-e style="--i:1">Una misma tecnología. <span class="gris">Diferentes desafíos en terreno.</span></h2>
+    <div class="lualc">
+      <div data-e style="--i:2"><small>Seguridad de personas</small><b>Uso de EPP</b><span>Casco, chaleco u otros elementos definidos para cada zona.</span></div>
+      <div data-e style="--i:3"><small>Interacción crítica</small><b>Persona–vehículo</b><span>Acercamientos entre personas y equipos móviles.</span></div>
+      <div data-e style="--i:4"><small>Control de acceso</small><b>Zonas restringidas</b><span>Ingresos, permanencias o cruces de línea.</span></div>
+      <div data-e style="--i:5"><small>Tráfico interno</small><b>Equipos móviles</b><span>Rutas, cruces y puntos ciegos de la operación.</span></div>
+      <div data-e style="--i:6"><small>Condiciones críticas</small><b>Eventos críticos</b><span>Humo, amagos de incendio, caídas u obstáculos, sujetos a validación técnica.</span></div>
+    </div>
+  </section>
+  <section class="lam" data-acto="Desarrollo de Lúmina y cierre" data-titulo="17 · Privacidad: uso responsable de cámaras e IA" data-estado="redacción legal por validar"
     data-notas="El mensaje: en Chile, las cámaras en el trabajo se justifican por seguridad; no como un medio para controlar o vigilar el rendimiento de las personas (Código del Trabajo, art. 5 y 154 bis, y dictámenes de la Dirección del Trabajo sobre videovigilancia: VERIFICAR la cita exacta con el abogado antes de la feria). Lúmina se usa para prevenir riesgos: la persona no es el foco (rostros pixelados), el foco es el riesgo, y los datos se tratan conforme a la ley de protección de datos personales (Ley 21.719).">
     <div class="usr">
       <div class="usr__img" data-e><img src="recursos/fotos/cctv-despacho.jpg" alt="">
@@ -273,7 +246,42 @@
     </div>
   </section>
 
-  <section class="lam lam--hist lam--guion lam--rew" data-escena="historia" data-sin-firma data-acto="Desarrollo de Lúmina y cierre" data-titulo="19 · Volvamos a la historia (rebobinado)" data-estado="guion y montaje: definir con Bastián"
+  <section class="lam lam--video lam--pucargo" data-sin-firma data-acto="Gestión de tráfico y entrada a Lúmina" data-titulo="18 · Lúmina en acción: caso Pucargo" data-estado="nombre del caso: el video dice Depocargo · confirmar"
+    data-notas="La grabación de cámara que pasó Bastián (puerta de despacho interior, 6-mar-2026): grúas y personas compartiendo la puerta de despacho. Bastián explica la situación de riesgo y la intervención. No atribuir resultados ni capacidades que el video no muestre. OJO: la lista de cámaras del video dice «Depocargo»; confirmar el nombre del caso antes de la feria.">
+    <div class="clips">
+      <video src="recursos/clips/pucargo.mp4" poster="recursos/clips/pucargo.jpg" muted loop playsinline preload="metadata"></video>
+    </div>
+    <canvas class="lu-capa" width="1920" height="1080"></canvas>
+    <div class="pucargo__falta"><b>Video del caso Pucargo</b><span>Por incorporar · recursos/clips/pucargo.mp4</span></div>
+    <div class="video__txt"><span class="eti eti--lu" data-e>Analítica y reportabilidad</span><h2 class="t" data-e style="--i:1">Proyecto <span class="acento-claro acento-claro--lu">cámaras con IA</span><br>+ gestión de tráfico.</h2></div>
+  </section>
+
+  <section class="lam lam--lu-ben" data-acto="Desarrollo de Lúmina y cierre" data-titulo="19 · Lúmina: beneficios"
+    data-notas="Como la one-page de Lúmina, «Beneficios». Una cámara normal solo graba; Lúmina entiende lo que ve, avisa en el momento y deja la evidencia lista. Respuesta, evidencia, prevención y el equipo: sin cámaras inteligentes vs con Lúmina.">
+    <span class="eti eti--lu" data-e>Beneficios</span>
+    <h2 class="t t--m" data-e style="--i:1">Las mismas cámaras. <span class="naranjo">Ahora entienden y actúan.</span></h2>
+    <div class="luben">
+      <div class="luben__c"><span></span><b>Solo cámaras</b><b class="lu">Con Lúmina</b></div>
+      <div data-e style="--i:2"><span>Respuesta</span><p>Te enteras cuando ya pasó.</p><p class="lu">Aviso en el momento a quien está en terreno.</p></div>
+      <div data-e style="--i:3"><span>Evidencia</span><p>Horas de video por revisar.</p><p class="lu">Cada evento con su clip, hora y lugar.</p></div>
+      <div data-e style="--i:4"><span>Prevención</span><p>Se decide por intuición.</p><p class="lu">Datos para corregir antes del accidente.</p></div>
+      <div data-e style="--i:5"><span>Tu equipo</span><p>Alguien mirando pantallas.</p><p class="lu">Nadie mira pantallas: Lúmina avisa.</p></div>
+    </div>
+  </section>
+  <section class="lam" data-acto="Desarrollo de Lúmina y cierre" data-sin-firma data-titulo="20 · De los eventos a las decisiones" data-estado="falta dashboard real o material validado"
+    data-notas="Los eventos, juntos, cuentan una historia: dónde se repiten, a qué hora, con qué frecuencia. Eso orienta las decisiones de prevención y las mejoras de gestión de tráfico (por ejemplo, dónde va el próximo cruce). Los dibujos son ilustrativos: NO son datos de un cliente. Cuando llegue una captura real del dashboard de Lúmina, va aquí.">
+    <span class="eti eti--lu" data-e>Analítica de Lúmina</span>
+    <h2 class="t t--m desafios__t" data-e style="--i:1">De los eventos a las <span class="naranjo">decisiones.</span></h2>
+    <div class="desafios desafios--lu">
+      <div class="desafio" data-e style="--i:2"><canvas class="vis" data-vis="a1" width="560" height="300"></canvas><i>01</i><b>Dónde se repite</b><span>Los puntos de la planta donde se concentran los eventos.</span></div>
+      <div class="desafio" data-e style="--i:3"><canvas class="vis" data-vis="a2" width="560" height="300"></canvas><i>02</i><b>A qué hora</b><span>Los turnos y horarios de mayor riesgo.</span></div>
+      <div class="desafio" data-e style="--i:4"><canvas class="vis" data-vis="a3" width="560" height="300"></canvas><i>03</i><b>Con qué frecuencia</b><span>Qué días se repite y si va bajando.</span></div>
+      <div class="desafio" data-e style="--i:5"><canvas class="vis" data-vis="a4" width="560" height="300"></canvas><i>04</i><b>Qué decidir</b><span>Dónde va el próximo cruce, barrera o capacitación.</span></div>
+    </div>
+    <small class="analitica__ilu" data-e style="--i:6">Ilustración · no son datos reales</small>
+  </section>
+
+  <section class="lam lam--hist lam--guion lam--rew" data-escena="historia" data-sin-firma data-acto="Desarrollo de Lúmina y cierre" data-titulo="21 · Volvamos a la historia (rebobinado)" data-estado="guion y montaje: definir con Bastián"
     data-guion='[["rewind",0],["rewind",1],["rewind",2],["rewind",3],["rewind",4],["rewind",5]]'
     data-notas="Rebobinamos a la misma mañana y vemos cómo cambia con Neisstech. Un avance por capa.">
     <div class="hist apilado">
@@ -286,7 +294,7 @@
     </div>
   </section>
 
-  <section class="lam lam--3d lam--fin2" data-toma="portada" data-sin-firma data-acto="Desarrollo de Lúmina y cierre" data-titulo="20 · Cierre: Muchas gracias. ¿Preguntas?"
+  <section class="lam lam--3d lam--fin2" data-toma="portada" data-sin-firma data-acto="Desarrollo de Lúmina y cierre" data-titulo="22 · Cierre: Muchas gracias. ¿Preguntas?"
     data-notas="Texto aprobado: «Muchas gracias. ¿Preguntas?» Invitar a escanear el QR (formulario filce.neisstech.com) para agendar su Discovery. Dejar esta lámina durante las preguntas.">
     <div class="fin">
       <div class="fin__txt">
@@ -311,6 +319,6 @@
 <aside class="notas" id="notas"><b>Bastián dice</b><p></p></aside>
 <div class="mapa" id="mapa"></div>
 
-<script src="presentacion.js?v=61"></script>
+<script src="presentacion.js?v=62"></script>
 </body>
 </html>

@@ -1105,3 +1105,70 @@ img, canvas { display: block; }
 .costo__bajo li i { background: var(--blue); color: #fff; }
 .costo__dato b { font-size: 140px; }
 .costo__dato span { font-size: 26px; }
+
+/* ═════════ v6 (17-nov noche) · revisión de Bastián: pirámide, iceberg con sus listas, Lúmina como la one-page ═════════ */
+/* pirámide (no embudo): la franja de arriba es la más angosta */
+.emb__f--3 .emb__pct::before { clip-path: polygon(270px 0, calc(100% - 270px) 0, calc(100% - 184.2px) 100%, 184.2px 100%); }
+.emb__f--2 .emb__pct::before { clip-path: polygon(177.9px 0, calc(100% - 177.9px) 0, calc(100% - 92.1px) 100%, 92.1px 100%); }
+.emb__f--1 .emb__pct::before { clip-path: polygon(85.8px 0, calc(100% - 85.8px) 0, 100% 100%, 0 100%); }
+/* a la derecha, cómo lo aborda Neisstech: aparece a medida que se avanza */
+.lam--embudo .emb__pil { display: flex; padding-left: 48px; font-size: 34px; opacity: 0; transform: translateX(-24px); transition: opacity .8s var(--llegada), transform .9s var(--llegada); transition-delay: .5s; }
+.lam--embudo .emb__pil--lu span { color: var(--lumina); }
+.lam--embudo.activa[data-pilar="0"].p1 .emb__f--1 .emb__pil,
+.lam--embudo.activa[data-pilar="2"] .emb__f--1 .emb__pil, .lam--embudo.activa[data-pilar="2"] .emb__f--2 .emb__pil,
+.lam--embudo.activa[data-pilar="3"] .emb__pil { opacity: 1; transform: none; }
+.lam--embudo[data-pilar="2"] .emb__f--1 .emb__pil, .lam--embudo[data-pilar="3"] .emb__f--1 .emb__pil, .lam--embudo[data-pilar="3"] .emb__f--2 .emb__pil { transition-delay: 0s; }
+.lam--embudo[data-pilar="2"] .emb__f--1 .emb__pil, .lam--embudo[data-pilar="3"] .emb__f--1 .emb__pil, .lam--embudo[data-pilar="3"] .emb__f--2 .emb__pil { color: var(--tinta-2); }
+
+/* 05 · iceberg: bola chica = directos, bola grande = indirectos */
+.costo--v6 .costo__arriba { top: 270px; right: 90px; }
+.costo--v6 .costo__bajo { top: 590px; right: 90px; }
+.costo--v6 h3 { font-size: 32px; margin-bottom: 18px; display: flex; align-items: baseline; gap: 18px; }
+.costo--v6 h3 small { font-size: 15px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; color: var(--tinta-2); }
+.costo--v6 .costo__bajo h3 small { color: var(--blue); }
+.costo--v6 ul { display: flex; flex-wrap: wrap; gap: 10px 10px; flex-direction: row; }
+.costo--v6 li { padding: 9px 20px 9px 16px; font-size: 21px; gap: 10px; }
+.costo--v6 li::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: rgba(24, 24, 24, .35); flex: none; }
+.costo--v6 .costo__bajo li::before { background: var(--blue); }
+.costo--v6 .costo__bajo ul { flex-direction: row; align-items: center; }
+
+/* 15 · funcionamiento: cuatro pasos encadenados */
+.lam--lu-pasos { justify-content: flex-start; padding-top: 150px; }
+.lupasos { list-style: none; margin-top: 110px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 34px; position: relative; }
+.lupasos::before { content: ""; position: absolute; left: 30px; right: 30px; top: 30px; border-top: 2px dashed rgba(236, 109, 39, .35); }
+.lupasos li { position: relative; display: grid; gap: 12px; align-content: start; }
+.lupasos i { font-style: normal; width: 60px; height: 60px; border-radius: 50%; display: grid; place-items: center; background: var(--lumina); color: #fff; font-size: 19px; font-weight: 600; letter-spacing: .04em; box-shadow: 0 0 0 10px var(--fondo), 0 14px 30px -10px rgba(236, 109, 39, .6); }
+.lupasos em { margin-top: 18px; font-style: normal; font-size: 16px; font-weight: 600; letter-spacing: .24em; text-transform: uppercase; color: var(--lumina); }
+.lupasos b { font-size: 36px; font-weight: 500; letter-spacing: -.025em; line-height: 1.15; }
+.lupasos span { font-size: 24px; line-height: 1.35; color: var(--tinta-2); }
+
+/* 16 · alcances: cinco aplicaciones */
+.lam--lu-alc { justify-content: flex-start; padding-top: 150px; }
+.lualc { margin-top: 80px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 22px; }
+.lualc > div { display: grid; gap: 12px; align-content: start; padding: 30px 28px 34px; border-radius: 22px; background: #fff; box-shadow: 0 0 0 1.5px rgba(24, 24, 24, .06), 0 20px 40px -24px rgba(24, 24, 24, .25); }
+.lualc small { font-size: 14px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(--lumina); }
+.lualc b { font-size: 32px; font-weight: 500; letter-spacing: -.02em; line-height: 1.15; }
+.lualc span { font-size: 21px; line-height: 1.4; color: var(--tinta-2); }
+
+/* 19 · beneficios: solo cámaras vs con Lúmina */
+.lam--lu-ben { justify-content: flex-start; padding-top: 150px; }
+.luben { margin-top: 70px; display: grid; gap: 0; }
+.luben > div { display: grid; grid-template-columns: 260px 1fr 1fr; gap: 40px; align-items: center; padding: 22px 0; border-top: 1.5px solid var(--line); }
+.luben > .luben__c { border-top: 0; padding-bottom: 14px; }
+.luben__c b { font-size: 16px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; color: var(--tinta-2); }
+.luben__c b.lu { color: var(--lumina); }
+.luben span { font-size: 18px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(--tinta-2); }
+.luben p { font-size: 30px; letter-spacing: -.015em; color: var(--tinta-3); }
+.luben p.lu { color: var(--tinta); font-weight: 500; display: flex; align-items: center; gap: 16px; }
+.luben p.lu::before { content: ""; width: 12px; height: 12px; border-radius: 50%; background: var(--lumina); flex: none; box-shadow: 0 0 0 6px rgba(236, 109, 39, .15); }
+/* v6 · ajustes de tamaño: el contenido ocupa la lámina */
+.lam--lu-pasos, .lam--lu-alc, .lam--lu-ben { padding-bottom: 150px; }
+.lupasos, .lualc, .luben { margin-top: auto !important; margin-bottom: auto; }
+.lupasos b { font-size: 44px; } .lupasos span { font-size: 28px; } .lupasos em { font-size: 18px; }
+.lupasos i { width: 76px; height: 76px; font-size: 22px; } .lupasos::before { top: 38px; }
+.lualc > div { padding: 40px 32px 46px; gap: 16px; } .lualc b { font-size: 38px; } .lualc span { font-size: 24px; } .lualc small { font-size: 15px; }
+.luben > div { padding: 28px 0; } .luben p { font-size: 34px; } .luben span { font-size: 20px; } .luben__c b { font-size: 18px; }
+.costo--v6 li { font-size: 23px; padding: 10px 22px 10px 18px; }
+.costo--v6 .costo__arriba { top: 260px; } .costo--v6 .costo__bajo { top: 580px; }
+.costo--v6 li { font-size: 22px; padding: 8px 20px 8px 16px; } .costo--v6 ul { gap: 9px 9px; }
+.costo--v6 .costo__arriba { top: 250px; } .costo--v6 .costo__bajo { top: 548px; } .costo--v6 h3 { margin-bottom: 14px; }
