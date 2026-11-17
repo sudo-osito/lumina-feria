@@ -11,7 +11,7 @@ import { nucleo, THREE, clamp, lerp } from '../js/planta/nucleo.js';
 import { modelos } from '../js/planta/modelos.js';
 import { modelos2 } from '../js/planta/modelos2.js';
 import { equipos } from '../js/planta5/equipos.js';
-import { construir, SOL, ALERO } from './mundo.js?v=4';
+import { construir, SOL, ALERO } from './mundo.js?v=6';
 import { gente } from './gente.js?v=4';
 
 const PI = Math.PI, H = PI / 2;
@@ -84,7 +84,9 @@ export async function crear(cont) {
   /* ───────── lugares y caminos (todos por los senderos del plano) ───────── */
   const S0 = [47.5, 31.4];
   const LUGAR = turno.map((_, i) => { const a = (-66 + i * 14.6) * PI / 180, r = i % 2 ? 4.6 : 3.4; return [S0[0] + r * Math.sin(a), S0[1] - r * Math.cos(a)]; });
-  const ANTES = [[43.8, 26.9, .4], [44.9, 27.6, 2.6], [44.1, 28.4, -1.2], [52.6, 30.4, 2.2], [53.3, 29.5, -2.4], [46.4, 26.0, .9], [47.3, 26.6, 2.9], [55.0, 27.4, 1.9], [55.6, 28.3, -2.2], [51.9, 29.3, .3]];
+  // antes de la charla: conversan en grupos, dejando libre el pasillo por donde entra la cámara (x 45,5–49)
+  const GRUPOS = [[[51.6, 27.2], [52.7, 27.8], [51.9, 28.7]], [[53.3, 30.8], [54.2, 30.1]], [[52.4, 24.4], [54.5, 24.2]], [[44.3, 28.4], [44.9, 27.5], [45.7, 31.9]]];
+  const ANTES = GRUPOS.flatMap((g) => { const cx = g.reduce((a, q) => a + q[0], 0) / g.length, cz = g.reduce((a, q) => a + q[1], 0) / g.length; return g.map(([x, z]) => [x, z, rumbo(cx - x, cz - z)]); });
   // puestos de trabajo (x, z, rumbo)
   const PUESTO = [[47.6, 18.85, H], [51, 13.45, H], [54.2, 18.85, H], [65, 27, 0], [68.5, 5.6, H], [77.9, 5.6, H], [54.4, 3.9, H], [95.9, 12.1, 0], [73, 13.4, 0], [94.2, 6.2, H]];
   const SALIDA = (i) => [[i % 2 ? 49.6 : 49.8, 30.0], [56.95 - (i % 3) * .2, 30.0]];   // de la ronda al sendero (x = 57)
@@ -140,7 +142,7 @@ export async function crear(cont) {
   const CP = [72, 16];   // centro del predio
   E.salva = [{   // el predio completo hasta el horizonte · se queda aquí hasta que Bastián avance
     casa: 1,
-    ini() { ANTES.forEach(([x, z, ry], i) => pon(turno[i].g, x, z, ry)); W.fiesta.visible = true; pon(salva.g, 48.2, 29.6, rumbo(50.5 - 48.2, 26.4 - 29.6)); ale.g.visible = true; aleS.g.visible = false; pon(ale.g, ...ALE0, rumbo(-1, .4)); },
+    ini() { ANTES.forEach(([x, z, ry], i) => pon(turno[i].g, x, z, ry)); W.fiesta.visible = true; pon(salva.g, 48.2, 29.7, rumbo(47.1 - 48.2, 26.1 - 29.7)); ale.g.visible = true; aleS.g.visible = false; pon(ale.g, ...ALE0, rumbo(-1, .4)); },
     cam(t) {
       const a = (158 + 7 * Math.sin(t * .035)) * PI / 180, r = 165 - 12 * suave(tr(t, 0, 16)), y = 50 - 4 * suave(tr(t, 0, 16));
       const p = [CP[0] + Math.cos(a) * r, y, CP[1] + Math.sin(a) * r], dx = CP[0] - p[0], dz = CP[1] - p[2], dh = Math.hypot(dx, dz);
@@ -150,14 +152,16 @@ export async function crear(cont) {
   }, {            // bajamos: el techo se va, las murallas bajan y lo encontramos a él
     casa: 0,
     ini() { E.salva[0].ini(); },
-    cam: claves([[0, -40, 60, 88, 60, 0, 18, 36], [3.4, 26, 44, 58, 52, 0, 27, 38], [6.4, 53, 4.4, 23.4, 48.6, 1.25, 29.9, 34], [8.8, 50.5, 1.62, 26.4, 48.5, 1.08, 30.05, 27], [40, 49.9, 1.6, 26.2, 48.5, 1.08, 30.05, 26]]),
+    trans: 'mezcla',
+    cam: claves([[0, -40, 52, 66, 60, 0, 20, 36], [3.0, 18, 40, -2, 48, 0, 26, 38], [5.6, 44, 10, 17.5, 47.8, .6, 28.6, 40], [7.8, 46.7, 2.6, 24.4, 48.6, 1.3, 29.5, 32], [9.6, 46.75, 1.66, 25.2, 49.0, 1.35, 29.4, 31], [40, 46.95, 1.64, 25.6, 49.0, 1.35, 29.4, 30]]),
     tick(t) { turno.forEach((p, i) => (i % 3 ? P.respirar(p, t) : P.hablar(p, t + i))); aleCelular(t); P.respirar(salva, t); if (t > 8.4 && t < 11.6) P.saludar(salva, t); else { salva.bd.rotation.z *= .9; salva.bd.rotation.x *= .9; } salva.cab.rotation.y = 0; },
   }];
   E.charla = [{   // 08:00 · la charla de seguridad
     ini() { enRonda(); W.fiesta.visible = true; ale.g.visible = true; aleS.g.visible = false; pon(ale.g, ...ALE0, rumbo(-1, .4)); },
-    cam: claves([[0, 45.2, 3.3, 24.6, 47.6, 1.55, 31.3, 33], [26, 49.6, 3.2, 24.4, 47.6, 1.55, 31.3, 33]]),
+    cam: claves([[0, 46.2, 3.0, 24.5, 47.5, 1.5, 31.4, 34], [26, 48.8, 2.85, 25.1, 47.5, 1.5, 31.4, 32]]),
     tick(t) { P.hablar(salva, t); turno.forEach((p, i) => { P.respirar(p, t); p.cab.rotation.x = Math.max(0, Math.sin(t * 1.3 + i * 2)) * .12; if (i === 4 && t % 7 > 4.5) P.saludar(p, t); }); aleCelular(t); },
   }, {            // 999 → 1.000: celebran
+    trans: 'mezcla',
     ini() { E.charla[0].ini(); est.lanzo = false; },
     cam: claves([[0, 48.7, 2.15, 27.5, 47.5, 2.5, 32.8, 30], [2.4, 48.5, 2.2, 27.9, 47.5, 2.5, 32.8, 28], [6, 49.6, 3.5, 24.2, 47.3, 1.35, 30.4, 38], [30, 44.6, 3.2, 24.4, 47.3, 1.35, 30.4, 38]]),
     tick(t) {
@@ -171,11 +175,11 @@ export async function crear(cont) {
   E.vuelven = [{  // cada uno vuelve a su puesto, en fila por el sendero
     casa: 0,
     ini() { ale.g.visible = true; aleS.g.visible = false; est.sigue = null; },
-    cam(t) {   // la cámara sigue al grupo desde arriba (sin techo), un poco atrás y al poniente
-      let x = 0, z = 0, n = 0; for (const p of [...turno, salva]) { x += p.g.position.x; z += p.g.position.z; n++; } x /= n; z /= n;
-      if (!est.sigue) est.sigue = [x, z]; est.sigue[0] += (x - est.sigue[0]) * .03; est.sigue[1] += (z - est.sigue[1]) * .03;
-      const [cx, cz] = est.sigue; return { p: [cx - 9, 15, cz + 12], m: [cx + 1, 0, cz - 3], f: 40 };
-    },
+    cam(t) {   // sigue a los que van caminando (promedio suave), desde atrás y al poniente, sobre los muros
+      let x = 0, z = 0, n = 0; for (const p of turno) if (p.caminando) { x += p.g.position.x; z += p.g.position.z; n++; }
+      const meta = n ? [x / n, z / n] : [48.5, 29]; if (!est.sigue) est.sigue = [48.5, 29]; est.sigue[0] += (meta[0] - est.sigue[0]) * .035; est.sigue[1] += (meta[1] - est.sigue[1]) * .035;
+      const [cx, cz] = est.sigue; return { p: [cx - 5.5, 13.5, cz + 6.5], m: [cx + .2, .5, cz + .2], f: 40 };
+    },   // acompaña a la fila por el sendero, desde el poniente y sobre los muros
     tick(t) { caminan(t, 2); },
   }, {            // Don Salva por el sendero que casi no se ve; una grúa le pasa al lado
     ini() { ale.g.visible = false; turno.forEach((p, i) => pon(p.g, ...PUESTO[i])); est.fondo = 'paso'; },
@@ -187,8 +191,8 @@ export async function crear(cont) {
     },
   }];
   function caminan(t, ventaja) {
-    turno.forEach((p, i) => { const r = VUELTA[i], d = Math.max(0, (t + ventaja) * 1.3 - i * 1.15); if (d <= 0) { P.respirar(p, t); return; }
-      if (d < r.largo) { const q = en(r, d, .7); pon(p.g, q.x, q.z, q.ry); P.andar(p, 1, t); } else { pon(p.g, ...PUESTO[i]); P.quieto(p); P.respirar(p, t); p.bi.rotation.x = p.bd.rotation.x = -.55; } });
+    turno.forEach((p, i) => { const r = VUELTA[i], d = Math.max(0, (t + ventaja) * 1.3 - i * 1.15); if (d <= 0) { p.caminando = false; pon(p.g, LUGAR[i][0], LUGAR[i][1], rumbo(S0[0] - LUGAR[i][0], S0[1] - LUGAR[i][1])); P.quieto(p); P.respirar(p, t); return; }
+      p.caminando = d < r.largo; if (d < r.largo) { const q = en(r, d, .7); pon(p.g, q.x, q.z, q.ry); P.andar(p, 1, t); } else { pon(p.g, ...PUESTO[i]); P.quieto(p); P.respirar(p, t); p.bi.rotation.x = p.bd.rotation.x = -.55; } });
     const ds = Math.max(0, (t + ventaja) * 1.25 - 12.5), qs = en(R_SALVA, ds); pon(salva.g, qs.x, qs.z, qs.ry); ds > 0 && ds < R_SALVA.largo ? P.andar(salva, 1, t) : P.respirar(salva, t);
     const da = Math.max(0, (t + ventaja) * 1.45 - 3), qa = en(R_ALE, da, .7); pon(ale.g, qa.x, qa.z, qa.ry);
     if (da > 0 && da < R_ALE.largo) { P.andar(ale, 1, t); ale.bd.rotation.x = -1.05; ale.cab.rotation.x = .4; } else if (da >= R_ALE.largo) { ale.g.visible = false; aleS.g.visible = true; } else aleCelular(t);
@@ -201,9 +205,10 @@ export async function crear(cont) {
   E.rapido = [{   // sin cinturón, a toda velocidad por el pasillo central; entra al pasillo del rack
     ini() { est.fondo = 'fuera'; est.chase = null; est.q = { x: 95.9, z: 3.2, ry: -H }; },
     cam(t) {
-      const q = est.q, ax = Math.cos(q.ry), az = -Math.sin(q.ry), meta = { p: [q.x - ax * 6.4 + az * 1.3, 2.6, q.z - az * 6.4 - ax * 1.3], m: [q.x + ax * 3, 1.3, q.z + az * 3] };
-      if (!est.chase) est.chase = meta; else for (const kk of ['p', 'm']) for (let j = 0; j < 3; j++) est.chase[kk][j] += (meta[kk][j] - est.chase[kk][j]) * (kk === 'p' ? .055 : .12);
-      return { p: [...est.chase.p], m: [...est.chase.m], f: 46 - 8 * tr(t, 6.6, 9) };
+      const q = est.q, giro = q.z > 8.6;
+      const meta = q.x > 91.5 && !giro ? { p: [88.6, 1.9, 6.2], m: [94.6, 1.0, 6.6] } : giro ? { p: [69.3, 2.25, 5.5], m: [69, 1.0, q.z + 2.5] } : { p: [q.x - 6.6, 1.95, 6.1], m: [q.x + .2, 1.05, 7.9] };
+      if (!est.chase) est.chase = meta; else for (const kk of ['p', 'm']) for (let j = 0; j < 3; j++) est.chase[kk][j] += (meta[kk][j] - est.chase[kk][j]) * (kk === 'p' ? .16 : .2);
+      return { p: [...est.chase.p], m: [...est.chase.m], f: 44 };
     },
     tick(t) {
       trabajar(t);
@@ -215,7 +220,7 @@ export async function crear(cont) {
     },
   }, {            // hoy quiere irse temprano: saca el pallet a la rápida
     ini() { pon(salva.g, 65.2, 9.45, 0); est.fondo = 'fuera'; },
-    cam: claves([[0, 68.05, 3.3, 20.2, 69.9, 2.7, 15.3, 42], [6.4, 68.1, 2.5, 19.6, 69.8, 2.1, 15.3, 40], [30, 68.1, 2.4, 19.4, 69.8, 2.0, 15.3, 40]]),
+    cam: claves([[0, 67.95, 2.6, 19.4, 70.3, 2.4, 15.2, 46], [6.4, 68.0, 2.1, 18.7, 70.1, 1.9, 15.3, 44], [30, 68.0, 2.0, 18.5, 70.1, 1.8, 15.3, 44]]),
     tick(t) { trabajar(t); P.respirar(salva, t); salva.cab.rotation.y = -.15; sacar(t); },
   }];
   function sacar(t) {   // gira hacia el rack, sube, toma, baja de golpe y gira hacia el sur para salir de espalda
@@ -270,6 +275,7 @@ export async function crear(cont) {
     },
   }];
   E.despues = [{  // negro: «Al día siguiente»
+    trans: 'mezcla',
     ini() { est.amb = 'frio'; est.fondo = 'fuera'; enRonda(); salva.g.visible = false; recuerdo.visible = true; W.tablero.pintar(1000); grua.g.visible = false; },
     cam: claves([[0, 44.5, 2.4, 26.2, 48.2, 1.05, 31.4, 34]]),
     tick(t) { fx.negro = Math.max(fx.negro, suave(tr(t, 0, .9))); turno.forEach((p) => P.triste(p, t)); },
@@ -279,6 +285,7 @@ export async function crear(cont) {
     cam: claves([[0, 44.5, 2.4, 26.2, 48.2, 1.05, 31.4, 34], [30, 46.4, 2.3, 25.2, 48.0, 1.05, 31.4, 31]]),
     tick(t) { turno.forEach((p) => P.triste(p, t)); recuerdo.userData.llama.emissiveIntensity = 1.8 + Math.sin(t * 11) * .5 + Math.sin(t * 5.3) * .4; },
   }, {            // el contador vuelve a cero
+    trans: 'mezcla',
     ini() { E.despues[0].ini(); },
     cam: claves([[0, 48.6, 2.2, 27.3, 47.5, 2.5, 32.8, 30], [12, 48.1, 2.3, 28.5, 47.5, 2.5, 32.8, 27]]),
     tick(t) { E.despues[1].tick(t); const u = tr(t, 1.3, 3.9); if (u >= 1) W.tablero.pintar(0, true); else W.tablero.pintar(Math.round(1000 * (1 - suave(u)))); W.tablero.mat.emissiveIntensity = .22 + (u >= 1 ? .5 * Math.exp(-(t - 3.9) * 1.2) : 0); },
@@ -296,13 +303,13 @@ export async function crear(cont) {
     return d >= meta;
   }
   function retrocede(t, t0, t1, z0 = 15.4, z1 = 7.4) { const u = suave(tr(t, t0, t1)); cargado(z0 + (z1 - z0) * u); P.manejar(aleS, t, .9); baliza(t, u > 0 && u < 1); return grua.g.position.z; }
-  const CAM_CRUCE = [69.4, 15.5, 20.5, 68.9, 0, 9.4, 40];   // sobre el pasillo 69, mirando el cruce desde arriba (sin techo)
+  const CAM_CRUCE = [68.0, 9.0, 1.6, 70.6, .2, 9.6, 44];   // desde la calle, alta, mirando el cruce y la boca del pasillo (sin racks en medio)
   E.rewind = [{   // ◀◀ se rebobina desde lo que quedó
     corte: true, casa: 0,
     ini() { est.fondo = 'fuera'; est.amb = 'frio'; },
-    cam: claves([[0, 72.5, .45, 6.9, 70.15, .55, 8.95, 31], [1.2, 71.5, 1.6, 8.5, 69.6, .7, 10.5, 33], [4.6, ...CAM_CRUCE]]),
+    cam: claves([[0, 72.5, .45, 6.9, 70.15, .55, 8.95, 31], [1.1, 71.2, 2.4, 6.4, 69.6, .7, 10.5, 34], [3.3, ...CAM_CRUCE]]),
     tick(t) {
-      trabajar(t); const u = tr(t, .15, 4.4); fx.rew = t < 4.7 ? 1 : Math.max(0, 1 - (t - 4.7) * 2); est.amb = u < .25 ? 'frio' : 'dia';
+      trabajar(t); const u = tr(t, .15, 3.2); fx.rew = t < 3.4 ? 1 : Math.max(0, 1 - (t - 3.4) * 2); est.amb = u < .25 ? 'frio' : 'dia';
       const vuelto = u > .06;
       casco.visible = !vuelto; fonoPiso.visible = !vuelto; casco.position.set(70.3, .012, 8.75); fonoPiso.position.set(70.95, .004, 8.35);
       ale.g.visible = !vuelto; if (!vuelto) { pon(ale.g, 68.5, 10.1, rumbo(1.8, -1.35)); P.cabeza(ale, t); } aleS.g.visible = vuelto; P.manejar(aleS, t, .9);
@@ -313,12 +320,14 @@ export async function crear(cont) {
   }, {            // gestión visual: el sendero y el cruce se ven; la grúa se detiene en la línea de PARE
     casa: 0,
     ini() { est.fondo = 'fuera'; cargado(15.4); },
-    cam: claves([[0, ...CAM_CRUCE], [20, 69.2, 14.5, 19.6, 68.9, 0, 9.4, 39]]),
+    trans: 'mezcla',
+    cam: claves([[0, ...CAM_CRUCE], [20, 67.2, 8.7, 2.0, 70.5, .2, 9.6, 43]]),
     tick(t) { trabajar(t); pintura(t, .3); salvaHasta(t, 66.6, 1.1, 2.2); const z = retrocede(t, 2.6, 7.4, 15.4, 11.85); grua.balMat.emissiveIntensity = z > 11.9 ? grua.balMat.emissiveIntensity : .4; },
   }, {            // gestión de tráfico: el sensor ve la grúa, el cruce se cierra; pasa la grúa y se abre
     casa: 0,
     ini() { est.fondo = 'fuera'; cargado(15.4); pintura(9); Mj.trafico.visible = true; Mj.pk = 1; },
-    cam: claves([[0, ...CAM_CRUCE], [20, 69.2, 14.5, 19.6, 68.9, 0, 9.4, 39]]),
+    trans: 'mezcla',
+    cam: claves([[0, 67.2, 8.7, 2.0, 70.5, .2, 9.6, 43], [20, 66.6, 8.5, 2.4, 70.4, .2, 9.8, 43]]),
     tick(t) {
       trabajar(t); pintura(9);
       const sube = suave(tr(t, .2, 1.1)); Mj.trafico.scale.y = Math.max(.01, sube); Mj.trafico.visible = true;
@@ -328,7 +337,7 @@ export async function crear(cont) {
   }, {            // Lúmina: la cámara ve a la persona y a la grúa en retroceso, avisa y activa la respuesta
     casa: 0,
     ini() { est.fondo = 'fuera'; cargado(15.4); pintura(9); Mj.trafico.visible = true; Mj.trafico.scale.y = 1; Mj.camara.visible = true; Mj.pk = 1; est.lumina = { alerta: 0, evento: 0 }; },
-    cam: claves([[0, 66.1, 5.05, 5.2, 68.6, .55, 11.4, 50], [30, 66.1, 5.05, 5.2, 68.7, .55, 11.6, 48]]),
+    cam: claves([[0, 71.0, 5.0, 5.35, 67.6, .5, 10.9, 52], [30, 71.0, 5.0, 5.35, 67.7, .5, 11.0, 50]]),
     tick(t) {
       trabajar(t); pintura(9); Mj.ojo.emissiveIntensity = 1 + .6 * Math.sin(reloj * 4);
       const L = est.lumina, z = retrocede(t, 2.0, 5.2, 15.4, 12.0); salvaHasta(t, 66.9, 1.1, .8);
@@ -382,15 +391,16 @@ export async function crear(cont) {
   function entrar(nombre, paso) {
     const lista = E[nombre]; if (!lista) return; const clip = lista[Math.min(paso, lista.length - 1)];
     if (clip === est.clip && est.t > 0) return;
-    est.de = clip.corte ? null : { p: [...ahora.p], m: [...ahora.m], f: ahora.f }; est.esc = nombre; est.paso = paso; est.clip = clip; est.t = 0; base(); clip.ini();
-    if (clip.corte && est.activo) { fx.negro = 1; est.aclara = true; } else est.aclara = false;
+    const modo = clip.trans || (clip.corte ? 'negro' : 'corte');
+    est.de = modo === 'mezcla' ? { p: [...ahora.p], m: [...ahora.m], f: ahora.f } : null; est.esc = nombre; est.paso = paso; est.clip = clip; est.t = 0; base(); clip.ini();
+    if (modo !== 'mezcla' && est.activo) { fx.negro = 1; est.aclara = modo === 'negro' ? 1.1 : .45; } else est.aclara = 0;
   }
   let tPrev = 0, reloj = 0;
   function cuadro(ms) {
     if (!est.activo) return; requestAnimationFrame(cuadro);
     const dt = Math.min(.05, (ms - tPrev) / 1000 || 0); tPrev = ms; est.t += dt; reloj += dt; const t = est.t, clip = est.clip;
     ronda(reloj); clip.tick(t, dt); W.vida(reloj, dt); confeti(dt, reloj);
-    if (est.aclara && t < 1.2) fx.negro = 1 - suave(tr(t, .05, 1.1));
+    if (est.aclara && t < est.aclara + .1) fx.negro = 1 - suave(tr(t, .02, est.aclara));
     const c = typeof clip.cam === 'function' ? clip.cam(t) : clip.cam, u = est.de ? suave(tr(t, 0, 1.6)) : 1;
     for (let j = 0; j < 3; j++) { ahora.p[j] = est.de ? lerp(est.de.p[j], c.p[j], u) : c.p[j]; ahora.m[j] = est.de ? lerp(est.de.m[j], c.m[j], u) : c.m[j]; } ahora.f = est.de ? lerp(est.de.f, c.f, u) : c.f;
     const dist = Math.hypot(ahora.p[0] - ahora.m[0], ahora.p[1] - ahora.m[1], ahora.p[2] - ahora.m[2]), pul = Math.min(.05, dist * .0022);
@@ -402,7 +412,7 @@ export async function crear(cont) {
     W.cielo.position.copy(cam.position);
     // luz y ambiente
     const A = AMB[est.amb], kk = Math.min(1, dt * 3); luzAmb.isol += (A.isol - luzAmb.isol) * kk; luzAmb.hemi += (A.hemi - luzAmb.hemi) * kk; luzAmb.vin += (A.vin - luzAmb.vin) * kk; luzAmb.sol.lerp(cTmp.set(A.sol), kk); luzAmb.niebla.lerp(cTmp.set(A.niebla), kk);
-    k.sol.intensity = luzAmb.isol; k.sol.color.copy(luzAmb.sol); if (hemi) hemi.intensity = luzAmb.hemi; k.escena.background.copy(luzAmb.niebla); k.escena.fog.color.copy(luzAmb.niebla);
+    k.sol.intensity = luzAmb.isol; k.sol.color.copy(luzAmb.sol); if (hemi) hemi.intensity = luzAmb.hemi * (1 + .45 * est.casa); k.escena.background.copy(luzAmb.niebla); k.escena.fog.color.copy(luzAmb.niebla);
     const lejos = Math.hypot(cam.position.x - ahora.m[0], cam.position.z - ahora.m[2]), foco = lejos > 150 ? CP : [ahora.m[0], ahora.m[2]];
     const r = lejos > 150 ? 118 : clamp(dist * .95, 9, 85); k.sol.target.position.set(foco[0], 0, foco[1]); k.sol.position.set(foco[0] + SOL.x * 160, SOL.y * 160, foco[1] + SOL.z * 160);
     Object.assign(k.sol.shadow.camera, { left: -r, right: r, top: r, bottom: -r, near: 1, far: 420 }); k.sol.shadow.camera.updateProjectionMatrix();

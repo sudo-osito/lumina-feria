@@ -401,13 +401,13 @@ export function construir(k, md, m2, eq) {
     // guirnalda sobre el tablero
     for (let i = 0; i < 15; i++) { const u = i / 14, x = 45 + u * 5, y = 3.95 - Math.sin(u * Math.PI) * .35; const b = caja(.18, .24, .01, x, y - .12, 32.78, std([0x056CF2, 0xF5C400, 0xFFFFFF][i % 3]), W.fiesta, .005); b.rotation.z = (u - .5) * .3; } }
   // mesas de descanso con bancas, junto al muro poniente
-  for (const [x, z] of [[43.0, 27.9]]) { const g = grupo(x, 0, z, 0, base); caja(1.8, .06, .8, 0, .74, 0, mat(0xE9DCC3, { roughness: .7 }), g, .03); for (const s of [-1, 1]) { caja(1.8, .05, .3, 0, .44, s * .72, mat(0xD9B98C), g, .02); for (const a of [-.8, .8]) { caja(.05, .44, .05, a, 0, s * .72, M.gris2, g, .01); caja(.05, .74, .05, a, 0, s * .3, M.gris2, g, .01); } } }
+  for (const [x, z] of [[53.7, 24.9]]) { const g = grupo(x, 0, z, 0, base); caja(1.8, .06, .8, 0, .74, 0, mat(0xE9DCC3, { roughness: .7 }), g, .03); for (const s of [-1, 1]) { caja(1.8, .05, .3, 0, .44, s * .72, mat(0xD9B98C), g, .02); for (const a of [-.8, .8]) { caja(.05, .44, .05, a, 0, s * .72, M.gris2, g, .01); caja(.05, .74, .05, a, 0, s * .3, M.gris2, g, .01); } } }
   // máquinas de bebida y café contra el muro poniente, mirando hacia la sala (su frente es +x)
   m2.vending(base, 40.58, 23.7, 0, 0xE5383B, 'BEBIDAS'); m2.vending(base, 40.58, 24.6, 0, 0x2B2F36, 'CAFÉ'); m2.vending(base, 40.58, 25.5, 0, 0x056CF2, 'AGUA');
   // lean corner al oriente de la sala, junto al sendero
-  { const g = grupo(53.3, 0, 25.1, Math.PI, base); m2.leanCorner(g, -2.4, 2.4, -1.5, 1.5); }
+  { const g = grupo(41.9, 0, 28.0, -Math.PI / 2, base); m2.leanCorner(g, -1.75, 1.75, -1.35, 1.35); }
   const planta = (x, z, s = 1) => { const g = grupo(x, 0, z, 0, base); cil(.22 * s, .4 * s, 0, 0, 0, std(0xF2F0EB), g, 14, .28 * s); for (let i = 0; i < 5; i++) { const h = esfera(.2 * s, Math.sin(i * 1.3) * .14 * s, (.62 + (i % 3) * .16) * s, Math.cos(i * 1.3) * .14 * s, std(0x9CC7A0, { roughness: .9 }), g, 10); h.scale.y = 1.3; } };
-  planta(40.8, 29.4, 1.2); planta(55.6, 32.4, 1.2);
+  planta(55.6, 32.4, 1.2); planta(56.0, 23.6, 1.1);
 
   /* ───────── comedor, camarines y taller ───────── */
   const tabique = (horiz, fijo, a, b, h, hu = []) => { let p = a; for (const [h0, h1] of hu) { if (h0 > p) horiz ? caja(h0 - p, h, .15, (p + h0) / 2, 0, fijo, mat(0xE9E4DC), base, .02) : caja(.15, h, h0 - p, fijo, 0, (p + h0) / 2, mat(0xE9E4DC), base, .02); horiz ? caja(h1 - h0, h - 2.2, .15, (h0 + h1) / 2, 2.2, fijo, mat(0xE9E4DC), base, .02) : caja(.15, h - 2.2, h1 - h0, fijo, 2.2, (h0 + h1) / 2, mat(0xE9E4DC), base, .02); p = h1; } if (b > p) horiz ? caja(b - p, h, .15, (p + b) / 2, 0, fijo, mat(0xE9E4DC), base, .02) : caja(.15, h, b - p, fijo, 0, (p + b) / 2, mat(0xE9E4DC), base, .02); };
@@ -495,7 +495,7 @@ export function construir(k, md, m2, eq) {
     W.mejora.sensor = eq.sensorGrua(g, 67.62, 10.55, -Math.PI / 2);
   }
   { // Lúmina: una cámara en la columna, mirando el cruce
-    const g = grupo(66, 0, 4.5, 0, vivo); g.visible = false; W.mejora.camara = g;
+    const g = grupo(71, 0, 4.5, -.55, vivo); g.visible = false; W.mejora.camara = g;
     caja(.1, .1, .5, 0, 5.3, .35, M.tinta, g, .02); const cuerpo = caja(.26, .24, .5, 0, 5.15, .78, std(0xF2F3F5, { roughness: .4 }), g, .06); cuerpo.rotation.x = .45;
     const ojo = luz(0xEC6D27, 0x4a2a15); const o = cil(.07, .04, 0, 5.03, 1.05, ojo, g, 14); o.rotation.x = Math.PI / 2 + .45; ojo.emissiveIntensity = 1.4; W.mejora.ojo = ojo;
   }
