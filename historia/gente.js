@@ -11,18 +11,30 @@ export function gente(k) {
   function persona(o = {}) {
     const chaleco = std(o.chaleco ?? 0xF5C400, { roughness: .55 }), pant = std(o.pantalon ?? 0x4A5568, { roughness: .8 }), piel = std(o.piel ?? 0xF1CBAA, { roughness: .7 }), manga = std(o.manga ?? 0x5B7FB0, { roughness: .7 });
     const g = grupo(0, 0, 0, 0, o.padre || k.escena), c = grupo(0, 0, 0, Math.PI / 2, g); c.scale.setScalar(o.talla ?? 1);
-    const pierna = (x) => { const p = grupo(x, .66, 0, 0, c); capsula(.085, .44, 0, -.3, 0, pant, p); caja(.15, .08, .26, 0, -.66, .04, M.negro, p, .03); return p; };
-    const brazo = (x) => { const p = grupo(x, 1.22, 0, 0, c); capsula(.062, .36, 0, -.22, 0, manga, p); esfera(.06, 0, -.47, 0, piel, p, 10); return p; };
+    const bota = std(0x3B2E26, { roughness: .75 }), suela = std(0x16181B, { roughness: .9 }), guante = std(o.guante ?? 0x8A93A0, { roughness: .8 });
+    const camisa = std(o.manga ?? 0x5B7FB0, { roughness: .75 }), cinturon = std(0x1E2126, { roughness: .6 });
+    // piernas: muslo y pantorrilla en una pieza, bota con suela
+    const pierna = (x) => { const p = grupo(x, .7, 0, 0, c); const m = capsula(.088, .46, 0, -.3, 0, pant, p); m.scale.set(1, 1, .95); caja(.15, .11, .25, 0, -.7, .035, bota, p, .045); caja(.155, .025, .26, 0, -.71, .035, suela, p, .008); return p; };
+    // brazos: manga de la camisa (o del chaleco ancho de la brigada), puño y guante
+    const brazo = (x) => { const p = grupo(x, 1.28, 0, 0, c); const m = capsula(.06, .34, 0, -.22, 0, manga, p); m.scale.set(1, 1, .95); const mano = esfera(.058, 0, -.48, .005, o.guantes ? guante : piel, p, 12); mano.scale.set(.85, 1.15, 1); return p; };
     const pi = pierna(-.1), pd = pierna(.1);
-    const torso = grupo(0, 0, 0, 0, c), pz = o.panza ?? 1; const t = capsula(.2, .32, 0, 1.0, 0, chaleco, torso); t.scale.set(pz, 1, pz * 1.04);
-    for (const y of [.86, 1.02]) { const f = cil(.205 * pz, .035, 0, y, 0, refl, torso, 18); f.castShadow = false; }
-    const bi = brazo(-.27), bd = brazo(.27);
-    // cabeza (grupo propio: se puede inclinar)
-    const cab = grupo(0, 1.3, 0, 0, c); esfera(.132, 0, .13, 0, piel, cab, 20);
-    for (const s of [-1, 1]) esfera(.016, s * .05, .15, .12, ojo, cab, 8);
-    caja(.05, .012, .02, 0, .068, .122, boca, cab, .004);
-    if (o.casco !== null) { const cs = std(o.casco ?? 0xF6F7F8, { roughness: .35 }); const d = new THREE.Mesh(new THREE.SphereGeometry(.152, 20, 10, 0, Math.PI * 2, 0, Math.PI / 2), cs); d.position.set(0, .17, 0); d.castShadow = true; cab.add(d); cil(.176, .02, 0, .16, .025, cs, cab, 20); caja(.04, .03, .2, 0, .3, 0, cs, cab, .012); }
-    else { const pelo = std(o.pelo ?? 0x3A2E28, { roughness: .9 }); const d = new THREE.Mesh(new THREE.SphereGeometry(.14, 16, 8, 0, Math.PI * 2, 0, Math.PI / 1.9), pelo); d.position.set(0, .14, -.012); cab.add(d); }
+    // torso con hombros (no una cápsula): camisa debajo, chaleco abierto adelante, cintas reflectantes, tirantes y cinturón
+    const torso = grupo(0, 0, 0, 0, c), pz = o.panza ?? 1;
+    const tronco = capsula(.19, .3, 0, 1.02, 0, camisa, torso); tronco.scale.set(1.2 * pz, 1, .82 * pz);
+    const hombros = capsula(.085, .36, 0, 1.31, 0, camisa, torso); hombros.rotation.z = Math.PI / 2; hombros.scale.set(1, 1, .9);
+    const abre = .36, chal = new THREE.Mesh(new THREE.CylinderGeometry(.205, .2, .5, 22, 1, true, abre, Math.PI * 2 - abre * 2), chaleco); chal.material.side = THREE.DoubleSide; chal.position.y = 1.02; chal.scale.set(1.2 * pz, 1, .84 * pz); chal.castShadow = true; torso.add(chal);
+    for (const y of [-.1, .08]) { const f = new THREE.Mesh(new THREE.CylinderGeometry(.208, .205, .045, 22, 1, true, abre, Math.PI * 2 - abre * 2), refl); f.material.side = THREE.DoubleSide; f.position.y = 1.02 + y; f.scale.set(1.2 * pz, 1, .84 * pz); torso.add(f); }
+    for (const s of [-1, 1]) for (const z of [-1, 1]) { const t = caja(.06, .25, .02, s * .115, 1.16, z * .174 * pz, chaleco, torso, .006); t.rotation.x = -z * .25; const r = caja(.025, .25, .022, s * .115, 1.16, z * .177 * pz, refl, torso, .004); r.rotation.x = -z * .25; }
+    const cint = cil(.2, .055, 0, .74, 0, cinturon, torso, 20); cint.scale.set(1.2 * pz, 1, .84 * pz);
+    cil(.055, .09, 0, 1.36, 0, piel, torso, 12);
+    const bi = brazo(-.29), bd = brazo(.29);
+    // cabeza (grupo propio: se puede inclinar), con orejas y nariz
+    const cab = grupo(0, 1.32, 0, 0, c); const craneo = esfera(.13, 0, .14, 0, piel, cab, 22); craneo.scale.set(.96, 1.06, 1);
+    for (const s of [-1, 1]) { esfera(.016, s * .048, .155, .118, ojo, cab, 8); const or = esfera(.03, s * .128, .14, 0, piel, cab, 8); or.scale.set(.5, 1, .8); }
+    caja(.03, .04, .03, 0, .105, .125, piel, cab, .01);
+    caja(.05, .012, .02, 0, .072, .122, boca, cab, .004);
+    if (o.casco !== null) { const cs = std(o.casco ?? 0xF6F7F8, { roughness: .35 }); const d = new THREE.Mesh(new THREE.SphereGeometry(.152, 22, 10, 0, Math.PI * 2, 0, Math.PI / 2), cs); d.position.set(0, .18, 0); d.scale.set(1, 1.05, 1.08); d.castShadow = true; cab.add(d); const ala = cil(.172, .02, 0, .17, .03, cs, cab, 22); ala.scale.set(1, 1, 1.12); caja(.04, .03, .21, 0, .32, 0, cs, cab, .012); }
+    else { const pelo = std(o.pelo ?? 0x3A2E28, { roughness: .9 }); const d = new THREE.Mesh(new THREE.SphereGeometry(.14, 16, 8, 0, Math.PI * 2, 0, Math.PI / 1.9), pelo); d.position.set(0, .15, -.012); cab.add(d); }
     if (o.bigote) { const can = std(o.bigote, { roughness: .9 }); caja(.1, .03, .035, 0, .082, .118, can, cab, .012); for (const s of [-1, 1]) caja(.02, .09, .06, s * .128, .09, .0, can, cab, .008); for (const s of [-1, 1]) caja(.045, .012, .02, s * .05, .178, .118, can, cab, .004); }
     if (o.audifonos) { const a = std(0x1E2126, { roughness: .4 }); for (const s of [-1, 1]) { const u = cil(.05, .04, 0, 0, 0, std(0xEC6D27, { roughness: .4 }), cab, 12); u.rotation.z = Math.PI / 2; u.position.set(s * .145, .13, 0); } const arco = new THREE.Mesh(new THREE.TorusGeometry(.165, .014, 6, 20, Math.PI), a); arco.position.set(0, .14, 0); cab.add(arco); }
     if (o.radio) { caja(.06, .13, .035, .1, 1.08, .19, M.negro, torso, .01); cil(.006, .1, .12, 1.21, .19, M.negro, torso, 5); }

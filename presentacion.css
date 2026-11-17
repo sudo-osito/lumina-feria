@@ -851,3 +851,127 @@ img, canvas { display: block; }
 
 .lam--centro .vis[data-vis="infra"] { width: 1500px !important; }
 .infra__t { margin-bottom: 0 !important; } .infra__p { margin-top: 6px !important; }
+
+/* ═════════ v3 (17-nov, noche) · feedback de Max: menos «vibe coded», imágenes reales, el texto siempre en su marco ═════════ */
+/* 09 · 10 · 13 · 16 · los tres pilares: tres columnas con foto real; la misma composición, se enciende una */
+.lam--pilares2 { justify-content: flex-start; padding-top: 92px; }
+.pil__t { margin: 12px 0 40px; }
+.pil { display: grid; grid-template-columns: repeat(3, 1fr); gap: 36px; align-items: start; }
+.pil__c { position: relative; display: flex; flex-direction: column; border-radius: 30px; overflow: hidden; background: #fff; box-shadow: 0 0 0 1.5px var(--line), 0 34px 70px -46px rgba(6, 26, 51, .45); }
+.pil__c::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 7px; z-index: 2; background: var(--blue); transform: scaleX(0); transform-origin: left; transition: transform 1.2s var(--llegada) .5s; }
+.pil__c--3::before { background: var(--lumina); }
+.pil__c.on::before { transform: none; }
+.pil__foto { position: relative; height: 300px; overflow: hidden; background: #dfe3e8; }
+.pil__foto img { width: 100%; height: 100%; object-fit: cover; transition: filter 1.2s var(--llegada), transform 8s linear; }
+.pil__c:not(.on) .pil__foto img { filter: grayscale(1) contrast(.85) brightness(1.12); }
+.lam.activa .pil__c.on .pil__foto img { transform: scale(1.06); }
+.pil__txt { padding: 30px 36px 38px; display: grid; gap: 8px; }
+.pil__txt i { font-style: normal; font-size: 17px; font-weight: 600; letter-spacing: .12em; color: var(--tinta-3); }
+.pil__txt small { font-size: 16px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; color: var(--gray); }
+.pil__txt b { font-size: 48px; font-weight: 500; letter-spacing: -.03em; line-height: 1.08; margin-top: 4px; }
+.pil__txt span { font-size: 23px; line-height: 1.42; color: var(--tinta-2); margin-top: 6px; }
+.pil__c.on .pil__txt i { color: var(--blue); } .pil__c--3.on .pil__txt i, .pil__c--3.on .pil__txt b { color: var(--lumina); }
+.lam.activa .pil__c[data-e]:not(.on) { opacity: .42; }
+.lam.activa .pil--0 .pil__c[data-e] { opacity: 1; }
+.pil__frase { position: absolute; left: 130px; right: 130px; bottom: 60px; font-size: 34px; line-height: 1.35; letter-spacing: -.015em; }
+.lam--pilares2[data-pilar="3"].p1 .pil { opacity: .25; transition: opacity .8s; }
+.lam--pilares2[data-pilar="3"] .pil__frase { bottom: auto; top: 50%; font-size: 52px; text-align: center; padding: 0 60px; text-wrap: balance; }
+.lam--pilares2[data-pilar="3"] .pil__frase.dado { transform: translateY(-50%); }
+/* marcos de detección de Lúmina sobre una imagen real */
+.caja { position: absolute; border: 2.5px solid var(--lumina); border-radius: 4px; box-shadow: 0 0 0 4px rgba(236, 109, 39, .16); animation: caja 2.4s ease-in-out infinite; }
+@keyframes caja { 50% { box-shadow: 0 0 0 8px rgba(236, 109, 39, .06); } }
+.caja--txt span { position: absolute; left: -2.5px; bottom: calc(100% + 8px); padding: 5px 14px; border-radius: 999px; background: var(--lumina); color: #fff; font-size: 16px; font-weight: 600; letter-spacing: .02em; white-space: nowrap; }
+
+/* 08 · jerarquía de controles: pirámide invertida en bandas; el texto siempre cabe */
+.marco { align-items: center; }
+.jer { position: relative; padding-left: 74px; }
+.jer__lista { list-style: none; display: grid; gap: 8px; }
+.jer__lista li { height: 96px; display: grid; place-items: center; font-size: 25px; font-weight: 500; letter-spacing: -.01em; background: #E6E9EE; color: var(--carbon);
+  clip-path: polygon(calc(var(--k) * 5%) 0, calc(100% - var(--k) * 5%) 0, calc(100% - (var(--k) + 1) * 5%) 100%, calc((var(--k) + 1) * 5%) 100%); }
+.jer__lista li.on { background: var(--blue); color: #fff; font-weight: 600; }
+.jer__eje { position: absolute; left: 0; top: 0; bottom: 46px; width: 40px; }
+.jer__eje i { position: absolute; left: 19px; top: 4px; bottom: 0; width: 2px; background: rgba(24, 24, 24, .22); }
+.jer__eje i::before { content: ""; position: absolute; left: -7px; top: -4px; border: 8px solid transparent; border-bottom: 12px solid rgba(24, 24, 24, .4); border-top: 0; }
+.jer__eje span { position: absolute; left: 0; top: 50%; transform: translate(-36%, -50%) rotate(-90deg); white-space: nowrap; font-size: 15px; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; color: var(--gray); }
+.jer__pie { display: block; margin-top: 18px; text-align: center; font-size: 17px; letter-spacing: .04em; color: var(--tinta-3); }
+
+/* 14 · gestión de tráfico: los seis frentes, cada uno con lo que se hace */
+.lam--gt .texto { width: 900px; }
+.gt2 { list-style: none; margin-top: 40px; display: grid; grid-template-columns: 1fr 1fr; column-gap: 40px; padding: 8px 36px; border-radius: 28px; background: rgba(255, 255, 255, .95); box-shadow: 0 0 0 1.5px var(--line), 0 30px 60px -40px rgba(6, 26, 51, .4); }
+.gt2 li { display: grid; gap: 6px; padding: 22px 0; border-bottom: 1.5px solid var(--line); }
+.gt2 li:nth-last-child(-n+2) { border-bottom: 0; }
+.gt2 b { font-size: 27px; font-weight: 600; letter-spacing: -.015em; display: flex; align-items: center; gap: 12px; }
+.gt2 b::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--blue); }
+.gt2 span { font-size: 20px; line-height: 1.35; color: var(--tinta-2); padding-left: 22px; }
+
+/* 15 · video con subtítulos propios (CIAL): nuestro texto arriba, sus subtítulos abajo, sin taparse */
+.lam--subtitulado .video__txt { top: 84px; bottom: auto; }
+.lam--subtitulado .video__txt .t { font-size: 64px; }
+.lam--subtitulado .clips::after { background: linear-gradient(180deg, rgba(6, 26, 51, .9) 0, rgba(6, 26, 51, .5) 22%, rgba(6, 26, 51, 0) 42%); }
+.lam--subtitulado .historias { top: auto; bottom: 40px; }
+
+/* 19 · cómo funciona Lúmina: cuatro piezas con imágenes reales, unidas por el flujo */
+.inf__t { margin: 12px 0 44px; }
+.inf { display: grid; grid-template-columns: repeat(4, 1fr); gap: 34px; }
+.inf__c { position: relative; margin: 0; border-radius: 26px; background: #fff; box-shadow: 0 0 0 1.5px var(--line), 0 30px 60px -42px rgba(6, 26, 51, .45); }
+.inf__c:not(:last-child)::after { content: ""; position: absolute; z-index: 3; right: -30px; top: 112px; width: 26px; height: 26px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 1.5px var(--line);
+  background-image: linear-gradient(var(--lumina), var(--lumina)); background-size: 8px 8px; background-position: center; background-repeat: no-repeat; animation: flujo 2s ease-in-out infinite; }
+.inf__c:nth-child(2)::after { animation-delay: .5s; } .inf__c:nth-child(3)::after { animation-delay: 1s; }
+@keyframes flujo { 50% { box-shadow: 0 0 0 1.5px var(--line), 0 0 0 9px rgba(236, 109, 39, .14); } }
+.inf__foto { position: relative; height: 250px; border-radius: 26px 26px 0 0; overflow: hidden; background: #dfe3e8; }
+.inf__foto img { width: 100%; height: 100%; object-fit: cover; }
+.inf__c figcaption { padding: 26px 30px 32px; display: grid; gap: 8px; }
+.inf__c figcaption i { font-style: normal; font-size: 16px; font-weight: 600; letter-spacing: .12em; color: var(--lumina); }
+.inf__c figcaption b { font-size: 31px; font-weight: 500; letter-spacing: -.02em; line-height: 1.12; }
+.inf__c figcaption span { font-size: 21px; line-height: 1.4; color: var(--tinta-2); }
+.rec { position: absolute; right: 14px; top: 14px; padding: 4px 12px 4px 26px; border-radius: 999px; background: rgba(15, 18, 24, .72); color: #fff; font-style: normal; font-size: 13px; font-weight: 600; letter-spacing: .12em; }
+.rec::before { content: ""; position: absolute; left: 10px; top: 50%; width: 8px; height: 8px; margin-top: -4px; border-radius: 50%; background: #FF3B3B; animation: rec 1.2s steps(2) infinite; }
+@keyframes rec { 50% { opacity: .2; } }
+.inf__dash { background: #F2F4F7; padding: 24px 26px; display: grid; grid-template-rows: auto 1fr auto; gap: 14px; }
+.inf__dash > b { font-size: 15px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--gray); }
+.inf__dash p { display: flex; align-items: flex-end; gap: 10px; height: 100%; }
+.inf__dash p i { flex: 1; height: var(--h); border-radius: 6px 6px 2px 2px; background: #C9CFD8; }
+.inf__dash p i:nth-child(4) { background: var(--lumina); }
+.inf__dash > span { display: grid; gap: 7px; } .inf__dash em { display: block; height: 7px; border-radius: 4px; background: #DCE0E6; } .inf__dash em:nth-child(2) { width: 70%; } .inf__dash em:nth-child(3) { width: 45%; }
+.inf__dash small { position: absolute; right: 16px; top: 18px; font-size: 13px; letter-spacing: .08em; color: var(--tinta-3); }
+.inf__p { margin-top: 40px; font-size: 28px; color: var(--tinta-2); }
+
+/* 21 · uso responsable: imagen real con las personas difuminadas y el riesgo marcado */
+.usr { display: grid; grid-template-columns: 900px 1fr; gap: 76px; align-items: center; }
+.usr__img { position: relative; border-radius: 28px; overflow: hidden; box-shadow: 0 40px 80px -50px rgba(6, 26, 51, .6); }
+.usr__img img { width: 100%; display: block; }
+.borroso { position: absolute; border-radius: 10px; backdrop-filter: blur(10px) saturate(.6); -webkit-backdrop-filter: blur(10px) saturate(.6); background: rgba(240, 242, 245, .12); }
+.usr__txt .t { margin-top: 14px; }
+.usr__lista { list-style: none; margin-top: 40px; }
+.usr__lista li { display: grid; grid-template-columns: 62px 1fr; row-gap: 6px; padding: 24px 0; border-top: 1.5px solid var(--line); }
+.usr__lista i { grid-row: span 2; font-style: normal; font-size: 17px; font-weight: 600; letter-spacing: .1em; color: var(--lumina); padding-top: 8px; }
+.usr__lista b { font-size: 34px; font-weight: 500; letter-spacing: -.02em; }
+.usr__lista span { font-size: 23px; line-height: 1.4; color: var(--tinta-2); }
+
+/* 23 · cierre: el QR es el protagonista */
+.lam--fin2::before { background: linear-gradient(90deg, rgba(var(--velo), .97) 0, rgba(var(--velo), .8) 30%, rgba(var(--velo), .15) 48%, rgba(var(--velo), .15) 52%, rgba(var(--velo), .85) 66%, rgba(var(--velo), .97) 100%); }
+.fin { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+.fin__txt .t--xl { margin-top: 40px; font-size: 136px; line-height: 1; }
+.fin__sub { margin-top: 18px; font-size: 84px; font-weight: 500; letter-spacing: -.035em; color: var(--blue); }
+.fin__autor { margin-top: 34px; font-size: 28px; color: var(--tinta-2); } .fin__autor b { color: var(--carbon); font-weight: 600; }
+.fin__qr { display: grid; justify-items: center; gap: 26px; padding: 46px 50px 40px; border-radius: 44px; background: #fff; box-shadow: 0 0 0 1.5px var(--line), 0 50px 100px -50px rgba(6, 26, 51, .55); }
+.fin__codigo { position: relative; width: 480px; aspect-ratio: 1; padding: 26px; }
+.fin__codigo img { width: 100%; height: 100%; display: block; }
+.fin__codigo i { position: absolute; width: 58px; height: 58px; border: 7px solid var(--blue); }
+.fin__codigo i:nth-of-type(1) { left: 0; top: 0; border-right: 0; border-bottom: 0; border-radius: 20px 0 0 0; }
+.fin__codigo i:nth-of-type(2) { right: 0; top: 0; border-left: 0; border-bottom: 0; border-radius: 0 20px 0 0; }
+.fin__codigo i:nth-of-type(3) { left: 0; bottom: 0; border-right: 0; border-top: 0; border-radius: 0 0 0 20px; }
+.fin__codigo i:nth-of-type(4) { right: 0; bottom: 0; border-left: 0; border-top: 0; border-radius: 0 0 20px 0; }
+.fin__qr .btn { height: 88px; padding: 0 54px; font-size: 34px; background: var(--blue); color: #fff; box-shadow: 0 24px 50px -24px rgba(5, 108, 242, .85); }
+.fin__qr small { font-size: 23px; color: var(--tinta-2); } .fin__qr small b { color: var(--carbon); font-weight: 600; }
+/* ajustes tras la primera revisión */
+.pil__foto { height: 390px; }
+.lam--pilares2[data-pilar="3"].p1 .pil { opacity: .06; }
+.lam--pilares2[data-pilar="3"] .pil__frase { font-size: 56px; }
+.lam--gt::before { background: linear-gradient(90deg, rgba(var(--velo), .98) 0, rgba(var(--velo), .9) 38%, rgba(var(--velo), 0) 58%) !important; }
+.lam--subtitulado .video__txt { top: 150px; }
+.inf__foto { height: 300px; }
+.usr { grid-template-columns: 1040px 1fr; gap: 64px; }
+.usr__lista b { font-size: 31px; } .usr__lista span { font-size: 21px; }
+.fin__txt { max-width: 860px; }
+.fin__txt .t--xl { font-size: 116px; }

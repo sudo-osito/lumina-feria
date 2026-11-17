@@ -17,7 +17,7 @@ export const RACKS_X = [59.05, 63.05, 67.05, 71.05, 75.05, 79.05, 83.05];
 export const COLUMNAS = [[89.5, 1.5], [89.5, 5.5], [89.5, 10.5], [89.5, 15], [89.5, 19], [53.5, 4.5], [57.5, 4.5], [61.5, 4.5], [66, 4.5], [71, 4.5], [75.5, 4.5], [80, 4.5], [84, 4.5],
   [56, 8.5], [56, 14.5], [56, 20], [56, 23.5], [56, 32.5], [48.2, 8.7], [40.5, 8.5], [48.5, 20], [48.5, 23.5]];
 export const ALERO = 7.6, CUMBRE = 9.6;          // altura del galpón en el alero y en la cumbrera (cumbrera en z = 20)
-export const SOL = new THREE.Vector3(.7, .5, -.5).normalize();   // 08:00 de noviembre en Santiago: sol bajo, por el oriente y algo al norte
+export const SOL = new THREE.Vector3(.5, 1.0, -.38).normalize();   // mañana de noviembre, sol ya alto: sombras cortas que no rayan el piso
 
 export function construir(k, md, m2, eq) {
   const { M, caja, cil, esfera, grupo, std, tex, luz, barra } = k;
@@ -234,7 +234,7 @@ export function construir(k, md, m2, eq) {
     if (h) for (let x = x0 + .15; x < x1 - .3; x += .6) gastada(c, x, z0 + .08, x, z1 - .08, .3, '#F0C419', vida * 1.6);
     else for (let z = z0 + .15; z < z1 - .3; z += .6) gastada(c, x0 + .08, z, x1 - .08, z, .3, '#F0C419', vida * 1.6); };
   const tNave = lienzo(35, 0, 75, 40, 4096, (c) => {
-    c.fillStyle = '#DAD6CF'; c.fillRect(35, 0, 75, 40);
+    c.fillStyle = '#CFCCC6'; c.fillRect(35, 0, 75, 40);
     c.fillStyle = '#E3DED4'; c.fillRect(35, 7, 5, 11.5); for (let x = 35; x < 40; x += .6) for (let z = 7; z < 18.5; z += .6) if ((Math.round(x / .6) + Math.round(z / .6)) % 2) { c.fillStyle = 'rgba(255,255,255,.35)'; c.fillRect(x, z, .6, .6); }
     c.fillStyle = '#D5DEE8'; c.fillRect(35, 18.5, 5, 11.5); c.fillStyle = '#CFCAC2'; c.fillRect(35, 30, 10, 10);
     c.fillStyle = '#DCE6F1'; c.fillRect(40.2, 22.9, 17.6, 7.1); c.fillRect(45.15, 29.9, 12.65, 2.95);
@@ -312,7 +312,7 @@ export function construir(k, md, m2, eq) {
   caja(26, .25, 4.2, 72.75, 4.6, -2.1, tmat(0xDDE1E6), techo, .04); for (const x of [60, 85.5]) cil(.09, 4.6, x, 0, -4, mCanal, techo, 8);
   k.fusionar(techo);
   techo.traverse((o) => { if (o.isMesh) { o.castShadow = false; o.receiveShadow = true; } });
-  W.casa = (kt, km) => { for (const m of mTecho) { m.opacity = kt * m.userData.op; m.depthWrite = kt > .97; } techo.visible = kt > .01; muros.scale.y = .13 + .87 * km; };
+  W.casa = (kt, km) => { for (const m of mTecho) { m.opacity = kt * m.userData.op; m.depthWrite = kt > .97; } techo.visible = kt > .01; muros.scale.y = 3 / ALERO + (1 - 3 / ALERO) * km; };
 
   /* ───────── andenes y camiones ───────── */
   const acero = mat(0x8D96A3, { roughness: .4, metalness: .5 }), goma = mat(0x1E2126, { roughness: .8 }), cortina = mat(0xE4E8ED, { roughness: .5 });
@@ -342,7 +342,7 @@ export function construir(k, md, m2, eq) {
   }
   W.palletPick = md.pallet(vivo, 'caja', .9); W.palletPick.position.set(W.hueco.x, W.hueco.y, W.hueco.z);
   // el rack que Alejandro golpeó hace unos días: pie doblado, cinta de peligro y restos en el piso
-  { const g = grupo(70.52, 0, 10.02, 0, base), nar = mat(0xD9732A, { roughness: .6 });
+  { const g = grupo(70.52, 0, 10.02, 0, vivo), nar = mat(0xD9732A, { roughness: .6 }); W.rackDanadoG = g;
     const p = caja(.11, 1.5, .11, 0, 0, 0, nar, g, .01); p.rotation.z = .2; p.rotation.x = -.12; p.position.x = -.06;
     for (const y of [.5, .95]) { const c = caja(1.25, .07, .02, .55, y, -.09, mat(0xF5C400), g, .005); c.rotation.z = (y - .7) * .16; }
     caja(.2, .03, .12, -.35, 0, -.3, nar, g, .005).rotation.y = .6; caja(.1, .02, .07, -.6, 0, -.1, M.gris2, g, .005);
@@ -394,7 +394,7 @@ export function construir(k, md, m2, eq) {
   // globos y mesa con torta (solo el día de la celebración)
   W.fiesta = grupo(0, 0, 0, 0, vivo);
   { const cols = [0x056CF2, 0xF5C400, 0xFFFFFF, 0x4F95F5, 0xF5C400, 0x056CF2, 0xFFFFFF];
-    W.globos = [[44.6, 32.4], [44.95, 32.5], [44.75, 32.2], [50.1, 32.45], [50.45, 32.5], [50.25, 32.2], [53.6, 32.4]].map(([x, z], i) => { const g = grupo(x, 0, z, 0, W.fiesta); const b = esfera(.19, 0, 3.1 + (i % 3) * .28, 0, std(cols[i], { roughness: .25 }), g, 18); b.scale.y = 1.18; caja(.008, 3.1 + (i % 3) * .28 - 1.1, .008, 0, 1.1, 0, M.gris2, g, .001); return { g, b, f: i * 1.7 }; });
+    W.globos = [[44.6, 32.4], [44.95, 32.5], [44.75, 32.2], [50.1, 32.45], [50.45, 32.5], [50.25, 32.2], [53.6, 32.4]].map(([x, z], i) => { const g = grupo(x, 0, z, 0, W.fiesta); const b = esfera(.19, 0, 3.1 + (i % 3) * .28, 0, std(cols[i], { roughness: .25 }), g, 18); b.scale.y = 1.18; caja(.006, 3.1 + (i % 3) * .28 - .22, .006, 0, .08, 0, std(0xD9DDE3, { roughness: .4 }), g, .001); const pe = caja(.13, .09, .13, 0, 0, 0, std(cols[i] === 0xFFFFFF ? 0x2B2F36 : cols[i], { roughness: .35 }), g, .03); pe.rotation.y = i * .7; return { g, b, f: i * 1.7 }; });
     const mesa = grupo(54.1, 0, 31.6, 0, W.fiesta); caja(1.5, .05, .8, 0, .76, 0, std(0xFFFFFF), mesa, .02); for (const [a, b] of [[-.68, -.33], [.68, -.33], [-.68, .33], [.68, .33]]) caja(.05, .76, .05, a, 0, b, M.gris2, mesa, .01);
     cil(.3, .16, 0, .81, 0, std(0xFFF7EC), mesa, 26); cil(.31, .03, 0, .88, 0, std(0x056CF2), mesa, 26); for (let i = 0; i < 5; i++) { const a = i * 1.257; cil(.012, .1, Math.sin(a) * .16, .97, Math.cos(a) * .16, std(0xF5C400), mesa, 6); }
     for (let i = 0; i < 6; i++) cil(.04, .1, -.55 + (i % 3) * .14, .81, -.2 + Math.floor(i / 3) * .16, std(0xE9EEF5), mesa, 10);
@@ -412,7 +412,7 @@ export function construir(k, md, m2, eq) {
   /* ───────── comedor, camarines y taller ───────── */
   const tabique = (horiz, fijo, a, b, h, hu = []) => { let p = a; for (const [h0, h1] of hu) { if (h0 > p) horiz ? caja(h0 - p, h, .15, (p + h0) / 2, 0, fijo, mat(0xE9E4DC), base, .02) : caja(.15, h, h0 - p, fijo, 0, (p + h0) / 2, mat(0xE9E4DC), base, .02); horiz ? caja(h1 - h0, h - 2.2, .15, (h0 + h1) / 2, 2.2, fijo, mat(0xE9E4DC), base, .02) : caja(.15, h - 2.2, h1 - h0, fijo, 2.2, (h0 + h1) / 2, mat(0xE9E4DC), base, .02); p = h1; } if (b > p) horiz ? caja(b - p, h, .15, (p + b) / 2, 0, fijo, mat(0xE9E4DC), base, .02) : caja(.15, h, b - p, fijo, 0, (p + b) / 2, mat(0xE9E4DC), base, .02); };
   tabique(false, 40, 7, 30, 3, [[11.6, 12.7], [23.6, 24.7]]); tabique(true, 7, 35, 40, 3); tabique(true, 18.5, 35, 40, 3); tabique(false, 45, 30, 40, 3, [[33.25, 36.75]]); tabique(true, 30, 35, 45, 3);
-  tabique(false, 58, 10.5, 33, 3.6, [[20.25, 22.75]]); tabique(true, 33, 45, 58, 3.8, [[56.4, 57.6]]);
+  tabique(false, 58, 10.5, 33, 3, [[20.25, 22.75]]); tabique(true, 33, 45, 58, 3, [[56.4, 57.6]]);
   for (const z of [9.2, 12.4, 15.6]) { const g = grupo(37.3, 0, z, 0, base); caja(1.9, .06, .9, 0, .74, 0, mat(0xFFFFFF), g, .03); caja(.08, .74, .08, 0, 0, 0, M.gris2, g, .02); for (const s of [-1, 1]) for (const a of [-.55, .55]) cil(.17, .44, a, 0, s * .78, mat(0x4F95F5, { roughness: .5 }), g, 12); }
   caja(.6, .9, 2.4, 35.5, 0, 17, mat(0xEDEAE4), base, .03); for (const z of [16.3, 17.2]) caja(.45, .3, .5, 35.5, .9, z, M.tinta, base, .04);
   for (const z of [20.2, 22.6, 26.4, 28.6]) m2.casilleros(base, 35.5, z, 0, 4); caja(.4, .45, 3, 38.4, 0, 21.5, mat(0xD9B98C), base, .04); caja(.4, .45, 3, 38.4, 0, 27.5, mat(0xD9B98C), base, .04);
@@ -478,6 +478,11 @@ export function construir(k, md, m2, eq) {
       const linea = (x0, z0, x1, z1, col, w = .13, dash) => { c.strokeStyle = col; c.lineWidth = w; c.setLineDash(dash || []); c.beginPath(); c.moveTo(x0, z0); c.lineTo(x1, z1); c.stroke(); c.setLineDash([]); };
       const flecha = (x, z, ang, s = 1) => { c.save(); c.translate(x, z); c.rotate(ang); c.scale(s, s); c.fillStyle = 'rgba(255,255,255,.92)'; c.beginPath(); c.moveTo(1.2, 0); c.lineTo(-.4, -.65); c.lineTo(-.4, -.25); c.lineTo(-1.6, -.25); c.lineTo(-1.6, .25); c.lineTo(-.4, .25); c.lineTo(-.4, .65); c.closePath(); c.fill(); c.restore(); };
       const AM = '#F5C400', VE = '#1FA45A', BL = '#FFFFFF';
+      c.fillStyle = '#9EA3A9'; c.fillRect(35, 0, 75, 40);                                   // epóxico gris en toda la operación
+      for (let i = 0; i < 900; i++) { c.fillStyle = `rgba(255,255,255,${.015 + R() * .03})`; c.fillRect(35 + R() * 75, R() * 40, .3 + R() * 2, .02 + R() * .05); }   // brillo del epóxico
+      c.fillStyle = '#E6E2DA'; c.fillRect(35, 7, 5, 23); c.fillStyle = '#D8E2EE'; c.fillRect(40.2, 22.9, 17.6, 7.1); c.fillRect(45.15, 29.9, 12.65, 2.95);
+      c.fillStyle = '#C9C5BE'; c.fillRect(35, 30, 10, 10); c.fillStyle = '#E4E7EC'; c.fillRect(96.5, 13, 13, 6.5);
+      c.strokeStyle = 'rgba(0,0,0,.06)'; c.lineWidth = .03; for (let x = 35; x <= 110; x += 6) { c.beginPath(); c.moveTo(x, 0); c.lineTo(x, 40); c.stroke(); }   // juntas de dilatación
       // calles de grúas: bordes nítidos y flechas de sentido
       for (const [x0, z0, x1, z1] of [[35, .15, 88, 7], [58.5, 6.25, 110, 9.75], [84, 8, 88, 40], [40.2, 20.25, 85, 22.75], [35, 33.25, 85, 36.75]]) caja2(x0, z0, x1, z1, AM, .14);
       for (const x of [62, 72, 82, 96, 104]) { flecha(x, 7.3, Math.PI); flecha(x + 2, 8.7, 0); }
@@ -488,7 +493,7 @@ export function construir(k, md, m2, eq) {
       for (const x of [61, 65, 69, 73, 77, 81]) { for (const [a, b] of [[10.1, 20.25], [22.75, 33.25]]) { linea(x - 1.25, a, x - 1.25, b, AM, .1); linea(x + 1.25, a, x + 1.25, b, AM, .1); }
         c.fillStyle = BL; for (const [z, zt] of [[10.45, 11.0], [19.75, 19.2], [23.25, 23.8], [32.75, 32.2]]) { c.fillRect(x - 1.2, z - .07, 2.4, .14); c.fillText('PARE', x, zt); } }
       // senderos peatonales: verdes, con borde y pictogramas
-      const sendero = (x0, z0, x1, z1) => { c.fillStyle = 'rgba(31,164,90,.36)'; c.fillRect(x0, z0, x1 - x0, z1 - z0); caja2(x0, z0, x1, z1, VE, .1);
+      const sendero = (x0, z0, x1, z1) => { c.fillStyle = 'rgba(31,164,90,.62)'; c.fillRect(x0, z0, x1 - x0, z1 - z0); caja2(x0, z0, x1, z1, VE, .1);
         const h = x1 - x0 > z1 - z0, L = h ? x1 - x0 : z1 - z0; c.fillStyle = 'rgba(255,255,255,.9)'; for (let k = 2.5; k < L - 1; k += 7) { const px = h ? x0 + k : (x0 + x1) / 2, pz = h ? (z0 + z1) / 2 : z0 + k; c.beginPath(); c.arc(px, pz - .18, .12, 0, 7); c.fill(); c.fillRect(px - .07, pz - .05, .14, .36); } };
       for (const r of [[56.5, 8.9, 88.5, 10.1], [88, 0, 89, 40], [45, 36.9, 88.5, 38.1], [40, 6.9, 57, 8.1], [56.4, 7.5, 57.6, 37.5], [50.9, 0, 52.1, 7.5], [88.5, 11.4, 110, 12.6]]) sendero(...r);
       // pasos de cebra nítidos donde un sendero cruza una calle
@@ -502,10 +507,30 @@ export function construir(k, md, m2, eq) {
       ANDENES.forEach((x, i) => { caja2(x - 1.6, 2.6, x + 1.6, 6.1, BL, .1); c.fillStyle = 'rgba(255,255,255,.75)'; c.font = '800 1.1px Poppins, Arial'; c.fillText(String(i + 1), x, 4.35); });
       for (let i = 0; i < 5; i++) caja2(91 + i * 3.4, .2, 94 + i * 3.4, 5.6, AM, .09);
       c.fillStyle = 'rgba(245,196,0,.22)'; c.fillRect(59.4, 38.4, 12.2, 1.4); caja2(59.4, 38.4, 71.6, 39.8, AM, .08);
-      c.fillStyle = 'rgba(40,44,52,.35)'; c.font = '700 1.1px Poppins, Arial'; c.fillText('RECEPCIÓN', 42, 4.2); c.fillText('BATERÍAS', 100, 3.2); c.fillText('DESPACHO', 72.5, 1.2); c.fillText('ENSAMBLE', 48, 19.4);
+      { c.fillStyle = '#1FA45A'; c.fillRect(41.2, 31.2, 3.2, 3.2); c.strokeStyle = BL; c.lineWidth = .1; c.strokeRect(41.45, 31.45, 2.7, 2.7); c.fillStyle = BL; c.font = '800 .34px Poppins, Arial'; c.fillText('PUNTO DE', 42.8, 32.2); c.fillText('ENCUENTRO', 42.8, 32.65);
+        for (let i = 0; i < 3; i++) { const px = 42.1 + i * .7; c.beginPath(); c.arc(px, 33.2, .12, 0, 7); c.fill(); c.fillRect(px - .08, 33.35, .16, .4); } }
+      c.fillStyle = 'rgba(255,255,255,.55)'; c.font = '700 1.1px Poppins, Arial'; c.fillText('RECEPCIÓN', 42, 4.2); c.fillText('BATERÍAS', 100, 3.2); c.fillText('DESPACHO', 72.5, 1.2); c.fillText('ENSAMBLE', 48, 19.4);
     });
     const m = new THREE.Mesh(new THREE.PlaneGeometry(75, 40), new THREE.MeshStandardMaterial({ map: t, transparent: true, opacity: 0, roughness: .7, polygonOffset: true, polygonOffsetFactor: -6, polygonOffsetUnits: -12, depthWrite: false }));
     m.rotation.x = -Math.PI / 2; m.position.set(72.5, .012, 20); m.receiveShadow = true; m.renderOrder = 2; m.visible = false; vivo.add(m); W.mejora.pintura = m;
+  }
+  { // gestión visual: letreros colgantes de zona y de sendero, tableros, EPP, espejos y puntos limpios
+    const g = grupo(0, 0, 0, 0, vivo); g.visible = false; W.mejora.visual = g; const piezasV = W.mejora.piezasV = [];
+    const pon = (o, x, z) => { piezasV.push({ o: o.g || o, d: Math.hypot(x - 57, z - 24) }); return o; };
+    for (const [txt, x, y, z, ry, w, col] of [['DESPACHO', 78.5, 4.4, 6.0, Math.PI / 2, 2.6, '#056CF2'], ['ALMACENAJE · A1–G1', 72, 4.6, 21.5, Math.PI / 2, 3.6, '#056CF2'], ['RECEPCIÓN', 43, 4.0, 5.5, Math.PI / 2, 2.4, '#056CF2'],
+      ['ENSAMBLE', 48, 3.9, 20.6, Math.PI / 2, 2.4, '#056CF2'], ['BATERÍAS', 100, 4.2, 7.6, Math.PI / 2, 2.2, '#056CF2'], ['SENDERO PEATONAL', 57, 3.0, 25.5, Math.PI / 2, 2.6, '#1FA45A'], ['SENDERO PEATONAL', 62.5, 3.1, 9.5, 0, 2.6, '#1FA45A'], ['SENDERO PEATONAL', 57, 3.0, 13.0, Math.PI / 2, 2.6, '#1FA45A']])
+      pon(md.colgante(g, txt, x, y, z, ry, w, .46, col), x, z);
+    // tablero de gestión diaria junto al sendero (muro oriente de la sala)
+    pon(md.tablero(g, 57.84, .95, 27.2, Math.PI, 2.4, 1.25, (c, Wd, Hh) => { c.fillStyle = '#fff'; c.fillRect(0, 0, Wd, Hh); c.fillStyle = '#056CF2'; c.fillRect(0, 0, Wd, Hh * .17); c.fillStyle = '#fff'; c.font = `800 ${Hh * .09}px Poppins, Arial`; c.textBaseline = 'middle'; c.fillText('GESTIÓN DIARIA · TURNO MAÑANA', Wd * .04, Hh * .09);
+      ['SEGURIDAD', 'CALIDAD', 'ENTREGA', 'COSTO'].forEach((n, i) => { const x = Wd * (.04 + i * .24); c.fillStyle = ['#1FA45A', '#056CF2', '#F5C400', '#6c6c6c'][i]; c.fillRect(x, Hh * .24, Wd * .22, Hh * .1); c.fillStyle = '#fff'; c.font = `700 ${Hh * .055}px Poppins, Arial`; c.fillText(n, x + Wd * .015, Hh * .29);
+        for (let k = 0; k < 15; k++) { c.fillStyle = (k * 7 + i * 3) % 11 ? '#1FA45A' : (i === 0 ? '#1FA45A' : '#F5C400'); c.fillRect(x + (k % 5) * Wd * .043, Hh * (.4 + Math.floor(k / 5) * .13), Wd * .036, Hh * .1); } });
+      c.fillStyle = '#1b2230'; c.font = `600 ${Hh * .06}px Poppins, Arial`; c.fillText('Días sin accidentes: 1.000', Wd * .04, Hh * .88); }), 57.8, 27.2);
+    // EPP a la entrada de la nave y señalética de puntos limpios
+    for (const [url, z] of [['img/letreros/o-casco.webp', 30.9], ['img/letreros/o-chaleco.webp', 31.6]]) pon(md.letrero(g, url, .42, 57.84, 1.3, z, Math.PI, 'muro'), 57.8, z);
+    for (const [url, x] of [['img/letreros/r-papel.webp', 73.5], ['img/letreros/r-plastico.webp', 74.3], ['img/letreros/r-carton.webp', 75.1], ['img/letreros/r-vidrio.webp', 75.9]]) pon(md.letrero(g, url, .34, x, 1.25, 39.83, Math.PI / 2, 'muro'), x, 39.8);
+    pon(md.letrero(g, 'img/letreros/s-extintor.webp', .3, 52.3, 1.3, .17, -Math.PI / 2, 'muro'), 52.3, .2);
+    // espejos convexos en las esquinas sin visión
+    for (const [x, z, dx, dz] of [[83.75, 8.6, -1, 1], [58.2, 20.05, 1, 1], [58.2, 33.05, 1, 1], [85.95, 33.05, -1, 1]]) pon(eq.espejo(g, x, z, dx, dz, 2.4, true), x, z);
   }
   { // gestión de tráfico en toda la planta
     const g = grupo(0, 0, 0, 0, vivo); g.visible = false; W.mejora.trafico = g; const piezas = W.mejora.piezas = [];
@@ -523,6 +548,8 @@ export function construir(k, md, m2, eq) {
     // protecciones: columnas en zonas de tránsito y cabeceras de rack
     for (const [x, z] of COLUMNAS) if (!(x < 49 && z > 8 && z < 24)) pieza(md.protectorColumna(g, x, z), x, z);
     for (const x of RACKS_X) for (const z of [20.15, 22.85, 33.15]) pieza(md.protectorRack(g, x - .5, x + .5, z), x, z);
+    { const am = std(0xF5C400, { roughness: .45 }), ng = std(0x1E2126, { roughness: .6 });
+      for (const x of RACKS_X) for (const z of [10.0, 20.0, 23.0, 33.0]) for (const sx of [-.55, .55]) { const q = grupo(x + sx, 0, z, 0, g); caja(.17, .62, .17, 0, 0, 0, am, q, .04); for (const y of [.12, .36]) caja(.18, .07, .18, 0, y, 0, ng, q, .01); pieza(q, x, z); } }
     // letreros en poste
     for (const [url, x, z, ry] of [['img/letreros/p-montacargas.webp', 59.6, 10.4, -Math.PI / 2], ['img/letreros/p-peatones.webp', 66.3, 8.6, Math.PI / 2], ['img/letreros/p-montacargas.webp', 75.6, 10.4, -Math.PI / 2],
       ['img/letreros/o-casco.webp', 52.6, .7, -Math.PI / 2], ['img/letreros/o-chaleco.webp', 50.3, .7, -Math.PI / 2], ['img/letreros/s-encuentro.webp', 44.2, 23.5, Math.PI / 2], ['img/letreros/p-peatones.webp', 58.4, 20.0, 0], ['img/letreros/s-salida.webp', 88.0, .8, -Math.PI / 2]])
@@ -533,7 +560,30 @@ export function construir(k, md, m2, eq) {
     // Safetygate frente al portón poniente: la barra colgante frena la carga alta
     A.sg = md.safetygate(g, 36.9, 33.35, 36.65, 3.3, .45, 35.15); A.piezas.push({ o: A.sg.g, d: 33 });
     // SmartDock: la cuña en la rueda de cada camión en el andén
-    A.cunas = [63.5, 73, 82].map((x) => { const c = eq.cunaSmart(g, x + 1.02, -2.95); /* frente a la rueda trasera (camión girado: ruedas en z −2,12 y −0,97) */ A.piezas.push({ o: c.g, d: Math.hypot(x - 69, 11) }); return c; });
+    const amar = std(0xF5C400, { roughness: .42 }), negroD = std(0x1E2126, { roughness: .6 }), grisD = std(0xC9CED6, { roughness: .45, metalness: .3 }), cableM = std(0x23262B, { roughness: .7 });
+    const formaCuna = (() => { const sh = new THREE.Shape(); sh.moveTo(-.21, 0); sh.lineTo(.22, 0); sh.quadraticCurveTo(.02, .05, -.21, .3); sh.lineTo(-.21, 0); const geo = new THREE.ExtrudeGeometry(sh, { depth: .3, bevelEnabled: true, bevelThickness: .012, bevelSize: .012, bevelSegments: 2 }); geo.translate(0, 0, -.15); geo.rotateY(-Math.PI / 2); return geo; })();
+    const smartDock = (xa) => {   // xa = eje del andén; el camión retrocede hacia z = 0 y la rueda trasera queda en z ≈ −2,12
+      const d = grupo(0, 0, 0, 0, g), px = xa + 1.85, pz = -.42;
+      // poste de control y semáforo hacia el chofer
+      caja(.12, 1.55, .12, px, 0, pz, grisD, d, .02); caja(.34, .06, .34, px, 0, pz, grisD, d, .02); caja(.3, .38, .17, px, .78, pz - .12, std(0xEEF0F3, { roughness: .4 }), d, .04);
+      caja(.22, .5, .14, px, 1.5, pz - .1, negroD, d, .05); const rojo = luz(0xFF3B3B, 0x4a1515), verde = luz(0x22C55E, 0x123a20);
+      esfera(.065, px, 1.86, pz - .18, rojo, d, 12); esfera(.065, px, 1.64, pz - .18, verde, d, 12); caja(.26, .04, .1, px, 2.0, pz - .2, negroD, d, .01);
+      // la cuña: rampa hacia la rueda, base negra, manilla y la placa del sensor
+      const cuna = grupo(px - .3, 0, pz - .55, 0, d); const cu = new THREE.Mesh(formaCuna, amar); cu.castShadow = true; cuna.add(cu);
+      caja(.34, .025, .46, 0, 0, 0, negroD, cuna, .008); caja(.3, .02, .1, 0, .2, -.14, negroD, cuna, .006);
+      const asa = new THREE.Mesh(new THREE.TorusGeometry(.07, .014, 6, 14, Math.PI), negroD); asa.position.set(0, .3, -.21); cuna.add(asa);
+      // cable por el piso desde la base del poste a la cuña
+      const cable = new THREE.Mesh(new THREE.CylinderGeometry(.013, .013, 1, 6), cableM); d.add(cable);
+      const ve = new THREE.Vector3(), up = new THREE.Vector3(0, 1, 0);
+      const tender = () => { const a = new THREE.Vector3(px, .03, pz - .05), b = new THREE.Vector3(cuna.position.x, Math.max(.03, cuna.position.y + .05), cuna.position.z - .2); ve.subVectors(b, a); const L = ve.length(); cable.position.copy(a).addScaledVector(ve, .5); cable.scale.set(1, L, 1); cable.quaternion.setFromUnitVectors(up, ve.normalize()); };
+      tender();
+      const sd = { g: d, cuna, rojo, verde, tender, parque: [px - .3, pz - .55], rueda: [xa + 1.02, -2.86] };
+      sd.poner = (u) => { cuna.position.set(lerp(sd.parque[0], sd.rueda[0], u), 0, lerp(sd.parque[1], sd.rueda[1], u)); tender(); };
+      sd.luz = (fijo) => { rojo.emissiveIntensity = fijo ? .08 : 2.4; verde.emissiveIntensity = fijo ? 2.4 : .08; };
+      sd.poner(1); sd.luz(true); return sd;
+    };
+    const lerp = (a, b, u) => a + (b - a) * u;
+    A.cunas = [63.5, 73, 82].map((x) => { const c = smartDock(x); A.piezas.push({ o: c.g, d: Math.hypot(x - 69, 11) }); return c; });
     // X-KUBE: cruce del sendero x = 57 con la calle z = 21,5, cruce de la calle x = 86, y cambios de área (portón poniente y baterías)
     A.proy = [];
     const kb1 = eq.xkube(g, 57, 21.5, 4.7, ALERO - .55), kb2 = eq.xkube(g, 86, 9.5, 4.7, ALERO - .55);
