@@ -11,7 +11,7 @@ import { nucleo, THREE, clamp, lerp } from '../js/planta/nucleo.js';
 import { modelos } from '../js/planta/modelos.js';
 import { modelos2 } from '../js/planta/modelos2.js';
 import { equipos } from '../js/planta5/equipos.js';
-import { construir, SOL, ALERO } from './mundo.js?v=10';
+import { construir, SOL, ALERO } from './mundo.js?v=11';
 import { gente } from './gente.js?v=6';
 
 const PI = Math.PI, H = PI / 2;
@@ -250,7 +250,7 @@ export async function crear(cont) {
     const f = t - 6; fono.pant.emissiveIntensity = t > 5 ? 1.2 : 0; if (f > 0 && f < .12) fx.flash = .85; else fx.flash *= .8;
   }
   E.cruce = [{    // Don Salva en el paso de cebra, con la grúa atrás
-    ini() { est.fondo = 'fuera'; cargado(13.5); },
+    ini() { est.fondo = 'fuera'; cargado(13.5); grua.g.visible = false; },   // la grúa aparece recién cuando retrocede (toma siguiente)
     cam: claves([[0, 71.6, 1.75, 5.7, 68.6, 1.3, 9.6, 31], [7, 71.25, 1.7, 6.1, 69.4, 1.38, 9.6, 26], [40, 71.1, 1.68, 6.2, 69.4, 1.38, 9.6, 25]]),
     tick(t) { trabajar(t); salvaFoto(t); cargado(13.5 - .5 * suave(tr(t, 5, 16))); P.manejar(aleS, t, .9); baliza(t); },
   }, {            // el retroceso (desde arriba, lento) · corte a negro · lo que queda
@@ -266,7 +266,7 @@ export async function crear(cont) {
         pon(salva.g, 69.55, 9.45, MIRA_RACK); P.quieto(salva); fono.g.visible = true; P.foto(salva, 1); fono.pant.emissiveIntensity = 1.2; salva.cab.rotation.y = -1.1 * suave(tr(t, 2.9, 3.4));
         cargado(13.0 - 2.15 * Math.pow(tr(t, 0, 3.5), 1.6)); P.manejar(aleS, t, .9); baliza(t); est.amb = 'tenso'; fx.negro = 0; return;
       }
-      est.amb = 'frio'; fx.negro = t < 5.6 ? 1 : 1 - suave(tr(t, 5.6, 8.6));
+      est.amb = 'frio'; fx.negro = 1; return;   // negro: «¿Qué creen que pasó?» (la lámina pone la pregunta). No se muestra el desenlace.
       salva.g.visible = false; cargado(11.7); grua.carga.rotation.z = .05; baliza(t);
       aleS.g.visible = false; ale.g.visible = true; fonoAle.g.visible = false; pon(ale.g, 68.5, 10.1, rumbo(1.8, -1.35)); P.quieto(ale); P.cabeza(ale, t);
       casco.visible = true; const a = Math.exp(-Math.max(0, t - 5.6) * .45); casco.position.set(70.3, .012, 8.75); casco.rotation.set(.16 + Math.sin(t * 3.1) * .3 * a, .9, -.2 + Math.cos(t * 3.1) * .22 * a);
@@ -329,10 +329,10 @@ export async function crear(cont) {
   E.rewind = [{   // ◀◀ se rebobina desde lo que quedó
     corte: true, casa: 0,
     ini() { est.fondo = 'fuera'; est.amb = 'frio'; },
-    cam: claves([[0, 72.5, .45, 6.9, 70.15, .55, 8.95, 31], [1.1, 71.2, 2.4, 6.4, 69.6, .7, 10.5, 34], [3.3, ...CAM_CRUCE]]),
+    cam: claves([[0, 68.4, 5.6, 3.4, 70.2, .4, 9.8, 42], [3.3, ...CAM_CRUCE]]),   // desde la calle, sin pasar junto a las columnas
     tick(t) {
       trabajar(t); const u = tr(t, .15, 3.2); fx.rew = t < 3.4 ? 1 : Math.max(0, 1 - (t - 3.4) * 2); est.amb = u < .25 ? 'frio' : 'dia';
-      const vuelto = u > .06;
+      const vuelto = true;   // parte del instante previo: nunca se muestra el desenlace
       casco.visible = !vuelto; fonoPiso.visible = !vuelto; casco.position.set(70.3, .012, 8.75); fonoPiso.position.set(70.95, .004, 8.35);
       ale.g.visible = !vuelto; if (!vuelto) { pon(ale.g, 68.5, 10.1, rumbo(1.8, -1.35)); P.cabeza(ale, t); } aleS.g.visible = vuelto; P.manejar(aleS, t, .9);
       cargado(11.7 + 3.7 * sale(u)); baliza(t);
@@ -381,13 +381,14 @@ export async function crear(cont) {
       trabajar(t); pintura(99); visualListo(); traficoListo(); puertasResto(); puertas(false); luminaArriba(t, 16.5); fx.negro = dip(t, 5.5, 11.5, 17);
       // SmartDock: el operador toma la cuña junto al poste, la deja frente a la rueda y el semáforo del chofer pasa de rojo a verde
       { const sd = Mj.cunas[1], op = turno[1];
-        if (t < 5.6) {
-          const u = suave(tr(t, 1.0, 3.1)), alza = suave(tr(t, .6, 1.0)) * (1 - suave(tr(t, 3.1, 3.6))), agacha = Math.max(1 - Math.abs(t - .75) / .4, 1 - Math.abs(t - 3.35) / .45, 0);
-          sd.poner(u); sd.cuna.position.y = .42 * alza; sd.tender(); sd.luz(t > 3.9);
-          const c = sd.cuna.position, atras = suave(tr(t, 4.0, 4.9)); pon(op.g, c.x + .62 + .5 * atras, c.z + .3 + .3 * atras, rumbo(-.55, -1));
-          P.quieto(op); if (u > 0 && u < 1 || (atras > 0 && atras < 1)) P.andar(op, .8, t);
-          if (alza > .02 || agacha > 0) { const k2 = Math.max(alza, suave(agacha)); op.bi.rotation.x = op.bd.rotation.x = -.95 + .7 * suave(agacha); op.bi.rotation.z = .12 * k2; op.bd.rotation.z = -.12 * k2; }
-          const ka = suave(agacha); op.torso.rotation.x = .78 * ka; op.pi.rotation.x = -.12 * ka; op.pd.rotation.x = .1 * ka;   // se inclina desde la cadera (piernas firmes) op.cab.rotation.x = -.35 * suave(agacha);
+        if (t < 5.6) {   // toma la cuña junto al poste, la lleva a la cintura y la deja frente a la rueda: se inclina poco y desde la cadera
+          const u = suave(tr(t, 1.0, 3.0)), lleva = suave(tr(t, .7, 1.0)) * (1 - suave(tr(t, 3.05, 3.5))), baja = Math.max(1 - Math.abs(t - .6) / .45, 1 - Math.abs(t - 3.3) / .5, 0), kb = suave(baja);
+          sd.poner(u); sd.cuna.position.y = .5 * lleva; sd.tender(); sd.luz(t > 3.9);
+          const c = sd.cuna.position, atras = suave(tr(t, 4.0, 4.9)), fx = -.48, fz = -.88, d = .55 + .45 * atras;
+          pon(op.g, c.x - fx * d, c.z - fz * d, rumbo(fx, fz)); P.quieto(op);
+          if ((u > 0 && u < 1) || (atras > 0 && atras < 1)) P.andar(op, .7, t);
+          if (lleva > .02 || kb > .02) { op.bi.rotation.x = op.bd.rotation.x = -.62 * lleva - .28 * kb; op.bi.rotation.z = .1; op.bd.rotation.z = -.1; }
+          op.torso.rotation.x = .42 * kb; op.cab.rotation.x = .18 * kb;
         } else if (op.g.position.z < 0) { P.quieto(op); pon(op.g, ...PUESTO[1]); sd.poner(1); sd.luz(true); } }
       // Safetygate: una grúa con la carga alta va hacia el portón; la barra la frena y avisa
       const u2 = t - 5.5, g0 = fondo[0], toca = u2 > 3.0;
@@ -474,7 +475,7 @@ export async function crear(cont) {
     for (let j = 0; j < 3; j++) { ahora.p[j] = est.de ? lerp(est.de.p[j], c.p[j], u) : c.p[j]; ahora.m[j] = est.de ? lerp(est.de.m[j], c.m[j], u) : c.m[j]; } ahora.f = est.de ? lerp(est.de.f, c.f, u) : c.f;
     const dist = Math.hypot(ahora.p[0] - ahora.m[0], ahora.p[1] - ahora.m[1], ahora.p[2] - ahora.m[2]), pul = Math.min(.05, dist * .0022);
     cam.position.set(ahora.p[0] + Math.sin(reloj * .53) * pul, ahora.p[1] + Math.sin(reloj * .71 + 1) * pul * .7, ahora.p[2] + Math.cos(reloj * .47) * pul); cam.lookAt(ahora.m[0], ahora.m[1], ahora.m[2]);
-    const nr = clamp(dist * .012, .12, 2.5);   // plano cercano según la distancia: desde el aire, más precisión de profundidad (sin parpadeo de superficies)
+    const nr = clamp(Math.min(dist * .04, cam.position.y * .3), .1, 15);   // plano cercano según la distancia: desde el aire, más precisión de profundidad (sin parpadeo de superficies)
     if (cam.fov !== ahora.f || Math.abs(cam.near - nr) > .02) { cam.fov = ahora.f; cam.near = nr; cam.updateProjectionMatrix(); }
     // casa de muñecas: adentro y abajo, techo y murallas; desde el aire, lo que pida la toma
     const meta = DENTRO(cam.position.x, cam.position.z) && cam.position.y < ALERO - .4 ? 1 : (typeof clip.casa === 'function' ? clip.casa(est.t) : clip.casa ?? 0);
@@ -485,7 +486,7 @@ export async function crear(cont) {
     k.sol.intensity = luzAmb.isol; k.sol.color.copy(luzAmb.sol); if (hemi) hemi.intensity = luzAmb.hemi * (1 + .45 * est.casa); k.escena.background.copy(luzAmb.niebla); k.escena.fog.color.copy(luzAmb.niebla);
     const lejos = Math.hypot(cam.position.x - ahora.m[0], cam.position.z - ahora.m[2]), foco = lejos > 150 ? CP : [ahora.m[0], ahora.m[2]];
     const r = lejos > 150 ? 118 : clamp(dist * .95, 9, 85); k.sol.target.position.set(foco[0], 0, foco[1]); k.sol.position.set(foco[0] + SOL.x * 160, SOL.y * 160, foco[1] + SOL.z * 160);
-    Object.assign(k.sol.shadow.camera, { left: -r, right: r, top: r, bottom: -r, near: 1, far: 420 }); k.sol.shadow.camera.updateProjectionMatrix();
+    Object.assign(k.sol.shadow.camera, { left: -r, right: r, top: r, bottom: -r, near: 1, far: 420 }); k.sol.shadow.camera.updateProjectionMatrix(); k.sol.shadow.normalBias = .02 + r * .0035; k.sol.shadow.bias = -.0003 - r * .000004;
     if (A.filtro !== filtro) { filtro = A.filtro; k.lienzo.style.filter = filtro; }
     eRew.style.opacity = fx.rew.toFixed(3); if (est.lumina || est.luminaPintada) { dibujarLumina(t); est.luminaPintada = !!est.lumina; }
     eVin.style.opacity = luzAmb.vin.toFixed(3); eNegro.style.opacity = fx.negro.toFixed(3); eFlash.style.opacity = fx.flash.toFixed(3); eVel.style.opacity = fx.vel.toFixed(3);

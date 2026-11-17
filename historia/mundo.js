@@ -89,10 +89,10 @@ export function construir(k, md, m2, eq) {
   { const L = 6000, tA = lienzo(0, 0, 17, 40, 256, (c) => { c.fillStyle = '#8F959E'; c.fillRect(0, 0, 17, 40); c.fillStyle = 'rgba(255,255,255,.9)'; for (const x of [2.85, 5.7, 11.3, 14.15]) for (let z = 0; z < 40; z += 10) c.fillRect(x - .07, z, .14, 4.5);
       c.fillStyle = '#E9B800'; c.fillRect(.35, 0, .14, 40); c.fillRect(16.5, 0, .14, 40); c.fillStyle = '#7E838B'; c.fillRect(8.1, 0, .8, 40); });
     tA.wrapS = tA.wrapT = THREE.RepeatWrapping; tA.repeat.set(1, L / 40);
-    const a = plano(tA, -20, -L / 2, 17, L, -.2, .9, 1); a.material.map = tA;
+    const a = plano(tA, -20, -L / 2, 17, L, -.08, .9, 1); a.material.map = tA;
     caja(.5, .9, L, -11.5, -.2, 0, mat(0xD6D9DD), base, .05);
     const tL = lienzo(0, 0, 9, 30, 128, (c) => { c.fillStyle = '#9CA2AA'; c.fillRect(0, 0, 9, 30); c.fillStyle = 'rgba(255,255,255,.85)'; for (let z = 0; z < 30; z += 8) c.fillRect(4.43, z, .14, 4); });
-    tL.wrapS = tL.wrapT = THREE.RepeatWrapping; tL.repeat.set(1, L / 30); plano(tL, 14, -L / 2, 9, L, -.2, .9, 1);
+    tL.wrapS = tL.wrapT = THREE.RepeatWrapping; tL.repeat.set(1, L / 30); plano(tL, 14, -L / 2, 9, L, -.08, .9, 1);
     // paso sobre nivel: la avenida que cruza la autopista hacia la ciudad
     caja(70, .9, 22, -12, 6.6, -380, mat(0xE2E3E1), base, .1); for (const s of [-1, 1]) caja(70, .9, .35, -12, 7.5, -380 + s * 10.8, mat(0xC9CDD2), base, .05);
     for (const x of [-34, -24, -12, 0, 10]) caja(1.6, 6.6, 9, x, 0, -380, mat(0xD5D7D6), base, .3);
@@ -152,14 +152,14 @@ export function construir(k, md, m2, eq) {
       // patio y camiones esperando
       const zp = lado < 0 ? z0 - 26 : z0 + d, pz = zp + 13;
       for (let i = 0; i < 2 + Math.floor(R() * 4); i++) { const x = x0 + 8 + R() * (w - 16); caja(2.5, 3.5, 12, x, 0, pz, mat(0xEEF1F4), vecinos, .1); caja(2.4, 2.6, 2.5, x, .3, pz + lado * -7.4, mat(franjas[Math.floor(R() * 6)], { roughness: .4 }), vecinos, .3); }
-      return { x0, z0, w, d };
+      return { x0, z0, w, d, lado };
     };
     const lotes = [];
     for (let bx = 210; bx < 1100; bx += 270) for (let bz = -1080; bz < 1080; bz += 280) { if (bx < 260 && bz > -160 && bz < 160) continue; lotes.push([bx + 20 + R() * 30, bz + 30 + R() * 30, 150 + R() * 70, 90 + R() * 70]); }
     for (let bx = -720; bx < -120; bx += 230) for (let bz = -700; bz < 720; bz += 240) lotes.push([bx + 20 + R() * 20, bz + 30 + R() * 25, 120 + R() * 60, 80 + R() * 60]);
     for (let bz = -1050; bz < 1050; bz += 210) { if (bz > -230 && bz < 160) continue; lotes.push([40 + R() * 20, bz + 20, 120 + R() * 30, 90 + R() * 40]); }
     for (let i = lotes.length - 1; i >= 0; i--) { const [, z, , d] = lotes[i]; if (z - 30 < -360 && z + d + 34 > -400) lotes.splice(i, 1); }
-    for (const [x, z, w, d] of lotes) galpon(x, z, w, d, 10 + R() * 5, R() < .5 ? -1 : 1);
+    const galpones = lotes.map(([x, z, w, d]) => galpon(x, z, w, d, 10 + R() * 5, R() < .5 ? -1 : 1));
     k.fusionar(vecinos);
     // autos en los estacionamientos de los vecinos (cajitas, de lejos se leen como autos)
     const autos = [], ac = [0xF2F2F2, 0x2B2F36, 0x8FA3BC, 0xB9C0C8, 0xC8553D, 0x2F6FB0, 0x6B7380];
@@ -168,6 +168,9 @@ export function construir(k, md, m2, eq) {
     const gc = new THREE.BoxGeometry(4.2, .62, 1.75); gc.translate(0, .52, 0); instancias(gc, mat(0xFFFFFF, { roughness: .35 }), autos, false);
     const gv = new THREE.BoxGeometry(2.2, .5, 1.55); gv.translate(-.2, 1.07, 0); instancias(gv, mat(0x39424F, { roughness: .2, metalness: .3 }), autos.map((a) => ({ ...a, c: null })), false);
     const gr = new THREE.BoxGeometry(3.3, .42, 1.82); gr.translate(0, .21, 0); instancias(gr, mat(0x1E2126, { roughness: .8 }), autos.map((a) => ({ ...a, c: null })), false);
+    // asfalto: estacionamiento bajo cada fila de autos y patio de camiones frente a los andenes (antes estaban sobre el pasto)
+    const asf = []; for (const g of galpones) { const fila = g.z0 + g.d + 30; asf.push({ x: g.x0 + g.w / 2, z: fila + .15, sx: g.w - 4, sz: 9 }); const zp = g.lado < 0 ? g.z0 - 26 : g.z0 + g.d; asf.push({ x: g.x0 + g.w / 2, z: zp + 13, sx: g.w, sz: 26 }); }
+    const ga = new THREE.BoxGeometry(1, .3, 1); ga.translate(0, -.18, 0); instancias(ga, mat(0xB4B9C0, { roughness: .95 }), asf.map((a) => ({ ...a, sy: 1 })), false);
   }
 
   /* ───────── árboles (instanciados): redondos, álamos y pinos ───────── */

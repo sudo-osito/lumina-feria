@@ -28,7 +28,7 @@
   const pedirPlanta = import("./escena/lumina5.js?v=42").then((m) => m.crear($("#planta3d"))).then((p) => { planta = p; sincronizar3d(); return planta; }).catch((e) => console.error("planta 3D:", e));
   // La historia de Don Salva: otra escena 3D, con cámara de cine (historia/historia.js); una toma por paso
   let historia = null;
-  const pedirHistoria = import("./historia/historia.js?v=19").then((m) => m.crear($("#historia3d"))).then((h) => { historia = h; sincronizar3d(); return h; }).catch((e) => console.error("historia 3D:", e));
+  const pedirHistoria = import("./historia/historia.js?v=20").then((m) => m.crear($("#historia3d"))).then((h) => { historia = h; sincronizar3d(); return h; }).catch((e) => console.error("historia 3D:", e));
   function sincronizar3d() {
     const esc = lams[i].dataset.escena;
     escenario.classList.toggle("conhistoria", !!esc);
@@ -251,28 +251,70 @@
         c.save(); c.translate(1180, 40); dias.forEach((v, d) => { const x = 40 + (d % 7) * 66, y = 60 + Math.floor(d / 7) * 72; if (v && a(2) > d / 35) punto(c, x, y, 13 * (v > .6 ? 1 : .6), NAR, v > .6 ? .9 : .4); else aro(c, x, y, 13, CARBON, .2 * a(2), 1.4); });
         "LMMJVSD".split("").forEach((d, k) => { c.font = "600 15px Poppins"; c.textAlign = "center"; c.fillStyle = `rgba(${GRIS},${.8 * a(2)})`; c.fillText(d, 40 + k * 66, 22); });
         rotulo(c, 240, 444, "Con qué frecuencia", NAR, a(2), 16); c.restore(); }; })(),
-    // 04 · accidentabilidad 2024 por rubro (SUSESO): cada punto = 0,1 accidentes por cada 100 personas; la línea es el promedio del país (2,5).
-    //      Al avanzar, las filas se apagan y aparece la mortalidad: 88 puntos (8,8) contra 21 (2,1) por cada 100.000.
+    // 04 · índice de accidentabilidad 2024 por rubro (SUSESO): cada punto = 0,1 accidentes por cada 100 personas; la línea es el promedio (2,5).
+    //      Al avanzar, LOS MISMOS puntos de Transporte se reordenan y crecen hasta la mortalidad (8,8 por 100.000), la línea pasa al promedio (2,1) y se marca «4×».
     accid: (() => { const R = [["Industria manufacturera", 3.5], ["Agricultura y pesca", 3.3], ["Transporte", 3.1, 1], ["Comercio", 2.8], ["Construcción", 2.8], ["Servicios", 2.0], ["Electricidad, gas y agua", 1.1], ["Minería", .9]];
-      let u = 0; return (c, t, w, h) => { c.clearRect(0, 0, w, h); u = ir(u, paso >= 1 ? 1 : 0, .07); const x0 = 470, s = 30, f = 70, y0 = 96, ahora = performance.now() - tPaso;
-        const v = 1 - u, xp = x0 + 24.5 * s;
-        if (v > .01) {
-          c.strokeStyle = `rgba(${CARBON},${.35 * v})`; c.lineWidth = 1.6; c.setLineDash([3, 8]); c.beginPath(); c.moveTo(xp, y0 - 46); c.lineTo(xp, y0 + R.length * f - 30); c.stroke(); c.setLineDash([]);
-          rotulo(c, xp, y0 - 78, "Promedio del país · 2,5", GRIS, v * Math.min(1, t / 900), 15);
-          R.forEach(([nom, val, top], r) => { const y = y0 + r * f, n = Math.round(val * 10), a = v * (top ? 1 : .9);
-            c.save(); c.font = `${top ? 600 : 400} 28px Poppins`; c.textAlign = "right"; c.textBaseline = "middle"; c.fillStyle = `rgba(${top ? AZUL : CARBON},${a * (top ? 1 : .8)})`; c.fillText(nom, x0 - 40, y); c.restore();
-            let ult = -1; for (let i = 0; i < n; i++) { const e = Math.min(1, Math.max(0, (t - 250 - r * 70 - i * 22) / 260)); if (e <= 0) break; ult = i;
-              const sobre = i >= 25; punto(c, x0 + i * s, y, (top ? 9.4 : 8) * (.4 + .6 * e) * (top ? 1 + .08 * Math.sin(t / 300 - i * .3) : 1), top ? AZUL : CARBON, a * e * (top ? 1 : sobre ? .7 : .42)); }
-            if (ult === n - 1) { c.save(); c.font = `${top ? 600 : 500} ${top ? 44 : 34}px Poppins`; c.textBaseline = "middle"; c.fillStyle = `rgba(${top ? AZUL : CARBON},${a})`; c.fillText(val.toFixed(1).replace(".", ","), x0 + n * s + 18, y + 1); c.restore(); } });
-        }
-        if (u > .01) {   // mortalidad: un punto = 0,1 muertes por cada 100.000 personas protegidas
-          const g = (n, y, rgb, nom, val, k) => { for (let i = 0; i < n; i++) { const e = Math.min(1, Math.max(0, (ahora - 150 - k * 500 - i * 14) / 300)); punto(c, x0 + (i % 22) * 34, y + Math.floor(i / 22) * 34, 11 * (.4 + .6 * e), rgb, u * e * (rgb === AZUL ? 1 : .55)); }
-            c.save(); c.font = "400 28px Poppins"; c.textAlign = "right"; c.textBaseline = "middle"; c.fillStyle = `rgba(${rgb},${u})`; c.fillText(nom, x0 - 40, y); c.restore();
-            c.save(); c.font = "500 96px Poppins"; c.textBaseline = "middle"; c.fillStyle = `rgba(${rgb},${u * Math.min(1, Math.max(0, (ahora - 400 - k * 500) / 500))})`; c.fillText(val, x0 + 22 * 34 + 40, y + (n > 22 ? 50 : 6)); c.restore(); };
-          rotulo(c, x0 - 14, y0 - 78, "Muertes por cada 100.000 personas protegidas · un punto = 0,1", GRIS, u, 15, "left");
-          g(88, y0 + 10, AZUL, "Transportes y comunicaciones", "8,8", 0); g(21, y0 + 250, CARBON, "Promedio del país", "2,1", 1);
-        }
+      let u = 0; return (c, t, w, h) => { c.clearRect(0, 0, w, h); u = ir(u, paso >= 1 ? 1 : 0, .055); const e = u * u * (3 - 2 * u), x0 = 470, s0 = 27, s1 = 11, f = 66, y0 = 96, ahora = performance.now() - tPaso;
+        const yT0 = y0 + 2 * f, yT1 = 300, yT = yT0 + (yT1 - yT0) * e, s = s0 + (s1 - s0) * e;
+        // encabezado: qué mide cada punto
+        rotulo(c, x0 - 14, 40, "Accidentes por cada 100 personas · un punto = 0,1", GRIS, 1 - e, 15, "left");
+        rotulo(c, x0 - 14, 40, "Muertes por cada 100.000 personas · un punto = 0,1", GRIS, e, 15, "left");
+        // la línea del promedio: 2,5 (accidentes) → 2,1 (mortalidad), en el mismo gráfico
+        const xp = x0 + (24.5 + (20.5 - 24.5) * e) * s, ya = 70, yb = (y0 + R.length * f - 30) * (1 - e) + (yT1 + 90) * e;
+        c.strokeStyle = `rgba(${CARBON},.38)`; c.lineWidth = 1.8; c.setLineDash([3, 8]); c.beginPath(); c.moveTo(xp, ya); c.lineTo(xp, yb); c.stroke(); c.setLineDash([]);
+        c.save(); c.font = "600 22px Poppins"; c.textAlign = "center"; c.fillStyle = `rgba(${CARBON},${Math.min(1, t / 900) * .75})`; c.fillText(`Promedio del país · ${e > .5 ? "2,1" : "2,5"}`, xp, yb + 34); c.restore();
+        R.forEach(([nom, val, top], r) => { const trans = !!top, a = trans ? 1 : 1 - e; if (a < .01) return;
+          const y = trans ? yT : y0 + r * f, n0 = Math.round(val * 10), n = trans ? Math.round(n0 + (88 - n0) * e) : n0;
+          c.save(); c.font = `${trans ? 600 : 400} ${trans ? 30 - 4 * e : 27}px Poppins`; c.textAlign = "right"; c.textBaseline = "middle"; c.fillStyle = `rgba(${trans ? AZUL : CARBON},${a * (trans ? 1 : .78)})`; c.fillText(trans && e > .5 ? "Transporte y comunicaciones" : nom, x0 - 36, y); c.restore();
+          let ult = -1; for (let i = 0; i < n; i++) { const ap = Math.min(1, Math.max(0, (t - 250 - r * 70 - i * 22) / 260)) * (i < n0 ? 1 : Math.min(1, Math.max(0, (ahora - 200 - (i - n0) * 16) / 260))); if (ap <= 0) break; ult = i;
+            const sobre = i >= 25 - 4 * e; punto(c, x0 + i * s, y, ((trans ? 8.4 : 7.2) - 2.6 * e) * (.4 + .6 * ap) * (trans ? 1 + .07 * Math.sin(t / 300 - i * .3) : 1), trans ? AZUL : CARBON, a * ap * (trans ? 1 : sobre ? .7 : .42)); }
+          if (ult === n - 1) { c.save(); c.font = `${trans ? 600 : 500} ${trans ? 46 + 20 * e : 34}px Poppins`; c.textBaseline = "middle"; c.fillStyle = `rgba(${trans ? AZUL : CARBON},${a})`; c.fillText(trans ? (e > .5 ? "8,8" : "3,1") : String(val).replace(".", ","), x0 + n * s + 22, y + 1); c.restore(); } });
+        // «4×»: de la línea del promedio al final de Transporte, en el mismo gráfico
+        const k = Math.min(1, Math.max(0, (ahora - 1500) / 600)) * e; if (k > .01) { const xa = xp, xb = x0 + 87 * s1, yy = yT1 + 70;
+          c.strokeStyle = `rgba(${AZUL},${k})`; c.lineWidth = 2.5; c.beginPath(); c.moveTo(xa, yy - 10); c.lineTo(xa, yy); c.lineTo(xa + (xb - xa) * k, yy); if (k > .98) c.lineTo(xb, yy - 10); c.stroke();
+          c.save(); c.textAlign = "center"; c.fillStyle = `rgba(${AZUL},${k})`; c.font = "600 64px Poppins"; c.fillText("4×", (xa + xb) / 2, yy + 74); c.font = "500 24px Poppins"; c.fillStyle = `rgba(${CARBON},${k * .8})`; c.fillText("el promedio del país: el rubro más alto", (xa + xb) / 2, yy + 112); c.restore(); }
       }; })(),
+    // 05 · un día cualquiera de 2024: cerca de 390 accidentes del trabajo (un punto = una persona); 4 de ellos, graves
+    dia: (() => { const N = 390, C = 26, k = new Float32Array(N), az = new Float32Array(N), rj = new Float32Array(N), graves = [57, 140, 233, 318];
+      return (c, t, w, h) => { c.clearRect(0, 0, w, h); const s = 31, ox = (w - (C - 1) * s) / 2, oy = 70, ahora = performance.now() - tPaso;
+        rotulo(c, w / 2, 26, paso >= 1 ? "Un día cualquiera · un punto = una persona" : "2024 · accidentes del trabajo", GRIS, Math.min(1, t / 800), 15);
+        for (let n = 0; n < N; n++) { const x = ox + (n % C) * s, y = oy + Math.floor(n / C) * s;
+          k[n] = ir(k[n], t > 200 + n * 4 ? 1 : 0, .12); az[n] = ir(az[n], paso >= 1 && ahora > n * 3 ? 1 : 0, .1); const g = graves.includes(n); rj[n] = ir(rj[n], paso >= 2 && g ? 1 : 0, .1);
+          const rgb = rj[n] > .5 ? ROJO : az[n] > .5 ? AZUL : CARBON, a = (paso >= 2 ? (g ? 1 : .18) : az[n] > .5 ? .9 : .45) * k[n];
+          punto(c, x, y, (6.4 + (g ? 6 * rj[n] : 0)) * (.5 + .5 * k[n]), rgb, a); if (rj[n] > .5) aro(c, x, y, 18 + 4 * Math.sin(t / 260), ROJO, .35 * rj[n], 2); } }; })(),
+    // 06 · iceberg ordenado: arriba lo que se ve (esfera chica); bajo la línea, lo que no se ve (esfera grande)
+    iceberg2: (() => { let u = 0; return (c, t, w, h) => { c.clearRect(0, 0, w, h); u = ir(u, paso >= 1 ? 1 : 0, .04); const g = t / 1600, yw = 520;
+      c.strokeStyle = `rgba(${CARBON},.4)`; c.lineWidth = 1.6; c.beginPath(); for (let x = 0; x <= w; x += 8) { const y = yw + Math.sin(x / 90 + t / 900) * 4; x ? c.lineTo(x, y) : c.moveTo(x, y); } c.stroke();
+      esfera(c, 400, 370, 92, P160, g, CARBON, 1, 2.4);
+      esfera(c, 400, 790, 230 * (.3 + .7 * u), P900, -g * .7, AZUL, u, 2.4); }; })(),
+    // 09 · 11 · 13 · el embudo: partículas que bajan por el embudo; la franja del pilar activo brilla. Cuenta los porcentajes.
+    embudo: (() => { const r = azar(31), P = [...Array(260)].map(() => ({ x: r(), y: r(), v: .4 + r() * .8, z: r() })); let on = [0, 0, 0], cuenta = 0;
+      return (c, t, w, h, cv) => { c.clearRect(0, 0, w, h); const lam = cv.closest(".lam"), n = +lam.dataset.pilar, act = n === 0 ? (paso >= 1 ? 1 : 0) : n, cx = 420 + 410, bandas = [[0, 190], [204, 394], [408, 598]];
+        const ancho = (y) => 820 - (y / 598) * 540;   // ancho del embudo a la altura y (820 arriba, 280 abajo)
+        const COL = [NAR, AZUL, AZUL];   // franja 0 = Lúmina (arriba), 1 = tráfico, 2 = gestión visual (abajo)
+        const activo = (b) => act === 0 || (act === 1 && b === 2) || (act === 2 && b === 1) || (act === 3 && b === 0);
+        for (let b = 0; b < 3; b++) on[b] = ir(on[b], activo(b) ? 1 : 0, .06);
+        for (const p of P) { p.y += p.v * .0016 * (1 + p.z); if (p.y > 1) { p.y = 0; p.x = r(); } const y = p.y * 598, b = y < 197 ? 0 : y < 401 ? 1 : 2, W = ancho(y) - 30, x = cx + (p.x - .5) * W;
+          const a = (.12 + .55 * on[b]) * (.4 + .6 * p.z), rr = (1.6 + 2.6 * p.z) * (.7 + .5 * on[b]); punto(c, x, y, rr, COL[b], a); }
+        for (let b = 0; b < 3; b++) { if (on[b] < .02) continue; const [y0, y1] = bandas[b], wt = ancho(y0), wb = ancho(y1); c.strokeStyle = `rgba(${COL[b]},${.5 * on[b]})`; c.lineWidth = 3; c.beginPath(); c.moveTo(cx - wt / 2, y0); c.lineTo(cx + wt / 2, y0); c.lineTo(cx + wb / 2, y1); c.lineTo(cx - wb / 2, y1); c.closePath(); c.stroke(); }
+        // los porcentajes cuentan hasta su valor la primera vez
+        cuenta = Math.min(1, cuenta + .012); const e = 1 - Math.pow(1 - cuenta, 3); lam.querySelectorAll(".emb__pct").forEach((el) => { const v = +el.dataset.v; el.firstChild.nodeValue = String(Math.round(v * e)); });
+      }; })(),
+    // 17 · analítica (ilustrativa): dónde · a qué hora · con qué frecuencia · qué decidir
+    a1: (() => { const r = azar(5), F = [[150, 110], [380, 180], [300, 80]], pts = [...Array(90)].map(() => { const f = F[Math.floor(r() * 3)]; return [f[0] + (r() - .5) * 70, f[1] + (r() - .5) * 50, r()]; });
+      return (c, t, w, h) => { c.clearRect(0, 0, w, h); for (let x = 60; x < w - 40; x += 60) for (let y = 30; y < h - 30; y += 12) punto(c, x, y, 1.4, CARBON, .2);
+        pts.forEach(([x, y, k], i) => { const a = Math.min(1, Math.max(0, (t - i * 18) / 400)); punto(c, x, y, 4 + 1.4 * Math.sin(t / 400 + k * 6), NAR, a * (.45 + .45 * k)); }); }; })(),
+    a2: (c, t, w, h) => { c.clearRect(0, 0, w, h); const H = [1, 1, 1, 0, 0, 1, 2, 6, 8, 5, 3, 2, 2, 2, 3, 6, 7, 5, 3, 2, 1, 1, 1, 1], s = (w - 80) / 23;
+      H.forEach((v, i) => { for (let k = 0; k < v; k++) { const a = Math.min(1, Math.max(0, (t - i * 40 - k * 60) / 300)); punto(c, 40 + i * s, h - 50 - k * 22, 6.5, v >= 5 ? NAR : CARBON, a * (v >= 5 ? 1 : .35)); } });
+      ["00", "06", "12", "18"].forEach((l, i) => rotulo(c, 40 + i * 6 * s, h - 16, l, GRIS, .8, 14)); },
+    a3: (c, t, w, h) => { c.clearRect(0, 0, w, h); const D = "LMMJVSD", S = [[1, 0, 1, 0, 1, 0, 0], [1, 0, 0, 1, 1, 0, 0], [0, 0, 1, 0, 1, 0, 0], [0, 0, 0, 0, 1, 0, 0]], sx = (w - 120) / 6;
+      [...D].forEach((d, i) => rotulo(c, 60 + i * sx, 24, d, GRIS, .8, 14));
+      S.forEach((fila, k) => { rotulo(c, 20, 66 + k * 56, `S${k + 1}`, GRIS, .6, 12, "left"); fila.forEach((v, i) => { const x = 60 + i * sx, y = 62 + k * 56, a = Math.min(1, Math.max(0, (t - (k * 7 + i) * 50) / 300)); v ? punto(c, x, y, 13, NAR, a) : aro(c, x, y, 12, CARBON, .25 * a, 1.5); }); }); },
+    a4: (c, t, w, h) => { c.clearRect(0, 0, w, h); const u = (t / 1000) % 7, cx = 290, cy = 150, puesto = Math.min(1, Math.max(0, (u - 2.2) / .8)), baja = Math.min(1, Math.max(0, (u - 3.4) / 1.6));
+      for (let x = 60; x < w - 40; x += 60) for (let y = 30; y < h - 30; y += 12) punto(c, x, y, 1.4, CARBON, .2);
+      const r = azar(9); for (let i = 0; i < 40; i++) { const x = cx + (r() - .5) * 120, y = cy + (r() - .5) * 80, a = Math.min(1, u / 1.4) * (1 - .85 * baja * (i % 5 ? 1 : .4)); punto(c, x, y, 4.2, NAR, a * .8); }
+      if (puesto > 0) { c.save(); c.globalAlpha = puesto; c.fillStyle = `rgba(${AZUL},.9)`; for (let k = 0; k < 6; k++) c.fillRect(cx - 70 + k * 25, cy - 30, 12, 60); c.restore();
+        rotulo(c, cx, cy + 62, "Nuevo cruce", AZUL, puesto, 15); } },
     // 08 · jerarquía de controles: cinco bandas de puntos, de la más efectiva (arriba) a la menos; la ingeniería, encendida
     jerarquia: (() => { const N = ["Eliminación", "Sustitución", "Controles de ingeniería", "Controles administrativos", "EPP"];
       return (c, t, w, h) => { c.clearRect(0, 0, w, h); const ahora = performance.now() - tPaso, cx = w / 2 + 40, H = 92, G = 16, y0 = 70;
@@ -346,39 +388,47 @@
       if (tipo === "chaleco") { c.beginPath(); c.moveTo(m - 9, y + 9); c.lineTo(m - 3, y + 7); c.lineTo(m, y + 13); c.lineTo(m + 3, y + 7); c.lineTo(m + 9, y + 9); c.lineTo(m + 9, y + 27); c.lineTo(m - 9, y + 27); c.closePath(); c.fill(); c.fillStyle = "rgba(18,20,24,.86)"; c.fillRect(m - 9, y + 18, 18, 2.5); }
       else { c.beginPath(); c.arc(m, y + 22, 10, Math.PI, 0); c.fill(); c.fillRect(m - 13, y + 21, 26, 3.5); }
       if (!ok) { c.strokeStyle = "#fff"; c.lineWidth = 2.4; c.beginPath(); c.moveTo(x + S - 11, y + 5); c.lineTo(x + S - 4, y + 12); c.moveTo(x + S - 4, y + 5); c.lineTo(x + S - 11, y + 12); c.stroke(); } }
-    let eventos = [], estados = new Map(), vistos = new Set(), ultT = 0, total = 0;
+    let eventos = [], estados = new Map(), vistos = new Set(), zest = new Map(), ultT = 0, total = 0;
     const evento = (txt, col) => { eventos.unshift({ txt, col, t: performance.now() }); eventos = eventos.slice(0, 4); total++; };
     function cuadro() {
       requestAnimationFrame(cuadro);
       if (!lam.classList.contains("activa") || !D) return;
       c.clearRect(0, 0, 1920, 1080);
-      const t = v.currentTime || 0; if (t < ultT - .5) { eventos = []; estados.clear(); vistos.clear(); total = 0; } ultT = t; const f = t * D.fps, ahora = performance.now();
+      const t = v.currentTime || 0; if (t < ultT - .5) { eventos = []; estados.clear(); vistos.clear(); zest.clear(); total = 0; } ultT = t; const f = t * D.fps, ahora = performance.now();
       const s = Math.max(1920 / D.ancho, 1080 / D.alto), ox = (1920 - D.ancho * s) / 2, oy = (1080 - D.alto * s) / 2, X = (n) => ox + n * D.ancho * s, Y = (n) => oy + n * D.alto * s;
-      // zonas en el piso
-      const ZC = { gruas: NAR, acopio: ROJ, peatonal: VER };
-      for (const z of D.zonas) { const col = ZC[z.id]; c.beginPath(); z.p.forEach(([a, b], i) => (i ? c.lineTo(X(a), Y(b)) : c.moveTo(X(a), Y(b)))); c.closePath();
-        c.fillStyle = `rgba(${col},.15)`; c.fill(); c.setLineDash([14, 9]); c.lineDashOffset = -t * 20; c.strokeStyle = `rgba(${col},.9)`; c.lineWidth = 3.5; c.stroke(); c.setLineDash([]);
-        const cx = z.p.reduce((m, q) => m + q[0], 0) / z.p.length, cy = z.p.reduce((m, q) => m + q[1], 0) / z.p.length; c.font = '600 16px Poppins, Arial'; pill(X(cx) - c.measureText(z.nombre).width / 2 - 18, Y(cy) + 14, z.nombre, col, 16); }
+      // grúas y personas de este instante
+      const gr = [], ps = []; D.gruas.forEach((tr, i) => { const b = en(tr, f); if (b) gr.push([b, i]); }); D.personas.forEach((tr, i) => { const b = en(tr, f); if (b) ps.push([b, tr, i]); });
+      const pie = (b) => [(b[0] + b[2]) / 2, b[3]];
+      // dos zonas de trabajo, una a cada lado del pasillo peatonal: con una persona adentro, la zona se cierra a las grúas (roja);
+      // vacía, verde; con una grúa operando, naranja; grúa y persona a la vez, alarma
+      const TXT = { libre: "libre", grua: "grúa operando", persona: "persona adentro · cerrada a grúas", alarma: "ALARMA · grúa con persona" };
+      for (const z of D.zonas) {
+        const pz = ps.some(([b]) => dentro(...pie(b), z.p)), gz = gr.some(([b]) => dentro(...pie(b), z.p)), est = pz && gz ? "alarma" : pz ? "persona" : gz ? "grua" : "libre";
+        const prev = zest.get(z.id); if (prev !== est) { zest.set(z.id, est); if (prev !== undefined) { if (est === "alarma") evento(`Alarma · grúa en ${z.nombre} con persona`, ROJ); else if (est === "persona") evento(`${z.nombre} · cerrada a grúas`, ROJ); else if (est === "libre") evento(`${z.nombre} · libre`, VER); } }
+        const col = est === "libre" ? VER : est === "grua" ? NAR : ROJ, k = est === "alarma" ? (Math.sin(ahora / 110) > 0 ? 1 : .35) : 1;
+        c.beginPath(); z.p.forEach(([a, b], i) => (i ? c.lineTo(X(a), Y(b)) : c.moveTo(X(a), Y(b)))); c.closePath();
+        c.fillStyle = `rgba(${col},${(est === "libre" ? .13 : .26) * k})`; c.fill(); c.setLineDash([16, 10]); c.lineDashOffset = -t * 22; c.strokeStyle = `rgba(${col},.95)`; c.lineWidth = 4; c.stroke(); c.setLineDash([]);
+        const cx = z.p.reduce((m, q) => m + q[0], 0) / z.p.length, cy = z.p.reduce((m, q) => m + q[1], 0) / z.p.length, txt = `${z.nombre} · ${TXT[est]}`; c.font = "600 18px Poppins, Arial";
+        pill(X(cx) - c.measureText(txt).width / 2 - 20, Y(cy) + 18, txt, est === "libre" ? VER : est === "grua" ? NAR : BLA, 18, est === "libre" || est === "grua" ? undefined : `rgba(${ROJ},.94)`); }
       // camiones en el andén y grúas en movimiento (con su rastro)
       for (const tr of D.camiones) { const b = en(tr, f); if (!b) continue; esquinas(X(b[0]), Y(b[1]), X(b[2]), Y(b[3]), BLA, .6, 2); }
-      const gr = [];
-      D.gruas.forEach((tr, i) => { const b = en(tr, f); if (!b) return; gr.push(b); const x0 = X(b[0]), y0 = Y(b[1]), x1 = X(b[2]), y1 = Y(b[3]);
+      gr.forEach(([b, i]) => { const tr = D.gruas[i], x0 = X(b[0]), y0 = Y(b[1]), x1 = X(b[2]), y1 = Y(b[3]);
         for (let k = 1; k <= 14; k++) { const q = en(tr, f - k * .5); if (!q) break; c.fillStyle = `rgba(${NAR},${.55 * (1 - k / 15)})`; c.beginPath(); c.arc(X((q[0] + q[2]) / 2), Y(q[3]), 3.5, 0, 7); c.fill(); }
         esquinas(x0, y0, x1, y1, NAR, 1, 3.5); pill(x0, y0 - 8, `Grúa horquilla · G-${String(i + 1).padStart(2, "0")}`, NAR, 16); });
-      // personas: rostro pixelado, atributos, zona y riesgo con las grúas cercanas
+      // personas: rostro pixelado, atributos y riesgo con las grúas cercanas
       let nP = 0, nV = 0;
-      D.personas.forEach((tr, i) => { const b = en(tr, f); if (!b) return; nP++; if (tr.chaleco) nV++;
-        const id = `P-${String(i + 1).padStart(2, "0")}`, pie = [(b[0] + b[2]) / 2, b[3]]; const zona = D.zonas.find((z) => dentro(pie[0], pie[1], z.p));
-        let riesgo = null; if (zona && zona.id === "gruas") for (const g of gr) { const dx = Math.max(g[0] - pie[0], 0, pie[0] - g[2]) * D.ancho, dy = Math.max(g[1] - pie[1], 0, pie[1] - g[3]) * D.alto; if (Math.hypot(dx, dy) < 120) riesgo = g; }
-        const est = riesgo ? "riesgo" : zona && zona.id === "gruas" ? "gruas" : zona && zona.id === "acopio" ? "acopio" : "ok";
+      ps.forEach(([b, tr, i]) => { nP++; if (tr.chaleco) nV++;
+        const id = `P-${String(i + 1).padStart(2, "0")}`, pp = pie(b), zona = D.zonas.find((z) => dentro(...pp, z.p));
+        let riesgo = null; if (tr.cerca) for (const [g] of gr) { const dx = Math.max(g[0] - pp[0], 0, pp[0] - g[2]) * D.ancho, dy = Math.max(g[1] - pp[1], 0, pp[1] - g[3]) * D.alto; if (Math.hypot(dx, dy) < 110) riesgo = g; }
+        const est = riesgo ? "riesgo" : zona ? "zona" : "ok";
         if (!vistos.has(i)) { vistos.add(i); if (tr.cerca && !tr.chaleco) evento(`Sin chaleco · ${id}`, ROJ); }
-        if (estados.get(i) !== est) { estados.set(i, est); if (est === "riesgo") evento(`Riesgo de atropello · ${id}`, ROJ); else if (est === "gruas" && tr.cerca) evento(`Persona en zona de grúas · ${id}`, AMA); else if (est === "acopio") evento(`Ingreso a zona restringida · ${id}`, AMA); }
-        const col = est === "riesgo" ? ROJ : est === "ok" ? BLA : AMA, x0 = X(b[0]), y0 = Y(b[1]), x1 = X(b[2]), y1 = Y(b[3]);
+        if (estados.get(i) !== est) { estados.set(i, est); if (est === "riesgo") evento(`Riesgo de atropello · ${id}`, ROJ); }
+        const col = est === "riesgo" ? ROJ : est === "zona" ? AMA : BLA, x0 = X(b[0]), y0 = Y(b[1]), x1 = X(b[2]), y1 = Y(b[3]);
         if (tr.cerca) { // rostro pixelado: la persona no es el foco
           const hx = b[0] * D.ancho + (b[2] - b[0]) * D.ancho * .22, hw = (b[2] - b[0]) * D.ancho * .56, hy = b[1] * D.alto, hh = (b[3] - b[1]) * D.alto * .17;
           try { pc.drawImage(v, hx, hy, hw, hh, 0, 0, 5, 5); c.imageSmoothingEnabled = false; c.drawImage(px, 0, 0, 5, 5, X(hx / D.ancho), Y(hy / D.alto), hw * s, hh * s); c.imageSmoothingEnabled = true; } catch (e) {} }
         esquinas(x0, y0, x1, y1, col, est === "ok" ? .85 : 1, tr.cerca ? 3 : 2);
-        if (riesgo) { c.setLineDash([9, 7]); c.strokeStyle = `rgba(${ROJ},.95)`; c.lineWidth = 3; c.beginPath(); c.moveTo(X(pie[0]), Y(pie[1])); c.lineTo(X((riesgo[0] + riesgo[2]) / 2), Y(riesgo[3])); c.stroke(); c.setLineDash([]); }
+        if (riesgo) { c.setLineDash([9, 7]); c.strokeStyle = `rgba(${ROJ},.95)`; c.lineWidth = 3; c.beginPath(); c.moveTo(X(pp[0]), Y(pp[1])); c.lineTo(X((riesgo[0] + riesgo[2]) / 2), Y(riesgo[3])); c.stroke(); c.setLineDash([]); }
         if (!tr.cerca) return;
         pill(x0, y0 - 8, est === "riesgo" ? `Riesgo de atropello · ${id}` : `Persona · ${id}`, col === BLA ? VER : col, 15, est === "riesgo" ? `rgba(${ROJ},.92)` : undefined);
         cubo(x1 + 8, y0, "chaleco", tr.chaleco); cubo(x1 + 8, y0 + 40, "casco", tr.casco); });
