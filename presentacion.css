@@ -667,7 +667,7 @@ img, canvas { display: block; }
 .lam--hist[data-escena="despues"]:not(.p1)::before { opacity: 0; }
 .p2 .apilado > .sale2 { opacity: 0 !important; filter: blur(10px) !important; }
 
-/* ═════════ TILSE 2026 (17-nov): estructura de 23 láminas ═════════ */
+/* ═════════ FILCE 2026 (17-nov): estructura de 23 láminas ═════════ */
 .sello--nt span { font-size: 22px; font-weight: 600; letter-spacing: .2em; color: var(--carbon); }
 .portada .t { font-size: 104px; }
 .portada__sub { margin-top: 18px !important; font-size: 62px !important; line-height: 1.12 !important; letter-spacing: -.035em !important; color: var(--carbon) !important; }

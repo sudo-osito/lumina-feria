@@ -468,7 +468,7 @@ export function construir(k, md, m2, eq) {
   for (let i = 0; i < 6; i++) { const pista = [-15.7, -7.3][i % 2], sur = pista < -11.5, t = eq.camion(vivo, [0x2F6FB0, 0xC9603A, 0xE9EDF2][i % 3]); t.g.rotation.y = sur ? -Math.PI / 2 : Math.PI / 2; t.g.position.x = pista; W.transito.push({ g: t.g, z: -900 + R() * 1800, v: (sur ? 1 : -1) * (15 + R() * 4) }); }
   for (let i = 0; i < 3; i++) { const g = eq.auto(vivo, 16.6 + (i % 2) * 4, 0, i % 2 ? Math.PI / 2 : -Math.PI / 2, COL[i + 4]); W.transito.push({ g, z: -300 + i * 220, v: (i % 2 ? -1 : 1) * 8 }); }
 
-  /* ───────── el rebobinado (TILSE 22): la misma planta con Neisstech. Todo parte oculto. ───────── */
+  /* ───────── el rebobinado (FILCE 22): la misma planta con Neisstech. Todo parte oculto. ───────── */
   W.mejora = {};
   { // gestión visual: pintura nueva sobre el piso gastado (franja de los racks y los andenes)
     const t = lienzo(55, 0, 36, 25, 2048, (c) => {

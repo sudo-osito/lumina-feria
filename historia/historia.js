@@ -284,7 +284,7 @@ export async function crear(cont) {
     tick(t) { E.despues[1].tick(t); const u = tr(t, 1.3, 3.9); if (u >= 1) W.tablero.pintar(0, true); else W.tablero.pintar(Math.round(1000 * (1 - suave(u)))); W.tablero.mat.emissiveIntensity = .22 + (u >= 1 ? .5 * Math.exp(-(t - 3.9) * 1.2) : 0); },
   }];
 
-  /* ───────── TILSE 22 · volvamos a la historia: se rebobina y la misma mañana ocurre con Neisstech ─────────
+  /* ───────── FILCE 22 · volvamos a la historia: se rebobina y la misma mañana ocurre con Neisstech ─────────
      0 rebobinar · 1 gestión visual · 2 gestión de tráfico · 3 Lúmina · 4 al día siguiente (1.001 días) */
   const Mj = W.mejora, R_S2 = ruta([[61.6, 9.45], [69.55, 9.45]]);
   function puertas(cerradas) { Mj.pk += ((cerradas ? 0 : 1) - Mj.pk) * .09; Mj.puertas.forEach((q) => { q.abrir(suave(Mj.pk)); q.rojo.emissiveIntensity = cerradas ? 2.6 : .05; q.verde.emissiveIntensity = cerradas ? .05 : 2.4; });

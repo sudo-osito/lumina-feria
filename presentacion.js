@@ -1,4 +1,4 @@
-/* Neisstech · TILSE 2026. Motor: escenario 1920×1080 escalado, láminas con pasos, clips de video por paso, dibujos en
+/* Neisstech · FILCE 2026. Motor: escenario 1920×1080 escalado, láminas con pasos, clips de video por paso, dibujos en
    canvas (data-vis), la planta 3D de Neisstech (escena/lumina5.js) y la historia de Don Salva (historia/historia.js).
    Las láminas con data-guion (02 y 22) recorren varias tomas de la historia, una por paso.
    Notas del presentador (N) y mapa (G), ocultos por defecto. */
