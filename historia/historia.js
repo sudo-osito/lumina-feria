@@ -413,6 +413,7 @@ export async function crear(cont) {
   /* «Cómo funciona el sistema» (lámina de Lúmina), en la misma planta con todo lo de Neisstech: ve · actúa · avisa · se corrige */
   function sisIni() { est.fondo = 'fuera'; cargado(15.4); pintura(99); visualListo(); traficoListo(); Mj.pk = 1; W.rackDanadoG.visible = false; }
   function sisBase(t) { trabajar(t); pintura(99); visualListo(); traficoListo(); puertasResto(); proyecciones(t); luminaArriba(t, 0); }
+  const camSis = claves([[0, 71.6, 6.1, 4.2, 67.9, .1, 11.6, 54], [30, 71.6, 6.1, 4.2, 68.0, .1, 11.7, 52]]);   // la cámara del cruce, más abierta: lo de arriba no choca con el título
   const CAM_JEFE = [[0, 53.0, 1.72, 24.1, 56.3, 1.42, 26.1, 34], [9, 53.3, 1.7, 24.4, 56.3, 1.42, 26.1, 32]];
   const CAM_TERRENO = [[0, 65.0, 1.8, 4.4, 66.8, 1.15, 9.6, 42], [12, 65.6, 1.75, 4.8, 66.8, 1.15, 9.6, 39]];   // desde la calle norte, de frente al cruce
   E.sistema = [{   // 01 · ve: la cámara del cruce detecta a la persona y a la grúa que retrocede
@@ -449,8 +450,9 @@ export async function crear(cont) {
   function marco(c, [x0, y0, x1, y1], col, txt) { const L = Math.min(28, (x1 - x0) / 3, (y1 - y0) / 3); c.strokeStyle = col; c.lineWidth = 3;
     for (const [px, py, dx, dy] of [[x0, y0, 1, 1], [x1, y0, -1, 1], [x0, y1, 1, -1], [x1, y1, -1, -1]]) { c.beginPath(); c.moveTo(px, py + dy * L); c.lineTo(px, py); c.lineTo(px + dx * L, py); c.stroke(); }
     c.fillStyle = 'rgba(236,109,39,.07)'; c.fillRect(x0, y0, x1 - x0, y1 - y0);
-    c.font = '600 21px Poppins, Arial'; const w = c.measureText(txt).width + 44; c.fillStyle = 'rgba(24,24,24,.86)'; c.beginPath(); c.roundRect(x0, y0 - 46, w, 36, 18); c.fill();
-    c.fillStyle = col; c.beginPath(); c.arc(x0 + 18, y0 - 28, 6, 0, 7); c.fill(); c.fillStyle = '#fff'; c.textBaseline = 'middle'; c.fillText(txt, x0 + 32, y0 - 27); }
+    const ly = Math.max(y0 - 46, est.esc === 'sistema' ? 150 : -1e9);   // en «cómo funciona» la etiqueta nunca sube hasta el título
+    c.font = '600 21px Poppins, Arial'; const w = c.measureText(txt).width + 44; c.fillStyle = 'rgba(24,24,24,.86)'; c.beginPath(); c.roundRect(x0, ly, w, 36, 18); c.fill();
+    c.fillStyle = col; c.beginPath(); c.arc(x0 + 18, ly + 18, 6, 0, 7); c.fill(); c.fillStyle = '#fff'; c.textBaseline = 'middle'; c.fillText(txt, x0 + 32, ly + 19); }
   function etiqueta(c, x, y, z, txt, col = '#EC6D27') { V3.set(x, y, z).project(cam); if (V3.z > 1) return; const sx = (V3.x + 1) / 2 * 1920, sy = (1 - V3.y) / 2 * 1080;
     c.strokeStyle = col; c.lineWidth = 2; c.beginPath(); c.arc(sx, sy, 9, 0, 7); c.stroke(); c.fillStyle = col; c.beginPath(); c.arc(sx, sy, 3.5, 0, 7); c.fill();
     c.font = '600 18px Poppins, Arial'; const w = c.measureText(txt).width + 34; c.fillStyle = 'rgba(24,24,24,.82)'; c.beginPath(); c.roundRect(sx + 14, sy - 44, w, 30, 15); c.fill();
