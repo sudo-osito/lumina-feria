@@ -1342,3 +1342,9 @@ img, canvas { display: block; }
 .prv { grid-template-columns: 1fr 1000px; gap: 44px 64px; }
 .prv__ley { font-size: 36px; }
 .prv__ley2 { margin-top: 18px; } .prv__ley2 .ley__f { padding: 32px 36px; } .prv__ley2 .ley__f b { font-size: 36px; } .prv__ley2 .ley__f span { font-size: 24px; }
+/* iceberg: el nombre al centro de cada bola, bien alineado (sin transform, que la animación de entrada pisaba) */
+.ice__nom { left: 0; right: 0; transform: none !important; text-align: center; pointer-events: none; }
+.ice__nom::after { content: none; }
+.ice__nom--a, .ice__nom--b { display: block; width: max-content; margin: 0 auto; padding: 10px 26px; border-radius: 999px; background: rgba(245, 246, 248, .9); box-shadow: 0 14px 34px -18px rgba(24, 24, 24, .35); }
+.ice__nom--a { top: 322px; font-size: 32px; }
+.ice__nom--b { top: 772px; font-size: 40px; }
