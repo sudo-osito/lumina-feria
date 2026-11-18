@@ -1360,3 +1360,5 @@ img, canvas { display: block; }
 .lam--embudo.activa[data-pilar="3"] .emb__sol { opacity: 1; transform: none; }
 .lam--embudo[data-pilar="2"] .emb__sol--1, .lam--embudo[data-pilar="3"] .emb__sol--1, .lam--embudo[data-pilar="3"] .emb__sol--2 { color: rgba(24, 24, 24, .35); transition-delay: 0s; }
 .lam--embudo[data-pilar="0"].p1 .emb__sol--1, .lam--embudo[data-pilar="2"] .emb__sol--2, .lam--embudo[data-pilar="3"] .emb__sol--3 { transition-delay: .4s; }
+/* privacidad: los cuatro puntos de la ley, con el formato del marco normativo y el naranjo de Lúmina */
+.norma__bloques--lu b { color: var(--lumina); }
