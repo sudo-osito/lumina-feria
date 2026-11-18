@@ -28,7 +28,7 @@
   const pedirPlanta = import("./escena/lumina5.js?v=42").then((m) => m.crear($("#planta3d"))).then((p) => { planta = p; sincronizar3d(); return planta; }).catch((e) => console.error("planta 3D:", e));
   // La historia de Don Salva: otra escena 3D, con cámara de cine (historia/historia.js); una toma por paso
   let historia = null;
-  const pedirHistoria = import("./historia/historia.js?v=21").then((m) => m.crear($("#historia3d"))).then((h) => { historia = h; sincronizar3d(); return h; }).catch((e) => console.error("historia 3D:", e));
+  const pedirHistoria = import("./historia/historia.js?v=23").then((m) => m.crear($("#historia3d"))).then((h) => { historia = h; sincronizar3d(); return h; }).catch((e) => console.error("historia 3D:", e));
   function sincronizar3d() {
     const esc = lams[i].dataset.escena;
     escenario.classList.toggle("conhistoria", !!esc);
@@ -97,7 +97,7 @@
         const on = n === k;
         if (on && !v.classList.contains("ve")) { try { v.currentTime = 0; } catch (e) {} }
         v.classList.toggle("ve", on);
-        if (on) v.play().catch(() => {}); else if (!v.paused) v.pause();
+        if (on) { v.playbackRate = +v.dataset.velocidad || 1; v.play().catch(() => {}); } else if (!v.paused) v.pause();
       });
       const pie = $(".pie", l), txt = vs[k].dataset.pie || "";
       if (pie && pie.textContent !== txt) { if (pie.textContent) { pie.classList.add("cambia"); setTimeout(() => { pie.textContent = txt; pie.classList.remove("cambia"); }, 320); } else pie.textContent = txt; }
@@ -267,7 +267,7 @@
     // 04 · accidentabilidad 2024 (SUSESO): industria manufacturera y transporte en columnas de 8 puntos (un punto = 0,1 por cada 100 personas), la línea del promedio (2,5)
     //      y el número grande: 3 de cada 100. AVANZAR → la torta de puntos con la forma del accidente (143.199 accidentes del trabajo 2024).
     accid: (() => { const C = [["Industria manufacturera", 3.5], ["Transporte", 3.1, 1]], cl = (v) => Math.min(1, Math.max(0, v));
-      const F = [["Caídas de personas", .345, AZUL, 1], ["Golpes por o contra objetos", .072, AZUL, .72], ["Atrapamientos o amputaciones", .047, AZUL, .52], ["Accidentes con vehículos", .047, AZUL, .36], ["Otras formas", .489, CARBON, .14]];
+      const F = [["Caídas de personas", .345, AZUL, 1], ["Golpes por o contra objetos", .072, AZUL, .72], ["Atrapamientos", .047, AZUL, .52], ["Accidentes con vehículos", .047, AZUL, .36], ["Otras formas", .489, CARBON, .14]];
       const anillo = [[0, 0]]; for (let r = 16; r <= 250; r += 16) { const n = Math.round(2 * Math.PI * r / 16); for (let k = 0; k < n; k++) anillo.push([r, k / n]); }
       const fDest = F.slice(0, 4).reduce((m, x) => m + x[1], 0), bis = -Math.PI / 2 + fDest * Math.PI;   // la tajada destacada y su bisectriz
       let u = 0; return (c, t, w, h) => { c.clearRect(0, 0, w, h); u = ir(u, paso >= 1 ? 1 : 0, .07); const v = 1 - u, ahora = performance.now() - tPaso;
@@ -295,7 +295,11 @@
           c.save(); c.textAlign = "center"; c.fillStyle = `rgba(${CARBON},${u * .85})`; c.font = "600 30px Poppins"; c.fillText("143.199 accidentes del trabajo", cx, cy + 312); c.restore();
           const k = cl((ahora - 1200) / 600) * u; c.save(); c.textAlign = "left"; c.fillStyle = `rgba(${AZUL},${k})`; c.font = "600 150px Poppins"; c.fillText("1 de cada 2", 820, 210);
           c.fillStyle = `rgba(${CARBON},${k * .85})`; c.font = "400 30px Poppins"; c.fillText("accidentes fue una caída, un golpe,", 826, 268); c.fillText("un atrapamiento o un accidente con vehículos.", 826, 308);
-          F.forEach(([nom, p, rgb, a], i) => { const y = 390 + i * 46, kk = cl((ahora - 1600 - i * 150) / 400) * u; punto(c, 838, y - 8, 10, rgb, a * kk); c.font = `${i < 4 ? 500 : 400} 26px Poppins`; c.fillStyle = `rgba(${CARBON},${kk * (i < 4 ? .9 : .55)})`; c.fillText(nom, 866, y); c.textAlign = "right"; c.fillText(`${Math.round(p * 100)} %`, 1500, y); c.textAlign = "left"; });
+          // las formas, en burbujas (como las del iceberg), sin porcentajes
+          let bx = 826, by = 380; F.forEach(([nom, p, rgb, a], i) => { const kk = cl((ahora - 1600 - i * 150) / 400) * u; c.font = "500 26px Poppins"; const tw = c.measureText(nom).width, bw = tw + 70, bh = 56;
+            if (bx + bw > 1640) { bx = 826; by += 72; } c.save(); c.globalAlpha = kk; c.shadowColor = "rgba(5,108,242,.25)"; c.shadowBlur = 24; c.shadowOffsetY = 10; c.fillStyle = "#fff"; c.beginPath(); c.roundRect(bx, by, bw, bh, 28); c.fill(); c.restore();
+            c.save(); c.globalAlpha = kk; c.strokeStyle = `rgba(${i < 4 ? AZUL : CARBON},${i < 4 ? .25 : .12})`; c.lineWidth = 1.5; c.beginPath(); c.roundRect(bx, by, bw, bh, 28); c.stroke(); punto(c, bx + 30, by + bh / 2, 7, rgb, i < 4 ? Math.max(.45, a) : .3);
+            c.fillStyle = `rgba(${CARBON},${i < 4 ? .9 : .5})`; c.textBaseline = "middle"; c.fillText(nom, bx + 50, by + bh / 2 + 1); c.restore(); bx += bw + 14; });
           c.restore(); }
       }; })(),
     // 05 · un día cualquiera de 2024: cerca de 390 accidentes del trabajo (un punto = una persona); 4 de ellos, graves
@@ -388,79 +392,69 @@
   const [h0, h1] = location.hash.slice(1).split(".");   // #7 o #7.2 (lámina.paso)
   mostrar((parseInt(h0, 10) || 1) - 1, parseInt(h1, 10) || 0);
 
-  /* ── 18 · Lúmina sobre la grabación real: zonas, grúas, camiones y personas (casco, chaleco, zona) con alertas.
-        Las trayectorias salen de un detector offline (YOLO-World) sobre el mismo video, revisadas a mano
-        (recursos/clips/pucargo-lumina.json, 4 cuadros por segundo); aquí solo se dibujan sincronizadas con el video. ── */
+  /* ── 17 · Lúmina sobre la grabación real de Pucargo: dos zonas y lo que entra en ellas.
+        Detección cuadro a cuadro (YOLO-World + ByteTrack, los 25 cuadros por segundo del mismo video: recursos/clips/pucargo-det.json).
+        Se dibuja el cuadro EXACTO que está en pantalla (requestVideoFrameCallback), sin interpolar: la caja va pegada a la persona.
+        Las zonas cambian de estado solo si el cambio dura 10 cuadros (0,4 s): sin parpadeos ni avisos repetidos. ── */
   (() => {
     const lam = $(".lam--pucargo"), v = lam && $("video", lam), cv = lam && $(".lu-capa", lam); if (!cv) return;
     const c = cv.getContext("2d"), px = document.createElement("canvas"); px.width = px.height = 5; const pc = px.getContext("2d");
-    let D = null; fetch("recursos/clips/pucargo-lumina.json?v=4").then((r) => r.json()).then((j) => (D = j)).catch(() => {});
+    let D = null; fetch("recursos/clips/pucargo-det.json?v=1").then((r) => r.json()).then((j) => (D = j)).catch(() => {});
     const NAR = "236,109,39", ROJ = "255,77,79", VER = "61,208,122", AMA = "245,180,0", BLA = "255,255,255";
     const dentro = (x, y, p) => { let d = false; for (let i = 0, j = p.length - 1; i < p.length; j = i++) { const [xi, yi] = p[i], [xj, yj] = p[j]; if ((yi > y) !== (yj > y) && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) d = !d; } return d; };
-    const en = (tr, f) => { const k = f - tr.t0; if (k < 0 || k > tr.b.length - 1) return null; const i = Math.floor(k), u = k - i, a = tr.b[i], b = tr.b[Math.min(i + 1, tr.b.length - 1)]; return a.map((x, j) => x + (b[j] - x) * u); };
     const rr = (x, y, w, h, r) => { c.beginPath(); c.roundRect(x, y, w, h, r); };
-    function esquinas(x0, y0, x1, y1, col, a = 1, lw = 3) { const L = Math.max(8, Math.min(26, (x1 - x0) / 3, (y1 - y0) / 3)); c.strokeStyle = `rgba(${col},${a})`; c.lineWidth = lw;
+    function esquinas(x0, y0, x1, y1, col, a = 1, lw = 3) { const L = Math.max(8, Math.min(24, (x1 - x0) / 3, (y1 - y0) / 3)); c.strokeStyle = `rgba(${col},${a})`; c.lineWidth = lw;
       for (const [x, y, dx, dy] of [[x0, y0, 1, 1], [x1, y0, -1, 1], [x0, y1, 1, -1], [x1, y1, -1, -1]]) { c.beginPath(); c.moveTo(x, y + dy * L); c.lineTo(x, y); c.lineTo(x + dx * L, y); c.stroke(); }
-      c.fillStyle = `rgba(${col},${.07 * a})`; c.fillRect(x0, y0, x1 - x0, y1 - y0); }
-    function pill(x, y, txt, col, tam = 17, fondo = "rgba(18,20,24,.84)") { c.font = `600 ${tam}px Poppins, Arial`; const w = c.measureText(txt).width + tam * 2.2, h = tam * 1.75;
+      c.fillStyle = `rgba(${col},${.08 * a})`; c.fillRect(x0, y0, x1 - x0, y1 - y0); }
+    function pill(x, y, txt, col, tam = 17, fondo = "rgba(18,20,24,.86)") { c.font = `600 ${tam}px Poppins, Arial`; const w = c.measureText(txt).width + tam * 2.2, h = tam * 1.75;
       c.fillStyle = fondo; rr(x, y - h, w, h, h / 2); c.fill(); c.fillStyle = `rgb(${col})`; c.beginPath(); c.arc(x + tam * .8, y - h / 2, tam * .28, 0, 7); c.fill();
       c.fillStyle = "#fff"; c.textBaseline = "middle"; c.fillText(txt, x + tam * 1.4, y - h / 2 + 1); return w; }
-    // cubitos de atributos: chaleco, casco y zona (verde = cumple, rojo = falta)
-    function cubo(x, y, tipo, ok) { const S = 34, col = ok ? VER : ROJ; c.fillStyle = "rgba(18,20,24,.86)"; rr(x, y, S, S, 9); c.fill(); c.strokeStyle = `rgba(${col},.95)`; c.lineWidth = 2; rr(x + 1, y + 1, S - 2, S - 2, 8); c.stroke();
-      c.fillStyle = `rgb(${col})`; c.strokeStyle = `rgb(${col})`; c.lineWidth = 2.2; const m = x + S / 2;
-      if (tipo === "chaleco") { c.beginPath(); c.moveTo(m - 9, y + 9); c.lineTo(m - 3, y + 7); c.lineTo(m, y + 13); c.lineTo(m + 3, y + 7); c.lineTo(m + 9, y + 9); c.lineTo(m + 9, y + 27); c.lineTo(m - 9, y + 27); c.closePath(); c.fill(); c.fillStyle = "rgba(18,20,24,.86)"; c.fillRect(m - 9, y + 18, 18, 2.5); }
-      else { c.beginPath(); c.arc(m, y + 22, 10, Math.PI, 0); c.fill(); c.fillRect(m - 13, y + 21, 26, 3.5); }
-      if (!ok) { c.strokeStyle = "#fff"; c.lineWidth = 2.4; c.beginPath(); c.moveTo(x + S - 11, y + 5); c.lineTo(x + S - 4, y + 12); c.moveTo(x + S - 4, y + 5); c.lineTo(x + S - 11, y + 12); c.stroke(); } }
-    let eventos = [], estados = new Map(), vistos = new Set(), zest = new Map(), ultT = 0, total = 0;
-    const evento = (txt, col) => { eventos.unshift({ txt, col, t: performance.now() }); eventos = eventos.slice(0, 4); total++; };
+    // el cuadro que de verdad se está mostrando
+    let mt = 0; if (v && v.requestVideoFrameCallback) { const cada = (n, m) => { mt = m.mediaTime; v.requestVideoFrameCallback(cada); }; v.requestVideoFrameCallback(cada); }
+    let eventos = [], zest = new Map(), ultF = -1;
+    const evento = (txt, col) => { eventos.unshift({ txt, col, t: performance.now() }); eventos = eventos.slice(0, 3); };
+    const TXT = { libre: "libre", grua: "grúa operando", persona: "persona adentro · cerrada a grúas", alarma: "ALARMA · grúa con persona" };
     function cuadro() {
       requestAnimationFrame(cuadro);
       if (!lam.classList.contains("activa") || !D) return;
       c.clearRect(0, 0, 1920, 1080);
-      const t = v.currentTime || 0; if (t < ultT - .5) { eventos = []; estados.clear(); vistos.clear(); zest.clear(); total = 0; } ultT = t; const f = t * D.fps, ahora = performance.now();
+      const t = v.requestVideoFrameCallback ? mt : v.currentTime || 0, f = Math.max(0, Math.min(D.cuadros.length - 1, Math.round(t * D.fps))), ahora = performance.now();
+      if (f < ultF - 12) { eventos = []; zest.clear(); }
       const s = Math.max(1920 / D.ancho, 1080 / D.alto), ox = (1920 - D.ancho * s) / 2, oy = (1080 - D.alto * s) / 2, X = (n) => ox + n * D.ancho * s, Y = (n) => oy + n * D.alto * s;
-      // grúas y personas de este instante
-      const gr = [], ps = []; D.gruas.forEach((tr, i) => { const b = en(tr, f); if (b) gr.push([b, i]); }); D.personas.forEach((tr, i) => { const b = en(tr, f); if (b) ps.push([b, tr, i]); });
-      const pie = (b) => [(b[0] + b[2]) / 2, b[3]];
-      // dos zonas de trabajo, una a cada lado del pasillo peatonal: con una persona adentro, la zona se cierra a las grúas (roja);
-      // vacía, verde; con una grúa operando, naranja; grúa y persona a la vez, alarma
-      const TXT = { libre: "libre", grua: "grúa operando", persona: "persona adentro · cerrada a grúas", alarma: "ALARMA · grúa con persona" };
+      const objs = D.cuadros[f] || [], pie = (o) => [(o[2] + o[4]) / 2, o[5]];
+      const zonaDe = (o) => D.zonas.find((z) => dentro(...pie(o), z.p));
+      // zonas, con histéresis por cuadro de video
       for (const z of D.zonas) {
-        const pz = ps.some(([b]) => dentro(...pie(b), z.p)), gz = gr.some(([b]) => dentro(...pie(b), z.p)), est = pz && gz ? "alarma" : pz ? "persona" : gz ? "grua" : "libre";
-        const prev = zest.get(z.id); if (prev !== est) { zest.set(z.id, est); if (prev !== undefined) { if (est === "alarma") evento(`Alarma · grúa en ${z.nombre} con persona`, ROJ); else if (est === "persona") evento(`${z.nombre} · cerrada a grúas`, ROJ); else if (est === "libre") evento(`${z.nombre} · libre`, VER); } }
-        const col = est === "libre" ? VER : est === "grua" ? NAR : ROJ, k = est === "alarma" ? (Math.sin(ahora / 110) > 0 ? 1 : .35) : 1;
+        const pz = objs.some((o) => o[1] === 0 && zonaDe(o) === z), gz = objs.some((o) => o[1] === 1 && zonaDe(o) === z), bruto = pz && gz ? "alarma" : pz ? "persona" : gz ? "grua" : "libre";
+        let e = zest.get(z.id); if (!e) { e = { est: bruto, cand: bruto, n: 0 }; zest.set(z.id, e); }
+        if (f !== ultF) { if (bruto === e.est) e.n = 0; else { if (bruto === e.cand) e.n++; else { e.cand = bruto; e.n = 1; } if (e.n >= 10) { e.est = bruto; e.n = 0;
+          if (bruto === "alarma") evento(`Alarma · grúa en ${z.nombre} con persona`, ROJ); else if (bruto === "persona") evento(`${z.nombre} · cerrada a grúas`, ROJ); else if (bruto === "libre") evento(`${z.nombre} · libre`, VER); else evento(`${z.nombre} · grúa operando`, NAR); } } }
+        const est = e.est, col = est === "libre" ? VER : est === "grua" ? NAR : ROJ, k = est === "alarma" ? (Math.sin(ahora / 110) > 0 ? 1 : .35) : 1;
         c.beginPath(); z.p.forEach(([a, b], i) => (i ? c.lineTo(X(a), Y(b)) : c.moveTo(X(a), Y(b)))); c.closePath();
-        c.fillStyle = `rgba(${col},${(est === "libre" ? .13 : .26) * k})`; c.fill(); c.setLineDash([16, 10]); c.lineDashOffset = -t * 22; c.strokeStyle = `rgba(${col},.95)`; c.lineWidth = 4; c.stroke(); c.setLineDash([]);
+        c.fillStyle = `rgba(${col},${(est === "libre" ? .12 : .24) * k})`; c.fill(); c.setLineDash([16, 10]); c.lineDashOffset = -t * 22; c.strokeStyle = `rgba(${col},.95)`; c.lineWidth = 4; c.stroke(); c.setLineDash([]);
         const cx = z.p.reduce((m, q) => m + q[0], 0) / z.p.length, cy = z.p.reduce((m, q) => m + q[1], 0) / z.p.length, txt = `${z.nombre} · ${TXT[est]}`; c.font = "600 18px Poppins, Arial";
-        pill(X(cx) - c.measureText(txt).width / 2 - 20, Y(cy) + 18, txt, est === "libre" ? VER : est === "grua" ? NAR : BLA, 18, est === "libre" || est === "grua" ? undefined : `rgba(${ROJ},.94)`); }
-      // camiones en el andén y grúas en movimiento (con su rastro)
-      // solo lo que importa: lo que entra a las zonas (Bastián: «enfocarse solo en lo bueno»; lo de afuera no se sigue bien)
-      gr.forEach(([b, i]) => { const z = D.zonas.find((q) => dentro(...pie(b), q.p)); if (!z) return; const x0 = X(b[0]), y0 = Y(b[1]), x1 = X(b[2]), y1 = Y(b[3]);
-        esquinas(x0, y0, x1, y1, NAR, 1, 3.5); pill(x0, y0 - 8, `Grúa en ${z.nombre}`, NAR, 16); });
-      // personas: rostro pixelado, atributos y riesgo con las grúas cercanas
-      ps.forEach(([b, tr, i]) => {
-        const id = `P-${String(i + 1).padStart(2, "0")}`, pp = pie(b), zona = D.zonas.find((z) => dentro(...pp, z.p)); if (!zona) return;
-        let riesgo = null; if (tr.cerca) for (const [g] of gr) { const dx = Math.max(g[0] - pp[0], 0, pp[0] - g[2]) * D.ancho, dy = Math.max(g[1] - pp[1], 0, pp[1] - g[3]) * D.alto; if (Math.hypot(dx, dy) < 110) riesgo = g; }
-        const est = riesgo ? "riesgo" : zona ? "zona" : "ok";
-        if (estados.get(i) !== est) { estados.set(i, est); if (est === "riesgo") evento(`Riesgo de atropello · ${id}`, ROJ); }
-        const col = est === "riesgo" ? ROJ : est === "zona" ? AMA : BLA, x0 = X(b[0]), y0 = Y(b[1]), x1 = X(b[2]), y1 = Y(b[3]);
-        if (tr.cerca) { // rostro pixelado: la persona no es el foco
-          const hx = b[0] * D.ancho + (b[2] - b[0]) * D.ancho * .22, hw = (b[2] - b[0]) * D.ancho * .56, hy = b[1] * D.alto, hh = (b[3] - b[1]) * D.alto * .17;
-          try { pc.drawImage(v, hx, hy, hw, hh, 0, 0, 5, 5); c.imageSmoothingEnabled = false; c.drawImage(px, 0, 0, 5, 5, X(hx / D.ancho), Y(hy / D.alto), hw * s, hh * s); c.imageSmoothingEnabled = true; } catch (e) {} }
-        esquinas(x0, y0, x1, y1, col, est === "ok" ? .85 : 1, tr.cerca ? 3 : 2);
-        if (riesgo) { c.setLineDash([9, 7]); c.strokeStyle = `rgba(${ROJ},.95)`; c.lineWidth = 3; c.beginPath(); c.moveTo(X(pp[0]), Y(pp[1])); c.lineTo(X((riesgo[0] + riesgo[2]) / 2), Y(riesgo[3])); c.stroke(); c.setLineDash([]); }
-        pill(x0, y0 - 8, est === "riesgo" ? `Riesgo de atropello · ${id}` : `Persona en ${zona.nombre}`, est === "riesgo" ? BLA : AMA, 15, est === "riesgo" ? `rgba(${ROJ},.92)` : undefined); });
-      // panel de Lúmina: lo que ve ahora la cámara y los últimos eventos
+        pill(X(cx) - c.measureText(txt).width / 2 - 20, Y(cy) + 18, txt, est === "libre" ? VER : est === "grua" ? NAR : BLA, 18, est === "libre" || est === "grua" ? undefined : `rgba(${ROJ},.94)`);
+      }
+      ultF = f;
+      // lo que entra a las zonas: grúas y personas (rostro pixelado: la persona no es el foco)
+      for (const o of objs) { const z = zonaDe(o); if (!z) continue; const [, cls, a0, b0, a1, b1] = o, x0 = X(a0), y0 = Y(b0), x1 = X(a1), y1 = Y(b1);
+        if (cls === 1) { esquinas(x0, y0, x1, y1, NAR, 1, 3.5); pill(x0, y0 - 8, `Grúa en ${z.nombre}`, NAR, 16); continue; }
+        const conGrua = objs.some((q) => q[1] === 1 && zonaDe(q) === z), col = conGrua ? ROJ : AMA;
+        const hx = a0 * D.ancho + (a1 - a0) * D.ancho * .22, hw = (a1 - a0) * D.ancho * .56, hy = b0 * D.alto, hh = (b1 - b0) * D.alto * .17;
+        if (hw > 3 && hh > 3) try { pc.drawImage(v, hx, hy, hw, hh, 0, 0, 5, 5); c.imageSmoothingEnabled = false; c.drawImage(px, 0, 0, 5, 5, X(hx / D.ancho), Y(hy / D.alto), hw * s, hh * s); c.imageSmoothingEnabled = true; } catch (e) {}
+        esquinas(x0, y0, x1, y1, col, 1, 3); pill(x0, y0 - 8, conGrua ? "Riesgo · persona con grúa" : `Persona en ${z.nombre}`, conGrua ? BLA : AMA, 15, conGrua ? `rgba(${ROJ},.92)` : undefined); }
+      // panel de Lúmina
       const PX = 64, PY = 86, PW = 470; c.fillStyle = "rgba(255,255,255,.96)"; rr(PX, PY, PW, 168, 24); c.fill();
       c.fillStyle = `rgb(${NAR})`; c.beginPath(); c.arc(PX + 34, PY + 36, 9, 0, 7); c.fill(); c.fillStyle = "#6c6c6c"; c.font = "600 15px Poppins, Arial"; c.textBaseline = "middle"; c.fillText("LÚMINA · CAM 1D · PUERTA DE DESPACHO", PX + 54, PY + 37);
       if (Math.sin(ahora / 300) > -.3) { c.fillStyle = "#FF3B3B"; c.beginPath(); c.arc(PX + PW - 64, PY + 37, 5, 0, 7); c.fill(); } c.fillStyle = "#181818"; c.font = "600 13px Poppins, Arial"; c.fillText("EN VIVO", PX + PW - 54, PY + 38);
-      D.zonas.forEach((z, k) => { const est = zest.get(z.id) || "libre", col = est === "libre" ? VER : est === "grua" ? NAR : ROJ, y = PY + 84 + k * 46;
+      D.zonas.forEach((z, k) => { const e = zest.get(z.id), est = e ? e.est : "libre", col = est === "libre" ? VER : est === "grua" ? NAR : ROJ, y = PY + 84 + k * 46;
         c.fillStyle = `rgb(${col})`; c.beginPath(); c.arc(PX + 38, y, 8, 0, 7); c.fill(); c.fillStyle = "#181818"; c.font = "600 22px Poppins, Arial"; c.fillText(z.nombre, PX + 58, y + 1);
         c.fillStyle = "#6c6c6c"; c.font = "500 18px Poppins, Arial"; c.fillText({ libre: "libre", grua: "grúa operando", persona: "persona · cerrada a grúas", alarma: "ALARMA" }[est], PX + 170, y + 1); });
-      eventos.forEach((e, k) => { const a = Math.min(1, (ahora - e.t) / 300) * (k === 3 ? .55 : 1); c.globalAlpha = a; pill(PX, PY + 168 + 8 + (k + 1) * 42, e.txt, e.col, 16); c.globalAlpha = 1; });
+      eventos.forEach((e, k) => { const a = Math.min(1, (ahora - e.t) / 300) * (k === 2 ? .55 : 1); c.globalAlpha = a; pill(PX, PY + 168 + 8 + (k + 1) * 42, e.txt, e.col, 16); c.globalAlpha = 1; });
     }
     requestAnimationFrame(cuadro);
   })();
 
+  $$("video[data-velocidad]").forEach((v) => v.addEventListener("play", () => (v.playbackRate = +v.dataset.velocidad)));   // gestión visual y tráfico a doble velocidad (Bastián)
   window.PRES = { ir: (n, p) => mostrar(n - 1, p || 0), avanzar, volver, planta: () => pedirPlanta, historia: () => pedirHistoria, n: lams.length };   // para QA
 })();

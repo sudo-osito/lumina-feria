@@ -69,6 +69,7 @@ export async function crear(cont) {
   const VEST = [0xF5C400, 0xF5C400, 0xC7E03A, 0xF5C400, 0xF2741F, 0xC7E03A, 0xF5C400, 0xF5C400, 0xC7E03A, 0xF5C400], CASCO = [0xF6F7F8, 0x056CF2, 0xF5C400, 0xF6F7F8, 0xF6F7F8, 0x056CF2, 0xF5C400, 0xF6F7F8, 0x1FA45A, 0xF5C400],
     PIEL = [0xF1CBAA, 0xD9A982, 0xF1CBAA, 0xC68F6B, 0xF1CBAA, 0xE8BE9C, 0xD9A982, 0xF1CBAA, 0xE8BE9C, 0xC68F6B];
   const turno = VEST.map((v, i) => G.persona({ padre: vivo, chaleco: v, casco: CASCO[i], piel: PIEL[i], talla: .94 + (i * 37 % 10) / 100, panza: i % 4 === 1 ? 1.1 : 1, manga: i % 3 ? 0x5B7FB0 : 0x6B7380 }));
+  const jefe = G.persona({ padre: vivo, chaleco: 0x2F6FB0, casco: 0xF6F7F8, manga: 0x1B2230, pantalon: 0x2B2F36, piel: 0xD9A982, talla: 1.02 }); const fonoJ = G.telefono(jefe);
   const fondo = [0, 1].map((i) => { const g = md.montacargas(vivo, { color: i ? std(0xE9EDF2) : std(0xF5C400, { roughness: .45 }) }); g.spot.visible = false; g.cams.visible = false; g.carga.visible = true; g.levantar(.25); return g; });
   // utilería: el casco y el teléfono en el piso, y el recuerdo del día siguiente
   const casco = grupo(0, 0, 0, 0, vivo); { const cs = std(0xF6F7F8, { roughness: .35 }); const d = new THREE.Mesh(new THREE.SphereGeometry(.152, 22, 11, 0, PI * 2, 0, H), cs); d.castShadow = true; casco.add(d); cil(.176, .02, 0, 0, .025, cs, casco, 22); caja(.04, .03, .2, 0, .135, 0, cs, casco, .012); }
@@ -118,7 +119,7 @@ export async function crear(cont) {
     fx.negro = 0; fx.flash = 0; fx.vel = 0; est.amb = 'dia';
     turno.forEach((p, i) => { P.quieto(p); p.g.visible = true; pon(p.g, ...PUESTO[i]); });
     P.quieto(salva); salva.g.visible = true; pon(salva.g, S0[0], S0[1], H); fono.g.visible = false; fono.pant.emissiveIntensity = 0;
-    P.quieto(ale); ale.g.visible = false; P.quieto(aleS); aleS.g.visible = true; fonoAle.g.visible = true;
+    P.quieto(ale); ale.g.visible = false; P.quieto(aleS); aleS.g.visible = true; fonoAle.g.visible = true; P.quieto(jefe); jefe.g.visible = false; fonoJ.g.visible = false; fonoJ.pant.emissiveIntensity = 0;
     grua.g.visible = true; pon(grua.g, 95.9, 3.2, -H); grua.g.position.y = 0; grua.levantar(.12); grua.carga.visible = false; grua.balMat.emissiveIntensity = 0; grua.carga.rotation.set(0, 0, 0);
     W.palletPick.visible = true; W.fiesta.visible = false; recuerdo.visible = false; casco.visible = false; fonoPiso.visible = false; conf.visible = false;
     W.tablero.pintar(999); W.tablero.mat.emissiveIntensity = .22;
@@ -409,6 +410,38 @@ export async function crear(cont) {
     tick(t) { P.hablar(salva, t); turno.forEach((p, i) => { P.respirar(p, t); p.cab.rotation.x = Math.max(0, Math.sin(t * 1.3 + i * 2)) * .12; }); P.respirar(ale, t); W.tablero.mat.emissiveIntensity = .22 + .5 * Math.exp(-t * 1.2); },
   }];
 
+  /* «Cómo funciona el sistema» (lámina de Lúmina), en la misma planta con todo lo de Neisstech: ve · actúa · avisa · se corrige */
+  function sisIni() { est.fondo = 'fuera'; cargado(15.4); pintura(99); visualListo(); traficoListo(); Mj.pk = 1; W.rackDanadoG.visible = false; }
+  function sisBase(t) { trabajar(t); pintura(99); visualListo(); traficoListo(); puertasResto(); proyecciones(t); luminaArriba(t, 0); }
+  const CAM_JEFE = [[0, 53.0, 1.72, 24.1, 56.3, 1.42, 26.1, 34], [9, 53.3, 1.7, 24.4, 56.3, 1.42, 26.1, 32]];
+  const CAM_TERRENO = [[0, 65.0, 1.8, 4.4, 66.8, 1.15, 9.6, 42], [12, 65.6, 1.75, 4.8, 66.8, 1.15, 9.6, 39]];   // desde la calle norte, de frente al cruce
+  E.sistema = [{   // 01 · ve: la cámara del cruce detecta a la persona y a la grúa que retrocede
+    casa: 0,
+    ini() { sisIni(); est.lumina = { alerta: 0, evento: 0, desde: 0 }; },
+    cam: camCCTV,
+    tick(t) { sisBase(t); salvaHasta(t, 66.9, 1.05, .3); retrocede(t, .8, 9.5, 15.4, 12.9); },
+  }, {            // 02 · actúa: riesgo → el cruce se cierra, baliza y aviso a la grúa, que frena; el evento queda registrado
+    casa: 0,
+    ini() { sisIni(); cargado(12.9); est.lumina = { alerta: 0, evento: 0, desde: 0 }; },
+    cam: camCCTV,
+    tick(t) { sisBase(t); const L = est.lumina; if (t > .5 && !L.alerta) L.alerta = t; if (t > 3.4 && !L.evento) L.evento = t; pon(salva.g, 66.9, 9.45, 0); P.quieto(salva); P.respirar(salva, t);
+      const u = suave(tr(t, 0, 1.4)); cargado(12.9 - .5 * u); P.manejar(aleS, t, .9); puertas(true); grua.balMat.emissiveIntensity = Math.sin(reloj * 12) > 0 ? 2.6 : .1; },
+  }, {            // 03 · avisa: al jefe de planta le llega el aviso al celular, esté donde esté
+    casa: 1, corte: true,
+    ini() { sisIni(); cargado(12.4); jefe.g.visible = true; pon(jefe.g, 56.25, 26.15, rumbo(-1, -.62)); fonoJ.g.visible = true; est.lumina = { modo: 'aviso', t0: .9 }; },
+    cam: claves(CAM_JEFE),
+    tick(t) { sisBase(t); P.quieto(jefe); P.respirar(jefe, t); const k = suave(tr(t, .5, 1.3)); jefe.bd.rotation.x = -1.05 * k; jefe.bd.rotation.z = .22 * k; jefe.cab.rotation.x = .42 * k;
+      fonoJ.pant.emissiveIntensity = t > .9 ? (t < 2.4 && Math.sin(t * 14) < 0 ? .3 : 1.3) : 0; },
+  }, {            // 04 · se corrige: el jefe va al cruce con el video en la mano y lo revisa con el equipo; el cruce vuelve a abrir
+    casa: 0, corte: true,
+    ini() { sisIni(); cargado(12.4); jefe.g.visible = true; fonoJ.g.visible = true; fonoJ.pant.emissiveIntensity = 1.1; pon(salva.g, 67.4, 9.0, rumbo(-1, .2)); est.lumina = { modo: 'terreno', t0: 4.6 }; },
+    cam: claves(CAM_TERRENO),
+    tick(t) { sisBase(t); P.manejar(aleS, t, .9); grua.balMat.emissiveIntensity = 0;
+      const u = Math.min(1, t / 3.6), x = 62.4 + (66.2 - 62.4) * u; pon(jefe.g, x, 9.7, u < 1 ? 0 : rumbo(1, -.05));
+      if (u < 1) { P.andar(jefe, 1, t); P.celular(jefe, t); } else { P.quieto(jefe); P.hablar(jefe, t); jefe.bi.rotation.x = -1.05; jefe.bi.rotation.z = .2; }
+      P.quieto(salva); P.respirar(salva, t); if (t > 4) salva.cab.rotation.y = -.25; puertas(t < 6.5); },
+  }];
+
   /* Lúmina sobre la imagen: marcos con esquinas, rostros pixelados, la línea del riesgo y el aviso; o, desde el aire, el resumen de la planta */
   const V3 = new THREE.Vector3();
   function proyectar(pts) { let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; for (const [x, y, z] of pts) { V3.set(x, y, z).project(cam); const sx = (V3.x + 1) / 2 * 1920, sy = (1 - V3.y) / 2 * 1080; x0 = Math.min(x0, sx); y0 = Math.min(y0, sy); x1 = Math.max(x1, sx); y1 = Math.max(y1, sy); } return [x0, y0, x1, y1]; }
@@ -436,22 +469,46 @@ export async function crear(cont) {
       lc.fillStyle = '#6c6c6c'; lc.font = '600 16px Poppins, Arial'; lc.textBaseline = 'middle'; lc.fillText('LÚMINA · TURNO MAÑANA', X + 94, Y + 36); lc.fillStyle = '#181818'; lc.font = '600 28px Poppins, Arial'; lc.fillText('Planta sin alertas', X + 94, Y + 72);
       return;
     }
-    // marco de cámara (CCTV)
-    lc.fillStyle = 'rgba(255,255,255,.92)'; lc.font = '600 22px Poppins, Arial'; lc.textBaseline = 'middle'; lc.fillText('CAM 04 · CRUCE C1', 1150, 60);
-    if (Math.sin(reloj * 5) > -.2) { lc.fillStyle = '#FF3B3B'; lc.beginPath(); lc.arc(1130, 60, 8, 0, 7); lc.fill(); }
-    const seg = 47 * 60 + 12 + Math.floor(t), hh = `08:${String(Math.floor(seg / 60) % 60).padStart(2, '0')}:${String(seg % 60).padStart(2, '0')}`; lc.fillText(hh, 1400, 60);
+    if (L.modo === 'aviso') {   // el celular del jefe de planta
+      const k = suave(tr(t, L.t0, L.t0 + .7)), X = 1300 + (1 - k) * 160, Y = 120, W = 420, Hh = 820; lc.globalAlpha = k;
+      lc.fillStyle = '#111317'; lc.beginPath(); lc.roundRect(X, Y, W, Hh, 64); lc.fill(); lc.fillStyle = '#F5F6F8'; lc.beginPath(); lc.roundRect(X + 14, Y + 14, W - 28, Hh - 28, 52); lc.fill();
+      lc.fillStyle = '#111317'; lc.beginPath(); lc.roundRect(X + W / 2 - 62, Y + 30, 124, 34, 17); lc.fill();
+      lc.fillStyle = '#181818'; lc.font = '600 76px Poppins, Arial'; lc.textAlign = 'center'; lc.textBaseline = 'alphabetic'; lc.fillText('08:47', X + W / 2, Y + 200); lc.font = '500 20px Poppins, Arial'; lc.fillStyle = '#6c6c6c'; lc.fillText('martes 17 de noviembre', X + W / 2, Y + 236); lc.textAlign = 'left';
+      const n = suave(tr(t, L.t0 + .5, L.t0 + 1.1)), NY = Y + 290 + (1 - n) * -40; lc.globalAlpha = k * n;
+      lc.fillStyle = '#fff'; lc.beginPath(); lc.roundRect(X + 34, NY, W - 68, 330, 28); lc.fill(); lc.strokeStyle = 'rgba(236,109,39,.55)'; lc.lineWidth = 2.5; lc.stroke();
+      lc.fillStyle = NAR; lc.beginPath(); lc.arc(X + 72, NY + 44, 18, 0, 7); lc.fill(); lc.fillStyle = '#fff'; lc.beginPath(); lc.arc(X + 72, NY + 44, 7, 0, 7); lc.fill();
+      lc.fillStyle = '#6c6c6c'; lc.font = '600 15px Poppins, Arial'; lc.textBaseline = 'middle'; lc.fillText('LÚMINA · ahora', X + 102, NY + 44);
+      lc.fillStyle = '#E5484D'; lc.font = '600 28px Poppins, Arial'; lc.fillText('Riesgo de atropello', X + 58, NY + 98);
+      lc.fillStyle = '#181818'; lc.font = '500 19px Poppins, Arial'; lc.fillText('Cruce C1 · grúa en retroceso', X + 58, NY + 134); lc.fillText('con una persona en el paso.', X + 58, NY + 160);
+      lc.fillStyle = '#2A2F36'; lc.beginPath(); lc.roundRect(X + 58, NY + 188, W - 116, 112, 16); lc.fill(); lc.fillStyle = '#fff'; lc.beginPath(); lc.moveTo(X + W / 2 - 14, NY + 226); lc.lineTo(X + W / 2 + 18, NY + 244); lc.lineTo(X + W / 2 - 14, NY + 262); lc.fill();
+      lc.fillStyle = 'rgba(255,255,255,.85)'; lc.font = '500 15px Poppins, Arial'; lc.fillText('Video del evento · 0:12', X + 74, NY + 284);
+      const b2 = suave(tr(t, L.t0 + 1.4, L.t0 + 2)); lc.globalAlpha = k * b2; lc.fillStyle = '#056CF2'; lc.beginPath(); lc.roundRect(X + 34, NY + 350, W - 68, 70, 35); lc.fill(); lc.fillStyle = '#fff'; lc.font = '600 22px Poppins, Arial'; lc.textAlign = 'center'; lc.fillText('Ir al cruce C1', X + W / 2, NY + 386); lc.textAlign = 'left';
+      lc.globalAlpha = 1; return;
+    }
+    if (L.modo === 'terreno') {   // en el cruce: el video en la mano y el evento cerrado
+      const k = suave(tr(t, L.t0, L.t0 + .6)), X = 1340, Y = 230; if (k <= 0) return; lc.globalAlpha = k;
+      lc.fillStyle = 'rgba(255,255,255,.97)'; lc.beginPath(); lc.roundRect(X, Y, 500, 132, 22); lc.fill();
+      lc.fillStyle = '#1F9D5A'; lc.beginPath(); lc.arc(X + 52, Y + 66, 26, 0, 7); lc.fill(); lc.strokeStyle = '#fff'; lc.lineWidth = 5; lc.beginPath(); lc.moveTo(X + 40, Y + 66); lc.lineTo(X + 49, Y + 76); lc.lineTo(X + 65, Y + 56); lc.stroke();
+      lc.fillStyle = '#6c6c6c'; lc.font = '600 17px Poppins, Arial'; lc.textBaseline = 'middle'; lc.fillText('LÚMINA · CRUCE C1', X + 98, Y + 36); lc.fillStyle = '#181818'; lc.font = '600 30px Poppins, Arial'; lc.fillText('Corregido en terreno', X + 98, Y + 72);
+      lc.fillStyle = '#6c6c6c'; lc.font = '500 19px Poppins, Arial'; lc.fillText('El evento queda para el análisis', X + 98, Y + 106); lc.globalAlpha = 1; return;
+    }
+    // marco de cámara (CCTV) · en «cómo funciona» todo baja, para no chocar con el título
+    const oy = est.esc === 'sistema' ? 120 : 0;
+    lc.fillStyle = 'rgba(255,255,255,.92)'; lc.font = '600 22px Poppins, Arial'; lc.textBaseline = 'middle'; lc.fillText('CAM 04 · CRUCE C1', 1150, 60 + oy);
+    if (Math.sin(reloj * 5) > -.2) { lc.fillStyle = '#FF3B3B'; lc.beginPath(); lc.arc(1130, 60 + oy, 8, 0, 7); lc.fill(); }
+    const seg = 47 * 60 + 12 + Math.floor(t), hh = `08:${String(Math.floor(seg / 60) % 60).padStart(2, '0')}:${String(seg % 60).padStart(2, '0')}`; lc.fillText(hh, 1400, 60 + oy);
     const bs = salva.g.position, bg = grua.g.position;
     const rS = cajaMundo(bs.x, bs.z, .35, 1.8), rG = cajaMundo(bg.x, bg.z, 1.25, 2.3);
     marco(lc, rS, NAR, 'Persona'); marco(lc, rG, NAR, 'Grúa · en retroceso');
     V3.set(bs.x, 1.62, bs.z).project(cam); pixel(lc, (V3.x + 1) / 2 * 1920, (1 - V3.y) / 2 * 1080);
     V3.set(bg.x, 1.36, bg.z + .38).project(cam); pixel(lc, (V3.x + 1) / 2 * 1920, (1 - V3.y) / 2 * 1080, 6);
     if (L.alerta) { const a = Math.min(1, (t - L.alerta) * 3); lc.globalAlpha = a; lc.setLineDash([10, 10]); lc.strokeStyle = '#FF4D4F'; lc.lineWidth = 3; lc.beginPath(); lc.moveTo((rS[0] + rS[2]) / 2, rS[3]); lc.lineTo((rG[0] + rG[2]) / 2, rG[3]); lc.stroke(); lc.setLineDash([]);
-      const X = 1340, Y = 110; lc.fillStyle = 'rgba(255,255,255,.97)'; lc.beginPath(); lc.roundRect(X, Y, 500, 132, 22); lc.fill();
+      const X = 1340, Y = 110 + oy; lc.fillStyle = 'rgba(255,255,255,.97)'; lc.beginPath(); lc.roundRect(X, Y, 500, 132, 22); lc.fill();
       lc.fillStyle = NAR; lc.beginPath(); lc.arc(X + 52, Y + 66, 26, 0, 7); lc.fill(); lc.fillStyle = '#fff'; lc.beginPath(); lc.arc(X + 52, Y + 66, 10, 0, 7); lc.fill();
       lc.fillStyle = '#6c6c6c'; lc.font = '600 17px Poppins, Arial'; lc.fillText('LÚMINA · AVISO AL JEFE DE TURNO', X + 98, Y + 36);
       lc.fillStyle = '#181818'; lc.font = '600 30px Poppins, Arial'; lc.fillText('Riesgo de atropello', X + 98, Y + 72); lc.fillStyle = '#6c6c6c'; lc.font = '500 19px Poppins, Arial'; lc.fillText('Cruce C1 · cierra el cruce y avisa a la grúa', X + 98, Y + 106);
       lc.globalAlpha = 1; }
-    if (L.evento) { const a = Math.min(1, (t - L.evento) * 3), X = 1340, Y = 262; lc.globalAlpha = a; lc.fillStyle = 'rgba(24,24,24,.86)'; lc.beginPath(); lc.roundRect(X, Y, 500, 64, 32); lc.fill();
+    if (L.evento) { const a = Math.min(1, (t - L.evento) * 3), X = 1340, Y = 262 + oy; lc.globalAlpha = a; lc.fillStyle = 'rgba(24,24,24,.86)'; lc.beginPath(); lc.roundRect(X, Y, 500, 64, 32); lc.fill();
       lc.fillStyle = '#3DD07A'; lc.beginPath(); lc.arc(X + 34, Y + 32, 8, 0, 7); lc.fill(); lc.fillStyle = '#fff'; lc.font = '500 21px Poppins, Arial'; lc.fillText('Evento registrado para el análisis', X + 56, Y + 33); lc.globalAlpha = 1; }
   }
 

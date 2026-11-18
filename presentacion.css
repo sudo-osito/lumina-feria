@@ -1266,3 +1266,31 @@ img, canvas { display: block; }
 .lam--frase { justify-content: center; align-items: center; }
 .frase-final { max-width: 1500px; text-align: center; font-size: 72px; line-height: 1.2; letter-spacing: -.035em; text-wrap: balance; }
 .frase-final b { color: var(--blue); font-weight: 600; }
+
+/* ═════════ v12 · «Cómo funciona el sistema» en la planta 3D de la historia ═════════ */
+.lam--sis { padding: 0; }
+.lam--sis::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, rgba(245, 246, 248, .92) 0, rgba(245, 246, 248, 0) 190px), linear-gradient(0deg, rgba(245, 246, 248, .96) 0, rgba(245, 246, 248, .85) 150px, rgba(245, 246, 248, 0) 300px); }
+.sis__t { position: absolute; left: 0; right: 0; top: 48px; text-align: center; font-size: 72px; font-weight: 600; letter-spacing: -.04em; color: var(--carbon); }
+.lam--sis .sis__pasos { position: absolute; left: 0; right: 0; bottom: 104px; display: grid; justify-items: center; }
+.lam--sis .hstep { display: flex; align-items: center; gap: 24px; align-self: end; }
+.lam--sis .hstep > b { font-size: 92px; font-weight: 650; line-height: .9; letter-spacing: -.06em; color: var(--lumina); font-variant-numeric: tabular-nums; }
+.lam--sis .hstep h3 { font-size: 44px; font-weight: 600; letter-spacing: -.035em; color: var(--carbon); }
+.lam--sis .hstep p { margin-top: 6px; font-size: 24px; color: var(--tinta-2); }
+.sis__segs { position: absolute; left: 50%; bottom: 40px; transform: translateX(-50%); list-style: none; display: grid; grid-template-columns: repeat(4, 230px); gap: 18px; }
+.sis__segs li { display: grid; gap: 10px; justify-items: center; font-size: 22px; font-weight: 600; color: rgba(24, 24, 24, .32); transition: color .6s; }
+.sis__segs li::after { content: ""; width: 100%; height: 5px; border-radius: 5px; background: rgba(24, 24, 24, .1); transition: background .6s; }
+.sis__segs li:first-child, .lam--sis.p1 .sis__segs li:nth-child(2), .lam--sis.p2 .sis__segs li:nth-child(3), .lam--sis.p3 .sis__segs li:nth-child(4) { color: var(--carbon); }
+.sis__segs li:first-child::after, .lam--sis.p1 .sis__segs li:nth-child(2)::after, .lam--sis.p2 .sis__segs li:nth-child(3)::after, .lam--sis.p3 .sis__segs li:nth-child(4)::after { background: var(--lumina); }
+
+/* ═════════ v13 (18-nov, Archivo 13 de Bastián) ═════════ */
+/* todos los títulos arriba, a la misma altura y del mismo tamaño */
+.lam:has(.desafios), .lam:has(.marco--solo), .lam--hoy, .lam:has(.usr) { justify-content: flex-start; padding-top: 84px; }
+.lam .t.t--m, .ice > .t, .barras .t--m { font-size: 64px; }
+.lam .t.t--m { margin-top: 12px; }
+.lam:has(.usr) .usr { align-items: start; }
+.lam:has(.usr) .usr__img { margin-top: 0; }
+/* iceberg: «Costos directos» y «Costos indirectos» junto a cada bola; sin las etiquetas de la izquierda */
+.ice__r { display: none; }
+.ice__nom { position: absolute; left: 50%; transform: translateX(-50%); font-size: 30px; font-weight: 600; letter-spacing: -.02em; white-space: nowrap; }
+.ice__nom--a { top: 452px; color: var(--blue); }
+.ice__nom--b { top: 1030px; color: var(--rojo); }
