@@ -1251,3 +1251,7 @@ img, canvas { display: block; }
 .lam--hoy .sn { padding: 30px 34px; }
 .lam--hoy .sn b { font-size: 32px; } .lam--hoy .sn span { font-size: 25px; }
 .hoy__eso img { height: 150px; }
+/* pirámide: el aporte de cada pilar al costado derecho, no dentro */
+.emb__por { padding-left: 48px; font-size: 64px; font-weight: 600; letter-spacing: -.04em; color: rgba(24, 24, 24, .22); transition: color .8s; }
+.lam--embudo[data-pilar="0"]:not(.p1) .emb__por, .lam--embudo[data-pilar="0"].p1 .emb__f--1 .emb__por, .lam--embudo[data-pilar="2"] .emb__f--2 .emb__por, .lam--embudo[data-pilar="3"] .emb__f--3 .emb__por { color: var(--blue); }
+.emb__f--3 .emb__pct { font-size: 34px; }
