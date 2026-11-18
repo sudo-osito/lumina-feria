@@ -1255,3 +1255,6 @@ img, canvas { display: block; }
 .emb__por { padding-left: 48px; font-size: 64px; font-weight: 600; letter-spacing: -.04em; color: rgba(24, 24, 24, .22); transition: color .8s; }
 .lam--embudo[data-pilar="0"]:not(.p1) .emb__por, .lam--embudo[data-pilar="0"].p1 .emb__f--1 .emb__por, .lam--embudo[data-pilar="2"] .emb__f--2 .emb__por, .lam--embudo[data-pilar="3"] .emb__f--3 .emb__por { color: var(--blue); }
 .emb__f--3 .emb__pct { font-size: 34px; }
+/* iceberg: la lista ocupa la lámina entera, así las pastillas no saltan de lugar mientras entra (el transform de entrada cambiaba su referencia) */
+.ice__p { position: absolute; inset: 0; margin: 0; padding: 0; pointer-events: none; }
+.lam .ice__p[data-e] { transform: none; filter: none; }
