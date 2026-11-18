@@ -575,7 +575,11 @@ export function construir(k, md, m2, eq) {
   { // el arsenal funcionando: Safetygate, SmartDock, X-KUBE con proyecciones, estaciones 5S y tren logístico
     const g = W.mejora.trafico, A = W.mejora;
     // Safetygate frente al portón poniente: la barra colgante frena la carga alta
-    A.sg = md.safetygate(g, 36.9, 33.35, 36.65, 3.3, .45, 35.15); A.piezas.push({ o: A.sg.g, d: 33 });
+    // colgada del techo (en el vano del portón no hay muro donde apoyarla): dos tensores hasta la cercha, travesaño y placas de anclaje
+    A.sg = md.safetygate(g, 36.9, 33.35, 36.65, 3.3, .45, 36.94); A.piezas.push({ o: A.sg.g, d: 33 });
+    { const sgT = grupo(0, 0, 0, 0, g); A.piezas.push({ o: sgT, d: 33 }); const ac = std(0x9AA3AE, { roughness: .4, metalness: .6 }), zc = (33.35 + 36.65) / 2, L = 36.65 - 33.35, yT = ALERO + (CUMBRE - ALERO) * (1 - Math.abs(zc - 20) / 20) - .12;
+      caja(.08, .08, L * .78, 36.9, 3.3, zc, ac, sgT, .01);   // travesaño del que cuelgan los soportes
+      for (const s of [-1, 1]) { const z = zc + s * L * .34; cil(.022, yT - 3.3, 36.9, 3.3, z, ac, sgT, 8); caja(.26, .03, .26, 36.9, yT - .02, z, ac, sgT, .01); caja(.1, .12, .1, 36.9, 3.24, z, ac, sgT, .01); } }
     // SmartDock: la cuña en la rueda de cada camión en el andén
     const amar = std(0xF5C400, { roughness: .42 }), negroD = std(0x1E2126, { roughness: .6 }), grisD = std(0xC9CED6, { roughness: .45, metalness: .3 }), cableM = std(0x23262B, { roughness: .7 });
     const formaCuna = (() => { const sh = new THREE.Shape(); sh.moveTo(-.21, 0); sh.lineTo(.22, 0); sh.quadraticCurveTo(.02, .05, -.21, .3); sh.lineTo(-.21, 0); const geo = new THREE.ExtrudeGeometry(sh, { depth: .3, bevelEnabled: true, bevelThickness: .012, bevelSize: .012, bevelSegments: 2 }); geo.translate(0, 0, -.15); geo.rotateY(-Math.PI / 2); return geo; })();

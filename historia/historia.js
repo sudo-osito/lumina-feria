@@ -11,7 +11,7 @@ import { nucleo, THREE, clamp, lerp } from '../js/planta/nucleo.js';
 import { modelos } from '../js/planta/modelos.js';
 import { modelos2 } from '../js/planta/modelos2.js';
 import { equipos } from '../js/planta5/equipos.js';
-import { construir, SOL, ALERO } from './mundo.js?v=14';
+import { construir, SOL, ALERO } from './mundo.js?v=15';
 import { gente } from './gente.js?v=6';
 
 const PI = Math.PI, H = PI / 2;
