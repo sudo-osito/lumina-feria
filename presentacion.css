@@ -1258,3 +1258,11 @@ img, canvas { display: block; }
 /* iceberg: la lista ocupa la lámina entera, así las pastillas no saltan de lugar mientras entra (el transform de entrada cambiaba su referencia) */
 .ice__p { position: absolute; inset: 0; margin: 0; padding: 0; pointer-events: none; }
 .lam .ice__p[data-e] { transform: none; filter: none; }
+
+/* ═════════ v11 (17-nov, audios y videos 23:18–23:28 de Bastián) ═════════ */
+.emb__sub { display: block; margin-top: 4px; font-size: 20px !important; font-weight: 500; letter-spacing: 0; opacity: .85; }
+.emb__f--3 .emb__pct { line-height: 1.05; }
+/* la frase de los tres pilares, sola, antes de volver a la historia */
+.lam--frase { justify-content: center; align-items: center; }
+.frase-final { max-width: 1500px; text-align: center; font-size: 72px; line-height: 1.2; letter-spacing: -.035em; text-wrap: balance; }
+.frase-final b { color: var(--blue); font-weight: 600; }

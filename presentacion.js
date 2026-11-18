@@ -268,7 +268,8 @@
     //      y el número grande: 3 de cada 100. AVANZAR → la torta de puntos con la forma del accidente (143.199 accidentes del trabajo 2024).
     accid: (() => { const C = [["Industria manufacturera", 3.5], ["Transporte", 3.1, 1]], cl = (v) => Math.min(1, Math.max(0, v));
       const F = [["Caídas de personas", .345, AZUL, 1], ["Golpes por o contra objetos", .072, AZUL, .72], ["Atrapamientos o amputaciones", .047, AZUL, .52], ["Accidentes con vehículos", .047, AZUL, .36], ["Otras formas", .489, CARBON, .14]];
-      const anillo = []; for (let r = 150; r <= 262; r += 16) { const n = Math.round(2 * Math.PI * r / 17); for (let k = 0; k < n; k++) anillo.push([r, k / n]); }
+      const anillo = [[0, 0]]; for (let r = 16; r <= 250; r += 16) { const n = Math.round(2 * Math.PI * r / 16); for (let k = 0; k < n; k++) anillo.push([r, k / n]); }
+      const fDest = F.slice(0, 4).reduce((m, x) => m + x[1], 0), bis = -Math.PI / 2 + fDest * Math.PI;   // la tajada destacada y su bisectriz
       let u = 0; return (c, t, w, h) => { c.clearRect(0, 0, w, h); u = ir(u, paso >= 1 ? 1 : 0, .07); const v = 1 - u, ahora = performance.now() - tPaso;
         if (v > .01) {   // columnas
           const s = 34, base = 520, xs = [250, 600];
@@ -285,11 +286,13 @@
           c.fillText("personas en transporte tuvieron", 1116, 400); c.fillText("un accidente con días perdidos", 1116, 446); c.fillText("en un año.", 1116, 492); c.restore();
         }
         if (u > .01) {   // la torta de puntos
-          const cx = 420, cy = 330, sw = cl((ahora - 200) / 1600);
+          const cx = 400, cy = 300, sw = cl((ahora - 200) / 1600);
           rotulo(c, 0, 4, "Forma del accidente · accidentes del trabajo 2024", GRIS, u, 15, "left");
-          for (const [r, f] of anillo) { if (f > sw) continue; let a0 = 0, seg = F[F.length - 1]; for (const x of F) { if (f < a0 + x[1]) { seg = x; break; } a0 += x[1]; }
-            const th = -Math.PI / 2 + f * 2 * Math.PI; punto(c, cx + Math.cos(th) * r, cy + Math.sin(th) * r, 5.2, seg[2], u * seg[3]); }
-          c.save(); c.textAlign = "center"; c.fillStyle = `rgba(${CARBON},${u})`; c.font = "600 52px Poppins"; c.fillText("143.199", cx, cy + 6); c.font = "400 22px Poppins"; c.fillStyle = `rgba(${GRIS},${u})`; c.fillText("accidentes del trabajo", cx, cy + 40); c.restore();
+          // la pizza: un círculo lleno de puntos; la tajada de caídas, golpes, atrapamientos y vehículos sale hacia afuera
+          const sale = 34 * (1 - Math.pow(1 - cl((ahora - 1500) / 900), 3)), dx = Math.cos(bis) * sale, dy = Math.sin(bis) * sale;
+          for (const [r, f] of anillo) { if (f > sw) continue; let a0 = 0, seg = F[F.length - 1], d = false; for (const [j, x] of F.entries()) { if (f < a0 + x[1]) { seg = x; d = j < 4; break; } a0 += x[1]; }
+            const th = -Math.PI / 2 + f * 2 * Math.PI; punto(c, cx + Math.cos(th) * r + (d ? dx : 0), cy + Math.sin(th) * r + (d ? dy : 0), 5.4, seg[2], u * (d ? Math.max(.4, seg[3]) : .16)); }
+          c.save(); c.textAlign = "center"; c.fillStyle = `rgba(${CARBON},${u * .85})`; c.font = "600 30px Poppins"; c.fillText("143.199 accidentes del trabajo", cx, cy + 312); c.restore();
           const k = cl((ahora - 1200) / 600) * u; c.save(); c.textAlign = "left"; c.fillStyle = `rgba(${AZUL},${k})`; c.font = "600 150px Poppins"; c.fillText("1 de cada 2", 820, 210);
           c.fillStyle = `rgba(${CARBON},${k * .85})`; c.font = "400 30px Poppins"; c.fillText("accidentes fue una caída, un golpe,", 826, 268); c.fillText("un atrapamiento o un accidente con vehículos.", 826, 308);
           F.forEach(([nom, p, rgb, a], i) => { const y = 390 + i * 46, kk = cl((ahora - 1600 - i * 150) / 400) * u; punto(c, 838, y - 8, 10, rgb, a * kk); c.font = `${i < 4 ? 500 : 400} 26px Poppins`; c.fillStyle = `rgba(${CARBON},${kk * (i < 4 ? .9 : .55)})`; c.fillText(nom, 866, y); c.textAlign = "right"; c.fillText(`${Math.round(p * 100)} %`, 1500, y); c.textAlign = "left"; });
