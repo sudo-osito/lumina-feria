@@ -417,24 +417,24 @@ export async function crear(cont) {
   const CAM_JEFE = [[0, 53.0, 1.72, 24.1, 56.3, 1.42, 26.1, 34], [9, 53.3, 1.7, 24.4, 56.3, 1.42, 26.1, 32]];
   const CAM_TERRENO = [[0, 65.0, 1.8, 4.4, 66.8, 1.15, 9.6, 42], [12, 65.6, 1.75, 4.8, 66.8, 1.15, 9.6, 39]];   // desde la calle norte, de frente al cruce
   E.sistema = [{   // 01 · ve: la cámara del cruce detecta a la persona y a la grúa que retrocede
-    casa: 0,
+    casa: 0, trans: 'seco',
     ini() { sisIni(); est.lumina = { alerta: 0, evento: 0, desde: 0 }; },
     cam: camCCTV,
     tick(t) { sisBase(t); salvaHasta(t, 66.9, 1.05, .3); retrocede(t, .8, 9.5, 15.4, 12.9); },
   }, {            // 02 · actúa: riesgo → el cruce se cierra, baliza y aviso a la grúa, que frena; el evento queda registrado
-    casa: 0,
+    casa: 0, trans: 'seco',
     ini() { sisIni(); cargado(12.9); est.lumina = { alerta: 0, evento: 0, desde: 0 }; },
     cam: camCCTV,
     tick(t) { sisBase(t); const L = est.lumina; if (t > .5 && !L.alerta) L.alerta = t; if (t > 3.4 && !L.evento) L.evento = t; pon(salva.g, 66.9, 9.45, 0); P.quieto(salva); P.respirar(salva, t);
       const u = suave(tr(t, 0, 1.4)); cargado(12.9 - .5 * u); P.manejar(aleS, t, .9); puertas(true); grua.balMat.emissiveIntensity = Math.sin(reloj * 12) > 0 ? 2.6 : .1; },
   }, {            // 03 · avisa: al jefe de planta le llega el aviso al celular, esté donde esté
-    casa: 1, corte: true,
+    casa: 1, trans: 'seco',
     ini() { sisIni(); cargado(12.4); jefe.g.visible = true; pon(jefe.g, 56.25, 26.15, rumbo(-1, -.62)); fonoJ.g.visible = true; est.lumina = { modo: 'aviso', t0: .9 }; },
     cam: claves(CAM_JEFE),
     tick(t) { sisBase(t); P.quieto(jefe); P.respirar(jefe, t); const k = suave(tr(t, .5, 1.3)); jefe.bd.rotation.x = -1.05 * k; jefe.bd.rotation.z = .22 * k; jefe.cab.rotation.x = .42 * k;
       fonoJ.pant.emissiveIntensity = t > .9 ? (t < 2.4 && Math.sin(t * 14) < 0 ? .3 : 1.3) : 0; },
   }, {            // 04 · se corrige: el jefe va al cruce con el video en la mano y lo revisa con el equipo; el cruce vuelve a abrir
-    casa: 0, corte: true,
+    casa: 0, trans: 'seco',
     ini() { sisIni(); cargado(12.4); jefe.g.visible = true; fonoJ.g.visible = true; fonoJ.pant.emissiveIntensity = 1.1; pon(salva.g, 67.4, 9.0, rumbo(-1, .2)); est.lumina = { modo: 'terreno', t0: 4.6 }; },
     cam: claves(CAM_TERRENO),
     tick(t) { sisBase(t); P.manejar(aleS, t, .9); grua.balMat.emissiveIntensity = 0;
@@ -457,6 +457,10 @@ export async function crear(cont) {
     c.strokeStyle = col; c.lineWidth = 2; c.beginPath(); c.arc(sx, sy, 9, 0, 7); c.stroke(); c.fillStyle = col; c.beginPath(); c.arc(sx, sy, 3.5, 0, 7); c.fill();
     c.font = '600 18px Poppins, Arial'; const w = c.measureText(txt).width + 34; c.fillStyle = 'rgba(24,24,24,.82)'; c.beginPath(); c.roundRect(sx + 14, sy - 44, w, 30, 15); c.fill();
     c.fillStyle = col; c.beginPath(); c.arc(sx + 29, sy - 29, 5, 0, 7); c.fill(); c.fillStyle = '#fff'; c.textBaseline = 'middle'; c.fillText(txt, sx + 42, sy - 28); }
+  const VQ = new THREE.Vector3(), VR = new THREE.Vector3();
+  function tapar(p) {   // la cara: frente de la cabeza (z+ del grupo cab), tapada entera aunque la cámara la vea desde arriba
+    p.cab.updateWorldMatrix(true, false); VQ.set(0, .105, .1); p.cab.localToWorld(VQ); VR.copy(VQ); VR.y += .15; VQ.project(cam); VR.project(cam); if (VQ.z > 1) return;
+    const sx = (VQ.x + 1) / 2 * 1920, sy = (1 - VQ.y) / 2 * 1080, h = Math.abs(sy - (1 - VR.y) / 2 * 1080); pixel(lc, sx, sy, Math.max(6, h / 1.5)); }
   function pixel(c, x, y, s = 7) { const tonos = ['#c9a58a', '#b38e75', '#d8b89f', '#a07c66']; for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) { c.fillStyle = tonos[(i * 3 + j * 5) % 4]; c.fillRect(x - 2 * s + i * s, y - 2 * s + j * s, s, s); } }
   function dibujarLumina(t) {
     lc.clearRect(0, 0, 1920, 1080); const L = est.lumina; if (!L || (L.desde && t < L.desde)) return;
@@ -502,8 +506,7 @@ export async function crear(cont) {
     const bs = salva.g.position, bg = grua.g.position;
     const rS = cajaMundo(bs.x, bs.z, .35, 1.8), rG = cajaMundo(bg.x, bg.z, 1.25, 2.3);
     marco(lc, rS, NAR, 'Persona'); marco(lc, rG, NAR, 'Grúa · en retroceso');
-    V3.set(bs.x, 1.62, bs.z).project(cam); pixel(lc, (V3.x + 1) / 2 * 1920, (1 - V3.y) / 2 * 1080);
-    V3.set(bg.x, 1.36, bg.z + .38).project(cam); pixel(lc, (V3.x + 1) / 2 * 1920, (1 - V3.y) / 2 * 1080, 6);
+    tapar(salva); tapar(aleS);
     if (L.alerta) { const a = Math.min(1, (t - L.alerta) * 3); lc.globalAlpha = a; lc.setLineDash([10, 10]); lc.strokeStyle = '#FF4D4F'; lc.lineWidth = 3; lc.beginPath(); lc.moveTo((rS[0] + rS[2]) / 2, rS[3]); lc.lineTo((rG[0] + rG[2]) / 2, rG[3]); lc.stroke(); lc.setLineDash([]);
       const X = 1340, Y = 110 + oy; lc.fillStyle = 'rgba(255,255,255,.97)'; lc.beginPath(); lc.roundRect(X, Y, 500, 132, 22); lc.fill();
       lc.fillStyle = NAR; lc.beginPath(); lc.arc(X + 52, Y + 66, 26, 0, 7); lc.fill(); lc.fillStyle = '#fff'; lc.beginPath(); lc.arc(X + 52, Y + 66, 10, 0, 7); lc.fill();
@@ -523,7 +526,8 @@ export async function crear(cont) {
     if (clip === est.clip && est.t > 0) return;
     const modo = clip.trans || (clip.corte ? 'negro' : 'corte');
     est.de = modo === 'mezcla' ? { p: [...ahora.p], m: [...ahora.m], f: ahora.f } : null; est.esc = nombre; est.paso = paso; est.clip = clip; est.t = 0; base(); clip.ini();
-    if (modo !== 'mezcla' && est.activo) { fx.negro = 1; est.aclara = modo === 'negro' ? 1.1 : .45; } else est.aclara = 0;
+    if (modo === 'seco') { fx.negro = 0; est.aclara = 0; }   // corte limpio, sin pasar por negro («cómo funciona»)
+    else if (modo !== 'mezcla' && est.activo) { fx.negro = 1; est.aclara = modo === 'negro' ? 1.1 : .45; } else est.aclara = 0;
   }
   let tPrev = 0, reloj = 0;
   function cuadro(ms) {

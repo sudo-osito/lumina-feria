@@ -28,7 +28,7 @@
   const pedirPlanta = import("./escena/lumina5.js?v=42").then((m) => m.crear($("#planta3d"))).then((p) => { planta = p; sincronizar3d(); return planta; }).catch((e) => console.error("planta 3D:", e));
   // La historia de Don Salva: otra escena 3D, con cámara de cine (historia/historia.js); una toma por paso
   let historia = null;
-  const pedirHistoria = import("./historia/historia.js?v=25").then((m) => m.crear($("#historia3d"))).then((h) => { historia = h; sincronizar3d(); return h; }).catch((e) => console.error("historia 3D:", e));
+  const pedirHistoria = import("./historia/historia.js?v=26").then((m) => m.crear($("#historia3d"))).then((h) => { historia = h; sincronizar3d(); return h; }).catch((e) => console.error("historia 3D:", e));
   function sincronizar3d() {
     const esc = lams[i].dataset.escena;
     escenario.classList.toggle("conhistoria", !!esc);
@@ -266,7 +266,7 @@
         rotulo(c, 240, 444, "Con qué frecuencia", NAR, a(2), 16); c.restore(); }; })(),
     // 04 · accidentabilidad 2024 (SUSESO): industria manufacturera y transporte en columnas de 8 puntos (un punto = 0,1 por cada 100 personas), la línea del promedio (2,5)
     //      y el número grande: 3 de cada 100. AVANZAR → la torta de puntos con la forma del accidente (143.199 accidentes del trabajo 2024).
-    accid: (() => { const C = [["Industria manufacturera", 3.5], ["Transporte", 3.1, 1]], cl = (v) => Math.min(1, Math.max(0, v));
+    accid: (() => { const C = [["Industria manufacturera", 3.5], ["Logística y transporte", 3.1, 1]], cl = (v) => Math.min(1, Math.max(0, v));
       const F = [["Caídas de personas", .345, AZUL, 1], ["Golpes por o contra objetos", .072, AZUL, .72], ["Atrapamientos", .047, AZUL, .52], ["Accidentes con vehículos", .047, AZUL, .36], ["Otras formas", .489, CARBON, .14]];
       const anillo = [[0, 0]]; for (let r = 16; r <= 250; r += 16) { const n = Math.round(2 * Math.PI * r / 16); for (let k = 0; k < n; k++) anillo.push([r, k / n]); }
       const fDest = F.slice(0, 4).reduce((m, x) => m + x[1], 0), bis = -Math.PI / 2 + fDest * Math.PI;   // la tajada destacada y su bisectriz
@@ -282,8 +282,8 @@
             c.font = `${top ? 600 : 400} 24px Poppins`; c.textBaseline = "top"; c.fillStyle = `rgba(${rgb},${v * (top ? 1 : .75)})`; c.fillText(nom, cx, base + 22); c.restore(); });
           // el número grande
           const k = cl((t - 1500) / 700) * v; c.save(); c.textAlign = "left"; c.fillStyle = `rgba(${AZUL},${k})`; c.font = "600 250px Poppins"; c.textBaseline = "alphabetic"; c.fillText("3", 1110, 330);
-          c.font = "500 64px Poppins"; c.fillText("de cada 100", 1272, 322); c.fillStyle = `rgba(${CARBON},${k * .85})`; c.font = "400 34px Poppins";
-          c.fillText("personas en transporte tuvieron", 1116, 400); c.fillText("un accidente con días perdidos", 1116, 446); c.fillText("en un año.", 1116, 492); c.restore();
+          c.font = "500 64px Poppins"; c.fillText("de cada 100", 1272, 322); c.fillStyle = `rgba(${CARBON},${k * .85})`; c.font = "400 30px Poppins";
+          c.fillText("personas en logística y transporte", 1116, 400); c.fillText("tuvieron un accidente con", 1116, 446); c.fillText("días perdidos en un año.", 1116, 492); c.restore();
         }
         if (u > .01) {   // la torta de puntos
           const cx = 400, cy = 300, sw = cl((ahora - 200) / 1600);
