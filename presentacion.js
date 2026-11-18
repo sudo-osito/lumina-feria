@@ -305,7 +305,6 @@
           punto(c, x, y, (6.4 + (g ? 6 * rj[n] : 0)) * (.5 + .5 * k[n]), rgb, a); if (rj[n] > .5) aro(c, x, y, 18 + 4 * Math.sin(t / 260), ROJO, .35 * rj[n], 2); } }; })(),
     // 06 · iceberg ordenado: arriba lo que se ve (esfera chica); bajo la línea, lo que no se ve (esfera grande)
     iceberg2: (() => { let u = 0; return (c, t, w, h) => { c.clearRect(0, 0, w, h); u = ir(u, paso >= 1 ? 1 : 0, .04); const g = t / 1600, yw = 520, cx = w / 2;
-      c.strokeStyle = `rgba(${AZUL},.45)`; c.lineWidth = 2; c.beginPath(); for (let x = 0; x <= w; x += 8) { const y = yw + Math.sin(x / 110 + t / 900) * 5; x ? c.lineTo(x, y) : c.moveTo(x, y); } c.stroke();
       esfera(c, cx, 345, 100, P160, g, AZUL, 1, 2.6);
       esfera(c, cx, 800, 235 * (.3 + .7 * u), P900, -g * .7, ROJO, u, 2.4); }; })(),
     // 08 · 10 · 12 · la pirámide de controles: partículas que suben por la pirámide (de lo menos a lo más efectivo); la franja del pilar activo brilla. Cuenta los porcentajes.
