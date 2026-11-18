@@ -1202,3 +1202,23 @@ img, canvas { display: block; }
 .lam--embudo[data-pilar="0"]:not(.p1) .emb__f--3 .emb__pct::before, .lam--embudo[data-pilar="3"] .emb__f--3 .emb__pct::before { background: linear-gradient(180deg, #2D86FF, #056CF2); }
 /* la frase final queda sola: la pirámide se va del todo */
 .lam--embudo.p1[data-pilar="3"] .emb, .lam--embudo.p1[data-pilar="3"] .emb__t, .lam--embudo.p1[data-pilar="3"] > .eti { opacity: 0 !important; transition: opacity .7s; }
+
+/* ═════════ v9 (17-nov noche, segunda ronda de videos de Bastián) ═════════ */
+/* 05 · iceberg: título arriba a la izquierda (como la 04), bolas al centro, costos repartidos alrededor */
+.lam--ice { padding: 0; }
+.ice__cv { position: absolute; inset: 0; width: 1920px; height: 1080px; }
+.ice { position: absolute; inset: 0; padding: 84px 130px 0; }
+.ice > .t { margin-top: 12px; font-size: 64px; }
+.ice__r { position: absolute; left: 130px; font-size: 26px; font-weight: 500; letter-spacing: -.02em; display: flex; align-items: baseline; gap: 14px; }
+.ice__r small { font-size: 14px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; }
+.ice__r--a { top: 482px; color: var(--blue); }
+.ice__r--b { top: 540px; color: var(--rojo); }
+.ice__p { list-style: none; }
+.ice__p li { position: absolute; transform: translate(-50%, -50%); display: flex; align-items: center; gap: 10px; white-space: nowrap; padding: 9px 20px 9px 16px; border-radius: 999px; background: #fff; font-size: 22px; letter-spacing: -.01em; color: var(--tinta);
+  box-shadow: 0 0 0 1.5px rgba(5, 108, 242, .2), 0 12px 30px -14px rgba(5, 108, 242, .35); }
+.ice__p li::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--blue); flex: none; }
+.ice__p--b li { box-shadow: 0 0 0 1.5px rgba(229, 72, 77, .22), 0 12px 30px -14px rgba(229, 72, 77, .32); }
+.ice__p--b li::before { background: var(--rojo); }
+.lam.activa .ice__p li, .lam.activa .ice__bajo.dado li { animation: icePill .8s var(--llegada) both; animation-delay: calc(var(--i) * 70ms + 300ms); }
+@keyframes icePill { from { opacity: 0; transform: translate(-50%, -30%) scale(.9); } }
+.ice__bajo { position: absolute; inset: 0; transform: none !important; filter: none !important; }

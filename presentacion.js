@@ -264,40 +264,36 @@
         c.save(); c.translate(1180, 40); dias.forEach((v, d) => { const x = 40 + (d % 7) * 66, y = 60 + Math.floor(d / 7) * 72; if (v && a(2) > d / 35) punto(c, x, y, 13 * (v > .6 ? 1 : .6), NAR, v > .6 ? .9 : .4); else aro(c, x, y, 13, CARBON, .2 * a(2), 1.4); });
         "LMMJVSD".split("").forEach((d, k) => { c.font = "600 15px Poppins"; c.textAlign = "center"; c.fillStyle = `rgba(${GRIS},${.8 * a(2)})`; c.fillText(d, 40 + k * 66, 22); });
         rotulo(c, 240, 444, "Con qué frecuencia", NAR, a(2), 16); c.restore(); }; })(),
-    // 04 · índice de accidentabilidad 2024 por rubro (SUSESO): cada punto = 0,1 accidentes por cada 100 personas; columnas de 8 puntos que crecen de abajo hacia arriba.
-    //      Al avanzar, LA MISMA columna de Transporte crece hasta la mortalidad (8,8 por 100.000) al lado del promedio (2,1) y se marca «4×».
-    accid: (() => { const R = [["Industria manufacturera", 3.5], ["Agricultura y pesca", 3.3], ["Transporte", 3.1, 1], ["Comercio", 2.8], ["Construcción", 2.8], ["Servicios", 2.0], ["Electricidad, gas y agua", 1.1], ["Minería", .9]];
-      const lerp = (a, b, e) => a + (b - a) * e, cl = (v) => Math.min(1, Math.max(0, v));
-      const lineas = (c, txt, x, y, max) => { const p = txt.split(" "), L = []; let l = ""; for (const w of p) { const n = l ? l + " " + w : w; if (c.measureText(n).width > max && l) { L.push(l); l = w; } else l = n; } L.push(l); L.forEach((s, i) => c.fillText(s, x, y + i * 27)); };
-      let u = 0; return (c, t, w, h) => { c.clearRect(0, 0, w, h); u = ir(u, paso >= 1 ? 1 : 0, .05); const e = u * u * (3 - 2 * u), ahora = performance.now() - tPaso;
-        const s0 = 22, s1 = 34, s = lerp(s0, s1, e), b0 = 420, b1 = 548, base = lerp(b0, b1, e), slot = w / 8;
-        const col = (cx, n, rgb, a, r, ap) => { for (let i = 0; i < n; i++) { const k = ap(i); if (k <= 0) break; punto(c, cx + ((i % 8) - 3.5) * s, base - s / 2 - Math.floor(i / 8) * s, r * (.4 + .6 * k), rgb, a * k); } };
-        // encabezado: qué mide cada punto
-        rotulo(c, 0, 4, "Accidentes por cada 100 personas · un punto = 0,1", GRIS, (1 - e) * cl(t / 800), 15, "left");
-        rotulo(c, 0, 4, "Muertes por cada 100.000 personas · un punto = 0,1", GRIS, e, 15, "left");
-        // la línea del promedio: 2,5 accidentes (25 puntos) → 2,1 muertes (21 puntos)
-        const xT = lerp(slot * 2.5, w / 2 + 190, e), xA = w / 2 - 230, yp = base - lerp(25, 21, e) / 8 * s, xa = lerp(0, xA - 4 * s1 - 30, e), xb = lerp(w, xT + 4 * s1 + 16, e);
-        c.strokeStyle = `rgba(${CARBON},.4)`; c.lineWidth = 1.8; c.setLineDash([3, 8]); c.beginPath(); c.moveTo(xa, yp); c.lineTo(xb, yp); c.stroke(); c.setLineDash([]);
-        { const al = .8 * (1 - e) * cl(t / 900); if (al > .01) { c.save(); c.font = "600 20px Poppins"; c.textAlign = "right"; c.textBaseline = "top"; c.fillStyle = `rgba(${CARBON},${al})`; c.fillText("Promedio del país · 2,5", w, 2); const tw = c.measureText("Promedio del país · 2,5").width;
-          c.strokeStyle = `rgba(${CARBON},${al * .6})`; c.lineWidth = 1.8; c.setLineDash([3, 8]); c.beginPath(); c.moveTo(w - tw - 80, 14); c.lineTo(w - tw - 16, 14); c.stroke(); c.setLineDash([]); c.restore(); } }
-        // columnas por rubro
-        R.forEach(([nom, val, top], r) => { const trans = !!top, a = trans ? 1 : 1 - e; if (a < .01) return;
-          const cx = trans ? xT : slot * (r + .5), n0 = Math.round(val * 10), n = trans ? Math.round(lerp(n0, 88, cl((ahora - 500) / 1400) * e)) : n0, rgb = trans ? AZUL : CARBON;
-          const ap = (i) => cl((t - 250 - r * 90 - i * 18) / 260);
-          col(cx, n, rgb, a * (trans ? 1 : .55), (trans ? 7.6 : 7) + 4 * e, ap);
-          const filas = Math.ceil(n / 8), yv = base - filas * s - 18, ok = ap(n0 - 1);
-          c.save(); c.textAlign = "center"; c.textBaseline = "alphabetic"; c.font = `${trans ? 600 : 500} ${trans ? lerp(44, 64, e) : 38}px Poppins`; c.fillStyle = `rgba(${rgb},${a * ok})`;
-          c.fillText(trans ? (e > .5 ? (n >= 88 ? "8,8" : "") : "3,1") : String(val).replace(".", ","), cx, yv);
-          c.font = `${trans ? 600 : 400} 21px Poppins`; c.textBaseline = "top"; c.fillStyle = `rgba(${rgb},${a * (trans ? 1 : .75) * cl(t / 700)})`; lineas(c, nom, cx, base + 22, slot - 26); c.restore(); });
-        // mortalidad: el promedio del país, como columna al lado de Transporte
-        if (e > .01) { col(xA, 21, CARBON, .55 * e, 11.6, (i) => cl((ahora - 300 - i * 30) / 300));
-          c.save(); c.textAlign = "center"; c.font = "500 44px Poppins"; c.fillStyle = `rgba(${CARBON},${.8 * cl((ahora - 900) / 400) * e})`; c.fillText("2,1", xA, base - 3 * s - 18);
-          c.font = "400 21px Poppins"; c.textBaseline = "top"; c.fillStyle = `rgba(${CARBON},${.75 * e})`; c.fillText("Promedio del país", xA, base + 22); c.restore(); }
-        // «4×»: del promedio a la cima de Transporte, al costado de la columna
-        const k = cl((ahora - 2100) / 600) * e; if (k > .01) { const x = xT + 4 * s1 + 34, ya = yp, yb = base - 11 * s1, yk = ya + (yb - ya) * k;
-          c.strokeStyle = `rgba(${AZUL},${k})`; c.lineWidth = 2.5; c.beginPath(); c.moveTo(x - 10, ya); c.lineTo(x, ya); c.lineTo(x, yk); if (k > .98) c.lineTo(x - 10, yb); c.stroke();
-          c.save(); c.textAlign = "left"; c.textBaseline = "middle"; c.fillStyle = `rgba(${AZUL},${k})`; c.font = "600 84px Poppins"; c.fillText("4×", x + 30, (ya + yb) / 2 - 18);
-          c.font = "500 23px Poppins"; c.fillStyle = `rgba(${CARBON},${k * .8})`; c.fillText("el promedio del país", x + 34, (ya + yb) / 2 + 40); c.fillText("el rubro más alto", x + 34, (ya + yb) / 2 + 70); c.restore(); }
+    // 04 · accidentabilidad 2024 (SUSESO): industria manufacturera y transporte en columnas de 8 puntos (un punto = 0,1 por cada 100 personas), la línea del promedio (2,5)
+    //      y el número grande: 3 de cada 100. AVANZAR → la torta de puntos con la forma del accidente (143.199 accidentes del trabajo 2024).
+    accid: (() => { const C = [["Industria manufacturera", 3.5], ["Transporte", 3.1, 1]], cl = (v) => Math.min(1, Math.max(0, v));
+      const F = [["Caídas de personas", .345, AZUL, 1], ["Golpes por o contra objetos", .072, AZUL, .72], ["Atrapamientos o amputaciones", .047, AZUL, .52], ["Accidentes con vehículos", .047, AZUL, .36], ["Otras formas", .489, CARBON, .14]];
+      const anillo = []; for (let r = 150; r <= 262; r += 16) { const n = Math.round(2 * Math.PI * r / 17); for (let k = 0; k < n; k++) anillo.push([r, k / n]); }
+      let u = 0; return (c, t, w, h) => { c.clearRect(0, 0, w, h); u = ir(u, paso >= 1 ? 1 : 0, .07); const v = 1 - u, ahora = performance.now() - tPaso;
+        if (v > .01) {   // columnas
+          const s = 34, base = 520, xs = [250, 600];
+          rotulo(c, 0, 4, "Accidentes con días perdidos por cada 100 personas · un punto = 0,1", GRIS, v * cl(t / 800), 15, "left");
+          const yp = base - 25 / 8 * s; c.strokeStyle = `rgba(${CARBON},${.45 * v})`; c.lineWidth = 2; c.setLineDash([3, 8]); c.beginPath(); c.moveTo(40, yp); c.lineTo(780, yp); c.stroke(); c.setLineDash([]);
+          c.save(); c.font = "600 22px Poppins"; c.textAlign = "left"; c.textBaseline = "middle"; c.fillStyle = `rgba(${CARBON},${.8 * v * cl((t - 900) / 500)})`; c.fillText("Promedio del país · 2,5", 796, yp); c.restore();
+          C.forEach(([nom, val, top], j) => { const n = Math.round(val * 10), rgb = top ? AZUL : CARBON, cx = xs[j];
+            for (let i = 0; i < n; i++) { const k = cl((t - 250 - j * 300 - i * 20) / 260); if (k <= 0) break; punto(c, cx + ((i % 8) - 3.5) * s, base - s / 2 - Math.floor(i / 8) * s, 10.5 * (.4 + .6 * k), rgb, v * k * (top ? 1 : .5)); }
+            c.save(); c.textAlign = "center"; c.font = `${top ? 600 : 500} ${top ? 54 : 44}px Poppins`; c.fillStyle = `rgba(${rgb},${v * cl((t - 450 - j * 300 - n * 20) / 400)})`; c.fillText(String(val).replace(".", ","), cx, base - Math.ceil(n / 8) * s - 24);
+            c.font = `${top ? 600 : 400} 24px Poppins`; c.textBaseline = "top"; c.fillStyle = `rgba(${rgb},${v * (top ? 1 : .75)})`; c.fillText(nom, cx, base + 22); c.restore(); });
+          // el número grande
+          const k = cl((t - 1500) / 700) * v; c.save(); c.textAlign = "left"; c.fillStyle = `rgba(${AZUL},${k})`; c.font = "600 250px Poppins"; c.textBaseline = "alphabetic"; c.fillText("3", 1110, 330);
+          c.font = "500 64px Poppins"; c.fillText("de cada 100", 1272, 322); c.fillStyle = `rgba(${CARBON},${k * .85})`; c.font = "400 34px Poppins";
+          c.fillText("personas en transporte tuvieron", 1116, 400); c.fillText("un accidente con días perdidos", 1116, 446); c.fillText("en un año.", 1116, 492); c.restore();
+        }
+        if (u > .01) {   // la torta de puntos
+          const cx = 420, cy = 330, sw = cl((ahora - 200) / 1600);
+          rotulo(c, 0, 4, "Forma del accidente · accidentes del trabajo 2024", GRIS, u, 15, "left");
+          for (const [r, f] of anillo) { if (f > sw) continue; let a0 = 0, seg = F[F.length - 1]; for (const x of F) { if (f < a0 + x[1]) { seg = x; break; } a0 += x[1]; }
+            const th = -Math.PI / 2 + f * 2 * Math.PI; punto(c, cx + Math.cos(th) * r, cy + Math.sin(th) * r, 5.2, seg[2], u * seg[3]); }
+          c.save(); c.textAlign = "center"; c.fillStyle = `rgba(${CARBON},${u})`; c.font = "600 52px Poppins"; c.fillText("143.199", cx, cy + 6); c.font = "400 22px Poppins"; c.fillStyle = `rgba(${GRIS},${u})`; c.fillText("accidentes del trabajo", cx, cy + 40); c.restore();
+          const k = cl((ahora - 1200) / 600) * u; c.save(); c.textAlign = "left"; c.fillStyle = `rgba(${AZUL},${k})`; c.font = "600 150px Poppins"; c.fillText("1 de cada 2", 820, 210);
+          c.fillStyle = `rgba(${CARBON},${k * .85})`; c.font = "400 30px Poppins"; c.fillText("accidentes fue una caída, un golpe,", 826, 268); c.fillText("un atrapamiento o un accidente con vehículos.", 826, 308);
+          F.forEach(([nom, p, rgb, a], i) => { const y = 390 + i * 46, kk = cl((ahora - 1600 - i * 150) / 400) * u; punto(c, 838, y - 8, 10, rgb, a * kk); c.font = `${i < 4 ? 500 : 400} 26px Poppins`; c.fillStyle = `rgba(${CARBON},${kk * (i < 4 ? .9 : .55)})`; c.fillText(nom, 866, y); c.textAlign = "right"; c.fillText(`${Math.round(p * 100)} %`, 1500, y); c.textAlign = "left"; });
+          c.restore(); }
       }; })(),
     // 05 · un día cualquiera de 2024: cerca de 390 accidentes del trabajo (un punto = una persona); 4 de ellos, graves
     dia: (() => { const N = 390, C = 26, k = new Float32Array(N), az = new Float32Array(N), rj = new Float32Array(N), graves = [57, 140, 233, 318];
@@ -308,10 +304,10 @@
           const rgb = rj[n] > .5 ? ROJO : az[n] > .5 ? AZUL : CARBON, a = (paso >= 2 ? (g ? 1 : .18) : az[n] > .5 ? .9 : .45) * k[n];
           punto(c, x, y, (6.4 + (g ? 6 * rj[n] : 0)) * (.5 + .5 * k[n]), rgb, a); if (rj[n] > .5) aro(c, x, y, 18 + 4 * Math.sin(t / 260), ROJO, .35 * rj[n], 2); } }; })(),
     // 06 · iceberg ordenado: arriba lo que se ve (esfera chica); bajo la línea, lo que no se ve (esfera grande)
-    iceberg2: (() => { let u = 0; return (c, t, w, h) => { c.clearRect(0, 0, w, h); u = ir(u, paso >= 1 ? 1 : 0, .04); const g = t / 1600, yw = 520;
-      c.strokeStyle = `rgba(${CARBON},.4)`; c.lineWidth = 1.6; c.beginPath(); for (let x = 0; x <= w; x += 8) { const y = yw + Math.sin(x / 90 + t / 900) * 4; x ? c.lineTo(x, y) : c.moveTo(x, y); } c.stroke();
-      esfera(c, 400, 370, 92, P160, g, NAR, 1, 2.4);
-      esfera(c, 400, 790, 230 * (.3 + .7 * u), P900, -g * .7, ROJO, u, 2.4); }; })(),
+    iceberg2: (() => { let u = 0; return (c, t, w, h) => { c.clearRect(0, 0, w, h); u = ir(u, paso >= 1 ? 1 : 0, .04); const g = t / 1600, yw = 520, cx = w / 2;
+      c.strokeStyle = `rgba(${AZUL},.45)`; c.lineWidth = 2; c.beginPath(); for (let x = 0; x <= w; x += 8) { const y = yw + Math.sin(x / 110 + t / 900) * 5; x ? c.lineTo(x, y) : c.moveTo(x, y); } c.stroke();
+      esfera(c, cx, 345, 100, P160, g, AZUL, 1, 2.6);
+      esfera(c, cx, 800, 235 * (.3 + .7 * u), P900, -g * .7, ROJO, u, 2.4); }; })(),
     // 08 · 10 · 12 · la pirámide de controles: partículas que suben por la pirámide (de lo menos a lo más efectivo); la franja del pilar activo brilla. Cuenta los porcentajes.
     embudo: (() => { const r = azar(31), P = [...Array(260)].map(() => ({ x: r(), y: r(), v: .4 + r() * .8, z: r() })); let on = [0, 0, 0], cuenta = 0;
       return (c, t, w, h, cv) => { c.clearRect(0, 0, w, h); const lam = cv.closest(".lam"), n = +lam.dataset.pilar, act = n === 0 ? (paso >= 1 ? 1 : 0) : n, cx = 390 + 410, bandas = [[0, 190], [204, 394], [408, 598]];
