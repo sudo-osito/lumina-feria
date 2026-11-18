@@ -416,17 +416,22 @@ export async function crear(cont) {
   const camSis = claves([[0, 71.6, 6.1, 4.2, 67.9, .1, 11.6, 54], [30, 71.6, 6.1, 4.2, 68.0, .1, 11.7, 52]]);   // la cámara del cruce, más abierta: lo de arriba no choca con el título
   const CAM_JEFE = [[0, 53.0, 1.72, 24.1, 56.3, 1.42, 26.1, 34], [9, 53.3, 1.7, 24.4, 56.3, 1.42, 26.1, 32]];
   const CAM_TERRENO = [[0, 65.0, 1.8, 4.4, 66.8, 1.15, 9.6, 42], [12, 65.6, 1.75, 4.8, 66.8, 1.15, 9.6, 39]];   // desde la calle norte, de frente al cruce
+  // el atajo de Don Salva: deja el sendero y cruza el pasillo de la grúa por la zona de racks (no por el cruce)
+  const ATAJO = ruta([[66.2, 9.45], [67.3, 10.6], [68.0, 11.55], [70.4, 11.55]]);
+  function sisAtajo(t, t0 = .2, vel = 1.0, dMax = 1e9) { const d = Math.min(ATAJO.largo, dMax, Math.max(0, (t - t0) * vel)), q = en(ATAJO, d); pon(salva.g, q.x, q.z, q.ry ?? 0);
+    if (d < Math.min(ATAJO.largo, dMax)) P.andar(salva, 1, t); else { P.quieto(salva); P.respirar(salva, t); } return d; }
   E.sistema = [{   // 01 · ve: la cámara del cruce detecta a la persona y a la grúa que retrocede
     casa: 0, trans: 'seco',
     ini() { sisIni(); est.lumina = { alerta: 0, evento: 0, desde: 0 }; },
     cam: camCCTV,
-    tick(t) { sisBase(t); salvaHasta(t, 66.9, 1.05, .3); retrocede(t, .8, 9.5, 15.4, 12.9); },
+    tick(t) { sisBase(t); puertas(false); sisAtajo(t); retrocede(t, .8, 9.5, 15.6, 13.9); },
   }, {            // 02 · actúa: riesgo → el cruce se cierra, baliza y aviso a la grúa, que frena; el evento queda registrado
     casa: 0, trans: 'seco',
-    ini() { sisIni(); cargado(12.9); est.lumina = { alerta: 0, evento: 0, desde: 0 }; },
+    ini() { sisIni(); cargado(13.9); est.lumina = { alerta: 0, evento: 0, desde: 0 }; },
     cam: camCCTV,
-    tick(t) { sisBase(t); const L = est.lumina; if (t > .5 && !L.alerta) L.alerta = t; if (t > 3.4 && !L.evento) L.evento = t; pon(salva.g, 66.9, 9.45, 0); P.quieto(salva); P.respirar(salva, t);
-      const u = suave(tr(t, 0, 1.4)); cargado(12.9 - .5 * u); P.manejar(aleS, t, .9); puertas(true); grua.balMat.emissiveIntensity = Math.sin(reloj * 12) > 0 ? 2.6 : .1; },
+    tick(t) { sisBase(t); const L = est.lumina; if (t > .5 && !L.alerta) L.alerta = t; if (t > 3.4 && !L.evento) L.evento = t; puertas(false);
+      sisAtajo(t, -2.3, 1.0, 3.2); salva.cab.rotation.y = t > .8 ? .5 : 0;
+      const u = suave(tr(t, 0, 1.0)); cargado(13.9 - .3 * u); P.manejar(aleS, t, .9); grua.balMat.emissiveIntensity = Math.sin(reloj * 12) > 0 ? 2.6 : .1; },
   }, {            // 03 · avisa: al jefe de planta le llega el aviso al celular, esté donde esté
     casa: 1, trans: 'seco',
     ini() { sisIni(); cargado(12.4); jefe.g.visible = true; pon(jefe.g, 56.25, 26.15, rumbo(-1, -.62)); fonoJ.g.visible = true; est.lumina = { modo: 'aviso', t0: .9 }; },
@@ -435,12 +440,14 @@ export async function crear(cont) {
       fonoJ.pant.emissiveIntensity = t > .9 ? (t < 2.4 && Math.sin(t * 14) < 0 ? .3 : 1.3) : 0; },
   }, {            // 04 · se corrige: el jefe va al cruce con el video en la mano y lo revisa con el equipo; el cruce vuelve a abrir
     casa: 0, trans: 'seco',
-    ini() { sisIni(); cargado(12.4); jefe.g.visible = true; fonoJ.g.visible = true; fonoJ.pant.emissiveIntensity = 1.1; pon(salva.g, 67.4, 9.0, rumbo(-1, .2)); est.lumina = { modo: 'terreno', t0: 4.6 }; },
+    ini() { sisIni(); cargado(13.6); jefe.g.visible = true; fonoJ.g.visible = true; fonoJ.pant.emissiveIntensity = 1.1; pon(salva.g, 67.0, 9.45, rumbo(-1, .05)); est.lumina = { modo: 'terreno', t0: 4.6 }; },
     cam: claves(CAM_TERRENO),
     tick(t) { sisBase(t); P.manejar(aleS, t, .9); grua.balMat.emissiveIntensity = 0;
       const u = Math.min(1, t / 3.6), x = 62.4 + (66.2 - 62.4) * u; pon(jefe.g, x, 9.7, u < 1 ? 0 : rumbo(1, -.05));
       if (u < 1) { P.andar(jefe, 1, t); P.celular(jefe, t); } else { P.quieto(jefe); P.hablar(jefe, t); jefe.bi.rotation.x = -1.05; jefe.bi.rotation.z = .2; }
-      P.quieto(salva); P.respirar(salva, t); if (t > 4) salva.cab.rotation.y = -.25; puertas(t < 6.5); },
+      P.quieto(salva); P.respirar(salva, t); if (t > 4) { salva.cab.rotation.x = .08; salva.cab.rotation.y = Math.sin(t * .8) * .1; }
+      if (u >= 1 && t > 5.5) { jefe.bd.rotation.set(-1.45, 0, -.15); }   // le muestra el camino: por el sendero y el cruce
+      puertas(false); },
   }];
 
   /* Lúmina sobre la imagen: marcos con esquinas, rostros pixelados, la línea del riesgo y el aviso; o, desde el aire, el resumen de la planta */
@@ -485,17 +492,17 @@ export async function crear(cont) {
       lc.fillStyle = NAR; lc.beginPath(); lc.arc(X + 72, NY + 44, 18, 0, 7); lc.fill(); lc.fillStyle = '#fff'; lc.beginPath(); lc.arc(X + 72, NY + 44, 7, 0, 7); lc.fill();
       lc.fillStyle = '#6c6c6c'; lc.font = '600 15px Poppins, Arial'; lc.textBaseline = 'middle'; lc.fillText('LÚMINA · ahora', X + 102, NY + 44);
       lc.fillStyle = '#E5484D'; lc.font = '600 28px Poppins, Arial'; lc.fillText('Riesgo de atropello', X + 58, NY + 98);
-      lc.fillStyle = '#181818'; lc.font = '500 19px Poppins, Arial'; lc.fillText('Cruce C1 · grúa en retroceso', X + 58, NY + 134); lc.fillText('con una persona en el paso.', X + 58, NY + 160);
+      lc.fillStyle = '#181818'; lc.font = '500 19px Poppins, Arial'; lc.fillText('Peatón fuera del sendero, cruzando', X + 58, NY + 134); lc.fillText('en zona de racks · pasillo 69.', X + 58, NY + 160);
       lc.fillStyle = '#2A2F36'; lc.beginPath(); lc.roundRect(X + 58, NY + 188, W - 116, 112, 16); lc.fill(); lc.fillStyle = '#fff'; lc.beginPath(); lc.moveTo(X + W / 2 - 14, NY + 226); lc.lineTo(X + W / 2 + 18, NY + 244); lc.lineTo(X + W / 2 - 14, NY + 262); lc.fill();
       lc.fillStyle = 'rgba(255,255,255,.85)'; lc.font = '500 15px Poppins, Arial'; lc.fillText('Video del evento · 0:12', X + 74, NY + 284);
-      const b2 = suave(tr(t, L.t0 + 1.4, L.t0 + 2)); lc.globalAlpha = k * b2; lc.fillStyle = '#056CF2'; lc.beginPath(); lc.roundRect(X + 34, NY + 350, W - 68, 70, 35); lc.fill(); lc.fillStyle = '#fff'; lc.font = '600 22px Poppins, Arial'; lc.textAlign = 'center'; lc.fillText('Ir al cruce C1', X + W / 2, NY + 386); lc.textAlign = 'left';
+      const b2 = suave(tr(t, L.t0 + 1.4, L.t0 + 2)); lc.globalAlpha = k * b2; lc.fillStyle = '#056CF2'; lc.beginPath(); lc.roundRect(X + 34, NY + 350, W - 68, 70, 35); lc.fill(); lc.fillStyle = '#fff'; lc.font = '600 22px Poppins, Arial'; lc.textAlign = 'center'; lc.fillText('Ir al pasillo 69', X + W / 2, NY + 386); lc.textAlign = 'left';
       lc.globalAlpha = 1; return;
     }
     if (L.modo === 'terreno') {   // en el cruce: el video en la mano y el evento cerrado
       const k = suave(tr(t, L.t0, L.t0 + .6)), X = 1340, Y = 230; if (k <= 0) return; lc.globalAlpha = k;
       lc.fillStyle = 'rgba(255,255,255,.97)'; lc.beginPath(); lc.roundRect(X, Y, 500, 132, 22); lc.fill();
       lc.fillStyle = '#1F9D5A'; lc.beginPath(); lc.arc(X + 52, Y + 66, 26, 0, 7); lc.fill(); lc.strokeStyle = '#fff'; lc.lineWidth = 5; lc.beginPath(); lc.moveTo(X + 40, Y + 66); lc.lineTo(X + 49, Y + 76); lc.lineTo(X + 65, Y + 56); lc.stroke();
-      lc.fillStyle = '#6c6c6c'; lc.font = '600 17px Poppins, Arial'; lc.textBaseline = 'middle'; lc.fillText('LÚMINA · CRUCE C1', X + 98, Y + 36); lc.fillStyle = '#181818'; lc.font = '600 30px Poppins, Arial'; lc.fillText('Corregido en terreno', X + 98, Y + 72);
+      lc.fillStyle = '#6c6c6c'; lc.font = '600 17px Poppins, Arial'; lc.textBaseline = 'middle'; lc.fillText('LÚMINA · PASILLO 69', X + 98, Y + 36); lc.fillStyle = '#181818'; lc.font = '600 30px Poppins, Arial'; lc.fillText('Retroalimentado en terreno', X + 98, Y + 72);
       lc.fillStyle = '#6c6c6c'; lc.font = '500 19px Poppins, Arial'; lc.fillText('El evento queda para el análisis', X + 98, Y + 106); lc.globalAlpha = 1; return;
     }
     // marco de cámara (CCTV) · en «cómo funciona» todo baja, para no chocar con el título
@@ -505,13 +512,13 @@ export async function crear(cont) {
     const seg = 47 * 60 + 12 + Math.floor(t), hh = `08:${String(Math.floor(seg / 60) % 60).padStart(2, '0')}:${String(seg % 60).padStart(2, '0')}`; lc.fillText(hh, 1400, 60 + oy);
     const bs = salva.g.position, bg = grua.g.position;
     const rS = cajaMundo(bs.x, bs.z, .35, 1.8), rG = cajaMundo(bg.x, bg.z, 1.25, 2.3);
-    marco(lc, rS, NAR, 'Persona'); marco(lc, rG, NAR, 'Grúa · en retroceso');
+    marco(lc, rS, NAR, est.esc === 'sistema' ? 'Persona · fuera del sendero' : 'Persona'); marco(lc, rG, NAR, 'Grúa · en retroceso');
     tapar(salva); tapar(aleS);
     if (L.alerta) { const a = Math.min(1, (t - L.alerta) * 3); lc.globalAlpha = a; lc.setLineDash([10, 10]); lc.strokeStyle = '#FF4D4F'; lc.lineWidth = 3; lc.beginPath(); lc.moveTo((rS[0] + rS[2]) / 2, rS[3]); lc.lineTo((rG[0] + rG[2]) / 2, rG[3]); lc.stroke(); lc.setLineDash([]);
       const X = 1340, Y = 110 + oy; lc.fillStyle = 'rgba(255,255,255,.97)'; lc.beginPath(); lc.roundRect(X, Y, 500, 132, 22); lc.fill();
       lc.fillStyle = NAR; lc.beginPath(); lc.arc(X + 52, Y + 66, 26, 0, 7); lc.fill(); lc.fillStyle = '#fff'; lc.beginPath(); lc.arc(X + 52, Y + 66, 10, 0, 7); lc.fill();
       lc.fillStyle = '#6c6c6c'; lc.font = '600 17px Poppins, Arial'; lc.fillText('LÚMINA · AVISO AL JEFE DE TURNO', X + 98, Y + 36);
-      lc.fillStyle = '#181818'; lc.font = '600 30px Poppins, Arial'; lc.fillText('Riesgo de atropello', X + 98, Y + 72); lc.fillStyle = '#6c6c6c'; lc.font = '500 19px Poppins, Arial'; lc.fillText('Cruce C1 · cierra el cruce y avisa a la grúa', X + 98, Y + 106);
+      lc.fillStyle = '#181818'; lc.font = '600 30px Poppins, Arial'; lc.fillText('Riesgo de atropello', X + 98, Y + 72); lc.fillStyle = '#6c6c6c'; lc.font = '500 19px Poppins, Arial'; lc.fillText(est.esc === 'sistema' ? 'Cruza en zona de racks · avisa a la grúa' : 'Cruce C1 · cierra el cruce y avisa a la grúa', X + 98, Y + 106);
       lc.globalAlpha = 1; }
     if (L.evento) { const a = Math.min(1, (t - L.evento) * 3), X = 1340, Y = 262 + oy; lc.globalAlpha = a; lc.fillStyle = 'rgba(24,24,24,.86)'; lc.beginPath(); lc.roundRect(X, Y, 500, 64, 32); lc.fill();
       lc.fillStyle = '#3DD07A'; lc.beginPath(); lc.arc(X + 34, Y + 32, 8, 0, 7); lc.fill(); lc.fillStyle = '#fff'; lc.font = '500 21px Poppins, Arial'; lc.fillText('Evento registrado para el análisis', X + 56, Y + 33); lc.globalAlpha = 1; }

@@ -28,7 +28,7 @@
   const pedirPlanta = import("./escena/lumina5.js?v=42").then((m) => m.crear($("#planta3d"))).then((p) => { planta = p; sincronizar3d(); return planta; }).catch((e) => console.error("planta 3D:", e));
   // La historia de Don Salva: otra escena 3D, con cámara de cine (historia/historia.js); una toma por paso
   let historia = null;
-  const pedirHistoria = import("./historia/historia.js?v=26").then((m) => m.crear($("#historia3d"))).then((h) => { historia = h; sincronizar3d(); return h; }).catch((e) => console.error("historia 3D:", e));
+  const pedirHistoria = import("./historia/historia.js?v=27").then((m) => m.crear($("#historia3d"))).then((h) => { historia = h; sincronizar3d(); return h; }).catch((e) => console.error("historia 3D:", e));
   function sincronizar3d() {
     const esc = lams[i].dataset.escena;
     escenario.classList.toggle("conhistoria", !!esc);
@@ -285,22 +285,23 @@
           c.font = "500 64px Poppins"; c.fillText("de cada 100", 1272, 322); c.fillStyle = `rgba(${CARBON},${k * .85})`; c.font = "400 30px Poppins";
           c.fillText("personas en logística y transporte", 1116, 400); c.fillText("tuvieron un accidente con", 1116, 446); c.fillText("días perdidos en un año.", 1116, 492); c.restore();
         }
-        if (u > .01) {   // la torta de puntos
-          const cx = 400, cy = 300, sw = cl((ahora - 200) / 1600);
-          rotulo(c, 0, 4, "Forma del accidente · accidentes del trabajo 2024", GRIS, u, 15, "left");
-          // la pizza: un círculo lleno de puntos; la tajada de caídas, golpes, atrapamientos y vehículos sale hacia afuera
-          const sale = 34 * (1 - Math.pow(1 - cl((ahora - 1500) / 900), 3)), dx = Math.cos(bis) * sale, dy = Math.sin(bis) * sale;
-          for (const [r, f] of anillo) { if (f > sw) continue; let a0 = 0, seg = F[F.length - 1], d = false; for (const [j, x] of F.entries()) { if (f < a0 + x[1]) { seg = x; d = j < 4; break; } a0 += x[1]; }
-            const th = -Math.PI / 2 + f * 2 * Math.PI; punto(c, cx + Math.cos(th) * r + (d ? dx : 0), cy + Math.sin(th) * r + (d ? dy : 0), 5.4, seg[2], u * (d ? Math.max(.4, seg[3]) : .16)); }
+        if (u > .01) {   // la torta de puntos, en cuatro: una de cada cuatro (Bastián)
+          const cx = 400, cy = 300, sw = cl((ahora - 200) / 1600), q = .25, bis = -Math.PI / 2 + q * Math.PI;
+          rotulo(c, 0, 4, "Accidentes del trabajo 2024", GRIS, u, 15, "left");
+          const sale = 38 * (1 - Math.pow(1 - cl((ahora - 1500) / 900), 3)), dx = Math.cos(bis) * sale, dy = Math.sin(bis) * sale;
+          for (const [r, f] of anillo) { if (f > sw) continue; const d = f < q, th = -Math.PI / 2 + f * 2 * Math.PI;
+            punto(c, cx + Math.cos(th) * r + (d ? dx : 0), cy + Math.sin(th) * r + (d ? dy : 0), 5.4, d ? AZUL : CARBON, u * (d ? 1 : .16)); }
+          // las líneas que separan los cuatro cuartos
+          c.save(); c.strokeStyle = `rgba(245,246,248,${u})`; c.lineWidth = 7; for (let k = 0; k < 4; k++) { const th = -Math.PI / 2 + k * Math.PI / 2; c.beginPath(); c.moveTo(cx, cy); c.lineTo(cx + Math.cos(th) * 262, cy + Math.sin(th) * 262); c.stroke(); } c.restore();
           c.save(); c.textAlign = "center"; c.fillStyle = `rgba(${CARBON},${u * .85})`; c.font = "600 30px Poppins"; c.fillText("143.199 accidentes del trabajo", cx, cy + 312); c.restore();
-          const k = cl((ahora - 1200) / 600) * u; c.save(); c.textAlign = "left"; c.fillStyle = `rgba(${AZUL},${k})`; c.font = "600 150px Poppins"; c.fillText("1 de cada 2", 820, 210);
-          c.fillStyle = `rgba(${CARBON},${k * .85})`; c.font = "400 30px Poppins"; c.fillText("accidentes fue una caída, un golpe,", 826, 268); c.fillText("un atrapamiento o un accidente con vehículos.", 826, 308);
-          // las formas, en burbujas (como las del iceberg), sin porcentajes
-          let bx = 826, by = 380; F.forEach(([nom, p, rgb, a], i) => { const kk = cl((ahora - 1600 - i * 150) / 400) * u; c.font = "500 26px Poppins"; const tw = c.measureText(nom).width, bw = tw + 70, bh = 56;
+          const k = cl((ahora - 1200) / 600) * u; c.save(); c.textAlign = "left"; c.fillStyle = `rgba(${AZUL},${k})`; c.font = "600 150px Poppins"; c.fillText("1 de cada 4", 820, 210);
+          c.fillStyle = `rgba(${CARBON},${k * .85})`; c.font = "400 30px Poppins"; c.fillText("accidentes tuvo relación con caídas de personas,", 826, 268); c.fillText("golpes o vehículos y equipos móviles.", 826, 308); c.restore();
+          // en burbujas, como las del iceberg, sin porcentajes
+          let bx = 826, by = 380; ["Caídas de personas", "Golpes", "Vehículos y equipos móviles"].forEach((nom, i) => { const kk = cl((ahora - 1600 - i * 150) / 400) * u; c.font = "500 26px Poppins"; const bw = c.measureText(nom).width + 70, bh = 56;
             if (bx + bw > 1640) { bx = 826; by += 72; } c.save(); c.globalAlpha = kk; c.shadowColor = "rgba(5,108,242,.25)"; c.shadowBlur = 24; c.shadowOffsetY = 10; c.fillStyle = "#fff"; c.beginPath(); c.roundRect(bx, by, bw, bh, 28); c.fill(); c.restore();
-            c.save(); c.globalAlpha = kk; c.strokeStyle = `rgba(${i < 4 ? AZUL : CARBON},${i < 4 ? .25 : .12})`; c.lineWidth = 1.5; c.beginPath(); c.roundRect(bx, by, bw, bh, 28); c.stroke(); punto(c, bx + 30, by + bh / 2, 7, rgb, i < 4 ? Math.max(.45, a) : .3);
-            c.fillStyle = `rgba(${CARBON},${i < 4 ? .9 : .5})`; c.textBaseline = "middle"; c.fillText(nom, bx + 50, by + bh / 2 + 1); c.restore(); bx += bw + 14; });
-          c.restore(); }
+            c.save(); c.globalAlpha = kk; c.strokeStyle = `rgba(${AZUL},.25)`; c.lineWidth = 1.5; c.beginPath(); c.roundRect(bx, by, bw, bh, 28); c.stroke(); punto(c, bx + 30, by + bh / 2, 7, AZUL, 1);
+            c.fillStyle = `rgba(${CARBON},.9)`; c.textBaseline = "middle"; c.fillText(nom, bx + 50, by + bh / 2 + 1); c.restore(); bx += bw + 14; });
+        }
       }; })(),
     // 05 · un día cualquiera de 2024: cerca de 390 accidentes del trabajo (un punto = una persona); 4 de ellos, graves
     dia: (() => { const N = 390, C = 26, k = new Float32Array(N), az = new Float32Array(N), rj = new Float32Array(N), graves = [57, 140, 233, 318];

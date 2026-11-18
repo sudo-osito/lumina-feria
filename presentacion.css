@@ -1348,3 +1348,15 @@ img, canvas { display: block; }
 .ice__nom--a, .ice__nom--b { display: block; width: max-content; margin: 0 auto; padding: 10px 26px; border-radius: 999px; background: rgba(245, 246, 248, .9); box-shadow: 0 14px 34px -18px rgba(24, 24, 24, .35); }
 .ice__nom--a { top: 322px; font-size: 32px; }
 .ice__nom--b { top: 772px; font-size: 40px; }
+
+/* ═════════ v15 (18-nov, Archivo 14) · pirámide: % dentro, soluciones a la derecha y solo desde el primer avance ═════════ */
+.emb__por { display: none; }
+.emb__pct { font-size: 64px !important; font-weight: 600; flex-direction: row; align-items: center; }
+.emb__pct small { font-size: .45em; margin-left: 4px; }
+.emb__sol { padding-left: 48px; font-size: 38px; font-weight: 600; letter-spacing: -.02em; line-height: 1.1; color: var(--blue); opacity: 0; transform: translateX(-24px); transition: opacity .8s var(--llegada), transform .9s var(--llegada); }
+.emb__sol .emb__sub { display: block; margin-top: 6px; font-size: 22px !important; font-weight: 500; color: var(--tinta-2); opacity: 1; }
+.lam--embudo.activa[data-pilar="0"].p1 .emb__sol--1,
+.lam--embudo.activa[data-pilar="2"] .emb__sol--1, .lam--embudo.activa[data-pilar="2"] .emb__sol--2,
+.lam--embudo.activa[data-pilar="3"] .emb__sol { opacity: 1; transform: none; }
+.lam--embudo[data-pilar="2"] .emb__sol--1, .lam--embudo[data-pilar="3"] .emb__sol--1, .lam--embudo[data-pilar="3"] .emb__sol--2 { color: rgba(24, 24, 24, .35); transition-delay: 0s; }
+.lam--embudo[data-pilar="0"].p1 .emb__sol--1, .lam--embudo[data-pilar="2"] .emb__sol--2, .lam--embudo[data-pilar="3"] .emb__sol--3 { transition-delay: .4s; }
