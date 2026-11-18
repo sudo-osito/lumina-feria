@@ -417,20 +417,20 @@ export async function crear(cont) {
   const CAM_JEFE = [[0, 53.0, 1.72, 24.1, 56.3, 1.42, 26.1, 34], [9, 53.3, 1.7, 24.4, 56.3, 1.42, 26.1, 32]];
   const CAM_TERRENO = [[0, 65.0, 1.8, 4.4, 66.8, 1.15, 9.6, 42], [12, 65.6, 1.75, 4.8, 66.8, 1.15, 9.6, 39]];   // desde la calle norte, de frente al cruce
   // el atajo de Don Salva: deja el sendero y cruza el pasillo de la grúa por la zona de racks (no por el cruce)
-  const ATAJO = ruta([[66.2, 9.45], [67.3, 10.6], [68.0, 11.55], [70.4, 11.55]]);
+  const ATAJO = ruta([[63.6, 9.45], [68.2, 9.45], [68.45, 10.4], [68.45, 11.7]]);   // del sendero al pasillo 69, a pie, entre los racks
   function sisAtajo(t, t0 = .2, vel = 1.0, dMax = 1e9) { const d = Math.min(ATAJO.largo, dMax, Math.max(0, (t - t0) * vel)), q = en(ATAJO, d); pon(salva.g, q.x, q.z, q.ry ?? 0);
     if (d < Math.min(ATAJO.largo, dMax)) P.andar(salva, 1, t); else { P.quieto(salva); P.respirar(salva, t); } return d; }
   E.sistema = [{   // 01 · ve: la cámara del cruce detecta a la persona y a la grúa que retrocede
     casa: 0, trans: 'seco',
     ini() { sisIni(); est.lumina = { alerta: 0, evento: 0, desde: 0 }; },
     cam: camCCTV,
-    tick(t) { sisBase(t); puertas(false); sisAtajo(t); retrocede(t, .8, 9.5, 15.6, 13.9); },
+    tick(t) { sisBase(t); puertas(false); sisAtajo(t, .3, .95); retrocede(t, .8, 9.5, 15.6, 13.9); },
   }, {            // 02 · actúa: riesgo → el cruce se cierra, baliza y aviso a la grúa, que frena; el evento queda registrado
     casa: 0, trans: 'seco',
     ini() { sisIni(); cargado(13.9); est.lumina = { alerta: 0, evento: 0, desde: 0 }; },
     cam: camCCTV,
     tick(t) { sisBase(t); const L = est.lumina; if (t > .5 && !L.alerta) L.alerta = t; if (t > 3.4 && !L.evento) L.evento = t; puertas(false);
-      sisAtajo(t, -2.3, 1.0, 3.2); salva.cab.rotation.y = t > .8 ? .5 : 0;
+      sisAtajo(t, -1e3); salva.cab.rotation.x = -.12 * suave(tr(t, .4, 1)); salva.bi.rotation.x = -.5 * suave(tr(t, .6, 1.2));   // ya en el pasillo: ve la grúa y se frena
       const u = suave(tr(t, 0, 1.0)); cargado(13.9 - .3 * u); P.manejar(aleS, t, .9); grua.balMat.emissiveIntensity = Math.sin(reloj * 12) > 0 ? 2.6 : .1; },
   }, {            // 03 · avisa: al jefe de planta le llega el aviso al celular, esté donde esté
     casa: 1, trans: 'seco',
