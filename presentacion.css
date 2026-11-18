@@ -1177,3 +1177,28 @@ img, canvas { display: block; }
 .luweb { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; border: 0; z-index: 4; background: #fff; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .7s var(--llegada), visibility 0s .7s; }
 .conlu .luweb { opacity: 1; visibility: visible; transition: opacity .7s var(--llegada), visibility 0s; }
 .conlu .numero { color: rgba(11, 19, 27, .35); }
+
+/* ═════════ v8 (17-nov, videos de Bastián) ═════════ */
+/* portada: el texto un dedo más a la derecha */
+.lam--portada .portada { margin-right: -80px; }
+/* iceberg: directos en naranjo (bola chica), indirectos en rojo (bola grande) */
+.costo--v6 .costo__arriba h3 small { color: var(--lumina); }
+.costo--v6 .costo__arriba li::before { background: var(--lumina); }
+.costo--v6 .costo__bajo h3 { color: var(--rojo); }
+.costo--v6 .costo__bajo h3 small { color: var(--rojo); }
+.costo--v6 .costo__bajo li { box-shadow: 0 0 0 1.5px rgba(229, 72, 77, .22), 0 12px 30px -14px rgba(229, 72, 77, .3); }
+.costo--v6 .costo__bajo li::before { background: var(--rojo); }
+/* marco normativo: cuatro bloques con título y desarrollo */
+.marco--solo { display: block; }
+.norma__bloques { margin-top: 56px; display: grid; grid-template-columns: 1fr 1fr; gap: 26px; width: 1660px; }
+.norma__bloques > div { display: grid; gap: 10px; align-content: start; padding: 36px 40px 40px; border-radius: 26px; background: #fff; box-shadow: inset 0 0 0 1.5px var(--line), 0 20px 40px -28px rgba(24, 24, 24, .3); }
+.norma__bloques b { font-size: 38px; font-weight: 600; color: var(--blue); letter-spacing: -.01em; }
+.norma__bloques small { font-size: 26px; font-weight: 500; letter-spacing: -.015em; }
+.norma__bloques span { margin-top: 6px; font-size: 23px; line-height: 1.45; color: var(--tinta-2); }
+/* pirámide: dentro de cada franja cómo lo aborda Neisstech (sin %), todo en azul */
+.emb__pct { font-size: 38px; font-weight: 600; letter-spacing: -.02em; text-align: center; line-height: 1.1; padding: 0 60px; }
+.emb__f--3 .emb__pct { padding: 0 220px; font-size: 32px; }
+.lam--embudo[data-pilar="0"]:not(.p1) .emb__f--3 .emb__pct, .lam--embudo[data-pilar="3"] .emb__f--3 .emb__pct { filter: drop-shadow(0 26px 40px rgba(5, 108, 242, .35)); }
+.lam--embudo[data-pilar="0"]:not(.p1) .emb__f--3 .emb__pct::before, .lam--embudo[data-pilar="3"] .emb__f--3 .emb__pct::before { background: linear-gradient(180deg, #2D86FF, #056CF2); }
+/* la frase final queda sola: la pirámide se va del todo */
+.lam--embudo.p1[data-pilar="3"] .emb, .lam--embudo.p1[data-pilar="3"] .emb__t, .lam--embudo.p1[data-pilar="3"] > .eti { opacity: 0 !important; transition: opacity .7s; }

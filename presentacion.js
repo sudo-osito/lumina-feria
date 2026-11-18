@@ -310,20 +310,20 @@
     // 06 · iceberg ordenado: arriba lo que se ve (esfera chica); bajo la línea, lo que no se ve (esfera grande)
     iceberg2: (() => { let u = 0; return (c, t, w, h) => { c.clearRect(0, 0, w, h); u = ir(u, paso >= 1 ? 1 : 0, .04); const g = t / 1600, yw = 520;
       c.strokeStyle = `rgba(${CARBON},.4)`; c.lineWidth = 1.6; c.beginPath(); for (let x = 0; x <= w; x += 8) { const y = yw + Math.sin(x / 90 + t / 900) * 4; x ? c.lineTo(x, y) : c.moveTo(x, y); } c.stroke();
-      esfera(c, 400, 370, 92, P160, g, CARBON, 1, 2.4);
-      esfera(c, 400, 790, 230 * (.3 + .7 * u), P900, -g * .7, AZUL, u, 2.4); }; })(),
+      esfera(c, 400, 370, 92, P160, g, NAR, 1, 2.4);
+      esfera(c, 400, 790, 230 * (.3 + .7 * u), P900, -g * .7, ROJO, u, 2.4); }; })(),
     // 08 · 10 · 12 · la pirámide de controles: partículas que suben por la pirámide (de lo menos a lo más efectivo); la franja del pilar activo brilla. Cuenta los porcentajes.
     embudo: (() => { const r = azar(31), P = [...Array(260)].map(() => ({ x: r(), y: r(), v: .4 + r() * .8, z: r() })); let on = [0, 0, 0], cuenta = 0;
       return (c, t, w, h, cv) => { c.clearRect(0, 0, w, h); const lam = cv.closest(".lam"), n = +lam.dataset.pilar, act = n === 0 ? (paso >= 1 ? 1 : 0) : n, cx = 390 + 410, bandas = [[0, 190], [204, 394], [408, 598]];
         const ancho = (y) => 280 + (y / 598) * 540;   // pirámide: ancho a la altura y (280 arriba, 820 abajo)
-        const COL = [NAR, AZUL, AZUL];   // franja 0 = Lúmina (arriba), 1 = tráfico, 2 = gestión visual (abajo)
+        const COL = [AZUL, AZUL, AZUL];   // franja 0 = Lúmina (arriba), 1 = tráfico, 2 = gestión visual (abajo)
         const activo = (b) => act === 0 || (act === 1 && b === 2) || (act === 2 && b === 1) || (act === 3 && b === 0);
         for (let b = 0; b < 3; b++) on[b] = ir(on[b], activo(b) ? 1 : 0, .06);
         for (const p of P) { p.y -= p.v * .0016 * (1 + p.z); if (p.y < 0) { p.y = 1; p.x = r(); } const y = p.y * 598, b = y < 197 ? 0 : y < 401 ? 1 : 2, W = ancho(y) - 30, x = cx + (p.x - .5) * W;
           const a = (.12 + .55 * on[b]) * (.4 + .6 * p.z), rr = (1.6 + 2.6 * p.z) * (.7 + .5 * on[b]); punto(c, x, y, rr, COL[b], a); }
         for (let b = 0; b < 3; b++) { if (on[b] < .02) continue; const [y0, y1] = bandas[b], wt = ancho(y0), wb = ancho(y1); c.strokeStyle = `rgba(${COL[b]},${.5 * on[b]})`; c.lineWidth = 3; c.beginPath(); c.moveTo(cx - wt / 2, y0); c.lineTo(cx + wt / 2, y0); c.lineTo(cx + wb / 2, y1); c.lineTo(cx - wb / 2, y1); c.closePath(); c.stroke(); }
         // los porcentajes cuentan hasta su valor la primera vez
-        cuenta = Math.min(1.6, cuenta + .012); lam.querySelectorAll(".emb__pct").forEach((el) => { const v = +el.dataset.v, f = +el.closest(".emb__f").className.match(/--(\d)/)[1], q = Math.min(1, Math.max(0, cuenta - (f - 1) * .3)), e = 1 - Math.pow(1 - q, 3); el.firstChild.nodeValue = String(Math.round(v * e)); });
+        cuenta = Math.min(1.6, cuenta + .012); lam.querySelectorAll(".emb__pct[data-v]").forEach((el) => { const v = +el.dataset.v, f = +el.closest(".emb__f").className.match(/--(\d)/)[1], q = Math.min(1, Math.max(0, cuenta - (f - 1) * .3)), e = 1 - Math.pow(1 - q, 3); el.firstChild.nodeValue = String(Math.round(v * e)); });
       }; })(),
     // 17 · analítica (ilustrativa): dónde · a qué hora · con qué frecuencia · qué decidir
     a1: (() => { const r = azar(5), F = [[150, 110], [380, 180], [300, 80]], pts = [...Array(90)].map(() => { const f = F[Math.floor(r() * 3)]; return [f[0] + (r() - .5) * 70, f[1] + (r() - .5) * 50, r()]; });
