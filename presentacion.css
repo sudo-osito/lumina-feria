@@ -1222,3 +1222,32 @@ img, canvas { display: block; }
 .lam.activa .ice__p li, .lam.activa .ice__bajo.dado li { animation: icePill .8s var(--llegada) both; animation-delay: calc(var(--i) * 70ms + 300ms); }
 @keyframes icePill { from { opacity: 0; transform: translate(-50%, -30%) scale(.9); } }
 .ice__bajo { position: absolute; inset: 0; transform: none !important; filter: none !important; }
+
+/* ═════════ v10 (17-nov, videos 22:40–22:47 de Bastián) ═════════ */
+/* pirámide: nombre + aporte de cada pilar; la frase con los pilares en azul y negrita */
+.emb__pct { flex-direction: column; gap: 4px; }
+.emb__pct em { font-style: normal; font-size: 26px; font-weight: 500; opacity: .85; letter-spacing: 0; margin: 0; }
+.emb__f--3 .emb__pct em { font-size: 22px; }
+.emb__frase b { color: var(--blue); font-weight: 600; }
+.emb__frase { font-size: 60px; color: var(--tinta); }
+/* 13 · desafío en dos tiempos (gris → Lúmina) y el cierre «Eso es Lúmina» sobre la escena */
+.hoy__bajada { margin-top: 14px; font-size: 26px; color: var(--tinta-2); }
+.hoy__cams { margin-top: 34px; }
+.hoy__fin { position: absolute; inset: 0; z-index: 5; display: grid; place-content: center; justify-items: center; gap: 30px; text-align: center; background: radial-gradient(60% 60% at 50% 50%, rgba(245, 246, 248, .98), rgba(245, 246, 248, .93)); transform: none !important; }
+.hoy__fin p { font-size: 64px; font-weight: 600; letter-spacing: -.035em; line-height: 1.1; color: var(--lumina); max-width: 16ch; }
+.hoy__eso { display: grid; justify-items: center; gap: 18px; font-size: 76px; font-weight: 600; letter-spacing: -.045em; }
+.hoy__eso img { height: 92px; }
+/* 16 · privacidad: los dos criterios llegan uno por avance */
+.lam .ley__f[data-paso] { transform: translateX(-30px); }
+.emb__pct em { font-size: 40px; font-weight: 600; opacity: 1; line-height: 1; }
+.emb__f--3 .emb__pct em { font-size: 32px; }
+.emb__pct { gap: 8px; }
+.lam--hoy { justify-content: center; padding-top: 70px; padding-bottom: 60px; }
+.lam--hoy .hoy__cab .t { font-size: 84px; }
+.hoy__bajada { font-size: 30px; }
+.hoy__cams { margin-top: 44px; gap: 22px; }
+.lam--hoy .cm { aspect-ratio: 16 / 11; }
+.hoy__sns { margin-top: 34px; }
+.lam--hoy .sn { padding: 30px 34px; }
+.lam--hoy .sn b { font-size: 32px; } .lam--hoy .sn span { font-size: 25px; }
+.hoy__eso img { height: 150px; }

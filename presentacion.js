@@ -432,17 +432,14 @@
         const cx = z.p.reduce((m, q) => m + q[0], 0) / z.p.length, cy = z.p.reduce((m, q) => m + q[1], 0) / z.p.length, txt = `${z.nombre} · ${TXT[est]}`; c.font = "600 18px Poppins, Arial";
         pill(X(cx) - c.measureText(txt).width / 2 - 20, Y(cy) + 18, txt, est === "libre" ? VER : est === "grua" ? NAR : BLA, 18, est === "libre" || est === "grua" ? undefined : `rgba(${ROJ},.94)`); }
       // camiones en el andén y grúas en movimiento (con su rastro)
-      for (const tr of D.camiones) { const b = en(tr, f); if (!b) continue; esquinas(X(b[0]), Y(b[1]), X(b[2]), Y(b[3]), BLA, .6, 2); }
-      gr.forEach(([b, i]) => { const tr = D.gruas[i], x0 = X(b[0]), y0 = Y(b[1]), x1 = X(b[2]), y1 = Y(b[3]);
-        for (let k = 1; k <= 14; k++) { const q = en(tr, f - k * .5); if (!q) break; c.fillStyle = `rgba(${NAR},${.55 * (1 - k / 15)})`; c.beginPath(); c.arc(X((q[0] + q[2]) / 2), Y(q[3]), 3.5, 0, 7); c.fill(); }
-        esquinas(x0, y0, x1, y1, NAR, 1, 3.5); pill(x0, y0 - 8, `Grúa horquilla · G-${String(i + 1).padStart(2, "0")}`, NAR, 16); });
+      // solo lo que importa: lo que entra a las zonas (Bastián: «enfocarse solo en lo bueno»; lo de afuera no se sigue bien)
+      gr.forEach(([b, i]) => { const z = D.zonas.find((q) => dentro(...pie(b), q.p)); if (!z) return; const x0 = X(b[0]), y0 = Y(b[1]), x1 = X(b[2]), y1 = Y(b[3]);
+        esquinas(x0, y0, x1, y1, NAR, 1, 3.5); pill(x0, y0 - 8, `Grúa en ${z.nombre}`, NAR, 16); });
       // personas: rostro pixelado, atributos y riesgo con las grúas cercanas
-      let nP = 0, nV = 0;
-      ps.forEach(([b, tr, i]) => { nP++; if (tr.chaleco) nV++;
-        const id = `P-${String(i + 1).padStart(2, "0")}`, pp = pie(b), zona = D.zonas.find((z) => dentro(...pp, z.p));
+      ps.forEach(([b, tr, i]) => {
+        const id = `P-${String(i + 1).padStart(2, "0")}`, pp = pie(b), zona = D.zonas.find((z) => dentro(...pp, z.p)); if (!zona) return;
         let riesgo = null; if (tr.cerca) for (const [g] of gr) { const dx = Math.max(g[0] - pp[0], 0, pp[0] - g[2]) * D.ancho, dy = Math.max(g[1] - pp[1], 0, pp[1] - g[3]) * D.alto; if (Math.hypot(dx, dy) < 110) riesgo = g; }
         const est = riesgo ? "riesgo" : zona ? "zona" : "ok";
-        if (!vistos.has(i)) { vistos.add(i); if (tr.cerca && !tr.chaleco) evento(`Sin chaleco · ${id}`, ROJ); }
         if (estados.get(i) !== est) { estados.set(i, est); if (est === "riesgo") evento(`Riesgo de atropello · ${id}`, ROJ); }
         const col = est === "riesgo" ? ROJ : est === "zona" ? AMA : BLA, x0 = X(b[0]), y0 = Y(b[1]), x1 = X(b[2]), y1 = Y(b[3]);
         if (tr.cerca) { // rostro pixelado: la persona no es el foco
@@ -450,15 +447,14 @@
           try { pc.drawImage(v, hx, hy, hw, hh, 0, 0, 5, 5); c.imageSmoothingEnabled = false; c.drawImage(px, 0, 0, 5, 5, X(hx / D.ancho), Y(hy / D.alto), hw * s, hh * s); c.imageSmoothingEnabled = true; } catch (e) {} }
         esquinas(x0, y0, x1, y1, col, est === "ok" ? .85 : 1, tr.cerca ? 3 : 2);
         if (riesgo) { c.setLineDash([9, 7]); c.strokeStyle = `rgba(${ROJ},.95)`; c.lineWidth = 3; c.beginPath(); c.moveTo(X(pp[0]), Y(pp[1])); c.lineTo(X((riesgo[0] + riesgo[2]) / 2), Y(riesgo[3])); c.stroke(); c.setLineDash([]); }
-        if (!tr.cerca) return;
-        pill(x0, y0 - 8, est === "riesgo" ? `Riesgo de atropello · ${id}` : `Persona · ${id}`, col === BLA ? VER : col, 15, est === "riesgo" ? `rgba(${ROJ},.92)` : undefined);
-        cubo(x1 + 8, y0, "chaleco", tr.chaleco); cubo(x1 + 8, y0 + 40, "casco", tr.casco); });
+        pill(x0, y0 - 8, est === "riesgo" ? `Riesgo de atropello · ${id}` : `Persona en ${zona.nombre}`, est === "riesgo" ? BLA : AMA, 15, est === "riesgo" ? `rgba(${ROJ},.92)` : undefined); });
       // panel de Lúmina: lo que ve ahora la cámara y los últimos eventos
       const PX = 64, PY = 86, PW = 470; c.fillStyle = "rgba(255,255,255,.96)"; rr(PX, PY, PW, 168, 24); c.fill();
       c.fillStyle = `rgb(${NAR})`; c.beginPath(); c.arc(PX + 34, PY + 36, 9, 0, 7); c.fill(); c.fillStyle = "#6c6c6c"; c.font = "600 15px Poppins, Arial"; c.textBaseline = "middle"; c.fillText("LÚMINA · CAM 1D · PUERTA DE DESPACHO", PX + 54, PY + 37);
       if (Math.sin(ahora / 300) > -.3) { c.fillStyle = "#FF3B3B"; c.beginPath(); c.arc(PX + PW - 64, PY + 37, 5, 0, 7); c.fill(); } c.fillStyle = "#181818"; c.font = "600 13px Poppins, Arial"; c.fillText("EN VIVO", PX + PW - 54, PY + 38);
-      [["Personas", nP], ["Grúas", gr.length], ["Con chaleco", `${nV}/${nP}`], ["Alertas", total]].forEach(([n, val], k) => { const x = PX + 30 + k * 108;
-        c.fillStyle = k === 3 && total ? `rgb(${ROJ})` : "#181818"; c.font = "600 38px Poppins, Arial"; c.fillText(String(val), x, PY + 98); c.fillStyle = "#6c6c6c"; c.font = "500 14px Poppins, Arial"; c.fillText(n, x, PY + 136); });
+      D.zonas.forEach((z, k) => { const est = zest.get(z.id) || "libre", col = est === "libre" ? VER : est === "grua" ? NAR : ROJ, y = PY + 84 + k * 46;
+        c.fillStyle = `rgb(${col})`; c.beginPath(); c.arc(PX + 38, y, 8, 0, 7); c.fill(); c.fillStyle = "#181818"; c.font = "600 22px Poppins, Arial"; c.fillText(z.nombre, PX + 58, y + 1);
+        c.fillStyle = "#6c6c6c"; c.font = "500 18px Poppins, Arial"; c.fillText({ libre: "libre", grua: "grúa operando", persona: "persona · cerrada a grúas", alarma: "ALARMA" }[est], PX + 170, y + 1); });
       eventos.forEach((e, k) => { const a = Math.min(1, (ahora - e.t) / 300) * (k === 3 ? .55 : 1); c.globalAlpha = a; pill(PX, PY + 168 + 8 + (k + 1) * 42, e.txt, e.col, 16); c.globalAlpha = 1; });
     }
     requestAnimationFrame(cuadro);
